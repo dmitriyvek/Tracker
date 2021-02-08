@@ -1,0 +1,10 @@
+# rename this file to env.yaml and fill it with your project parameters
+postgres:
+  database: DB_NAME
+  user: DB_USER
+  password: DB_PSWD
+  host: DB_HOST
+  port: DB_PORT
+
+host: 127.0.0.1
+port: 8000
