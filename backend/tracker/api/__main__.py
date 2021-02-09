@@ -2,7 +2,7 @@ import sys
 
 from aiohttp import web
 
-from app import init_app
+from tracker.api.app import init_app
 
 
 def main(argv):

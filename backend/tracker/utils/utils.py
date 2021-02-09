@@ -1,7 +1,7 @@
 import trafaret as T
 
 
-TRAFARET = T.Dict({
+ENV_TRAFARET = T.Dict({
     T.Key('postgres'):
         T.Dict({
             'database': T.String(),

@@ -1,0 +1,2 @@
+autopep8==1.5.5
+ipython==7.20.0
