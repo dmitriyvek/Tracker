@@ -22,3 +22,15 @@ def get_config(argv=None):
 
     config = commandline.config_from_options(options, ENV_TRAFARET)
     return config
+
+
+def get_default_pg_url():
+    pg_config = get_config()['postgres']
+    pg_url = 'postgresql://{user}:{password}@{host}:{port}/{database}'.format(
+        user=pg_config['user'],
+        password=pg_config['password'],
+        host=pg_config['host'],
+        port=pg_config['port'],
+        database=pg_config['database']
+    )
+    return pg_url

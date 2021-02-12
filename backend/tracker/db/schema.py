@@ -55,12 +55,14 @@ User = sa.Table(
     'users',
     metadata,
     sa.Column('id', sa.Integer, primary_key=True),
-    sa.Column('username', sa.String, nullable=False, index=True),
+    sa.Column('username', sa.String, unique=True, nullable=False, index=True),
     sa.Column('password', sa.String, nullable=False),
-    sa.Column('email', sa.String, nullable=False),
-    sa.Column('registered_at', sa.DateTime, nullable=False),
+    sa.Column('email', sa.String, unique=True, nullable=False),
+    sa.Column('registered_at', sa.DateTime, default=sa.func.current_timestamp(
+    ), nullable=False),
     sa.Column('is_admin', sa.Boolean, nullable=False, default=False,
               comment='If user has admin priviliges in app'),
+    sa.Column('is_deleted', sa.Boolean, nullable=False, default=False),
     comment='Representation of user'
 )
 
@@ -68,9 +70,11 @@ Project = sa.Table(
     'projects',
     metadata,
     sa.Column('id', sa.Integer, primary_key=True),
-    sa.Column('title', sa.String, nullable=False),
+    sa.Column('title', sa.String, unique=True, nullable=False),
     sa.Column('description', sa.String, nullable=True),
-    sa.Column('created_at', sa.DateTime, nullable=False),
+    sa.Column('created_at', sa.DateTime, default=sa.func.current_timestamp(
+    ), nullable=False),
+    sa.Column('is_deleted', sa.Boolean, nullable=False, default=False),
 
     sa.Column('created_by', sa.Integer, sa.ForeignKey(
         'users.id', ondelete='CASCADE'
@@ -85,6 +89,7 @@ Role = sa.Table(
     sa.Column('id', sa.Integer, primary_key=True),
     sa.Column('role', sa.Enum(UserRole, name='role'), nullable=False),
     sa.Column('assign_at', sa.DateTime, nullable=False),
+    sa.Column('is_deleted', sa.Boolean, nullable=False, default=False),
 
     sa.Column('user_id', sa.Integer, sa.ForeignKey(
         'users.id', ondelete='CASCADE'
@@ -105,15 +110,18 @@ Ticket = sa.Table(
     'tickets',
     metadata,
     sa.Column('id', sa.Integer, primary_key=True),
-    sa.Column('title', sa.String, nullable=False),
+    sa.Column('title', sa.String, unique=True, nullable=False),
     sa.Column('description', sa.String, nullable=True),
-    sa.Column('created_at', sa.DateTime, nullable=False),
-    sa.Column('updated_at', sa.DateTime, nullable=True),
+    sa.Column('created_at', sa.DateTime, default=sa.func.current_timestamp(
+    ), nullable=False),
+    sa.Column('updated_at', sa.DateTime,
+              onupdate=sa.func.current_timestamp(), nullable=True),
     sa.Column('status', sa.Enum(TicketStatus, name='status'),
               nullable=False, default=TicketStatus.open),
     sa.Column('priority', sa.Enum(TicketPriority, name='priority'),
               nullable=False, default=TicketPriority.none),
     sa.Column('type', sa.Enum(TicketType, name='type'), nullable=False),
+    sa.Column('is_deleted', sa.Boolean, nullable=False, default=False),
 
     sa.Column('created_by', sa.Integer, sa.ForeignKey(
         'users.id', ondelete='CASCADE'
@@ -132,9 +140,10 @@ Comment = sa.Table(
     'comments',
     metadata,
     sa.Column('id', sa.Integer, primary_key=True),
-    sa.Column('title', sa.String, nullable=False),
-    sa.Column('content', sa.String, nullable=True),
-    sa.Column('created_at', sa.DateTime, nullable=False),
+    sa.Column('content', sa.String, nullable=False),
+    sa.Column('created_at', sa.DateTime, default=sa.func.current_timestamp(
+    ), nullable=False),
+    sa.Column('is_deleted', sa.Boolean, nullable=False, default=False),
 
     sa.Column('ticket_id', sa.Integer, sa.ForeignKey(
         'tickets.id', ondelete='CASCADE'
