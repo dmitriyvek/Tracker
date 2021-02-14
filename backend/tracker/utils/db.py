@@ -4,7 +4,14 @@ from types import SimpleNamespace
 
 from alembic.config import Config
 
-from tracker.utils.settings import BASE_DIR
+from tracker.utils.settings import BASE_DIR, DEFAULT_CONFIG_PARAMS, ENV_PATH
+from tracker.utils.utils import parse_env_file, construct_db_url
+
+
+def get_default_db_url() -> str:
+    '''Alembic helper for returning current db url'''
+    env_options = parse_env_file(ENV_PATH)
+    return construct_db_url(env_options, DEFAULT_CONFIG_PARAMS['db_url'])
 
 
 def make_alembic_config(cmd_opts: SimpleNamespace,
