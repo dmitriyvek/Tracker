@@ -2,11 +2,11 @@ import sys
 
 from aiohttp import web
 
-from tracker.api.app import init_app
+from tracker.api.app import create_app
 
 
 def main(argv):
-    app = init_app()
+    app = create_app()
     config = app['config']
     web.run_app(app, host=config['api_address'], port=config['api_port'])
 

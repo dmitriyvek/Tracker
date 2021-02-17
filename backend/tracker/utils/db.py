@@ -1,11 +1,43 @@
 import os
 from pathlib import Path
 from types import SimpleNamespace
+# import logging as log
 
+from asyncpgsa import PG
+from aiohttp.web_app import Application
 from alembic.config import Config
 
 from tracker.utils.settings import BASE_DIR, DEFAULT_CONFIG_PARAMS, ENV_PATH
 from tracker.utils.utils import parse_env_file, construct_db_url
+
+
+async def setup_db(app: Application) -> PG:
+    log = app['logger']
+
+    log.error('Test')
+    db_url = app['config']['db_url']
+    log.info(f'Connecting to database: {db_url}')
+
+    # TODO: implement sqlite engine
+    if db_url == DEFAULT_CONFIG_PARAMS['db_url']:
+        raise NotImplementedError(
+            'Default sqlite engine is not implemented yet')
+
+    app['db'] = PG()
+    await app['db'].init(
+        str(db_url),
+        min_size=app['config']['pg_pool_min_size'],
+        max_size=app['config']['pg_pool_max_size']
+    )
+    await app['db'].fetchval('SELECT 1')
+    log.info(f'Connected to database {db_url}')
+
+    try:
+        yield
+    finally:
+        log.info(f'Disconnecting from database {db_url}')
+        await app['db'].pool.close()
+        log.info(f'Disconnected from database {db_url}')
 
 
 def get_default_db_url() -> str:

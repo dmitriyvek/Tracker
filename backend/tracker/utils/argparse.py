@@ -1,6 +1,8 @@
 import argparse
 from typing import Callable
 
+from tracker.utils.loggers import LogLevelEnum
+
 
 def validate(type: Callable, constrain: Callable):
     def wrapper(value):
@@ -40,15 +42,13 @@ def get_arg_parser(params: dict) -> argparse.ArgumentParser:
     group = parser.add_argument_group('PostgreSQL options')
     group.add_argument('--db-url', type=str, required=False, default=params['db_url'],
                        help='URL to use to connect to the database')
-    group.add_argument('--pg-pool-min-size', type=positive_int, default=params['min_db_pool'],
+    group.add_argument('--pg-pool-min-size', type=positive_int, default=params['pg_pool_min_size'],
                        required=False, help='Minimum database connections')
-    group.add_argument('--pg-pool-max-size', type=positive_int, default=params['max_db_pool'],
+    group.add_argument('--pg-pool-max-size', type=positive_int, default=params['pg_pool_max_size'],
                        required=False, help='Maximum database connections')
 
-    # group = parser.add_argument_group('Logging options')
-    # group.add_argument('--log-level', default='info',
-    #                    choices=('debug', 'info', 'warning', 'error', 'fatal'))
-    # group.add_argument('--log-format', choices=LogFormat.choices(),
-    #                    default='color')
+    group = parser.add_argument_group('Logging options')
+    group.add_argument('--log-level', default=params['log_level'],
+                       choices=list(LogLevelEnum.__members__.keys()))
 
     return parser
