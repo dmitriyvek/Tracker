@@ -1,7 +1,12 @@
+import sys
 from enum import Enum, unique
 from functools import partial
+from pathlib import PosixPath
 
+from aiohttp.web_app import Application
 from loguru import logger
+
+from tracker.utils.utils import init_logs
 
 
 @unique
@@ -22,19 +27,29 @@ def exact_level_only(record, level: int, global_level: int) -> bool:
     return record_level == level and record_level >= global_level
 
 
-def setup_logger(global_log_level: str):
+def setup_logger(global_log_level: str, error_path: PosixPath, info_path: PosixPath, debug: bool) -> logger:
+    '''Setting up Loguru logger'''
     global_log_level = LogLevelEnum[global_log_level].value.no
 
     # remove default console logging
     logger.remove()
-    logger.add('/home/dmitriy/1programming/aiohttp-start/tracker/backend/log/info.log',
-               enqueue=True, rotation='100 MB', compression='zip', level='INFO',
+
+    if debug:
+        logger.add(sys.stderr, enqueue=True,
+                   level=LogLevelEnum.trace.value.name,
+                   filter=lambda record: record['level'].no >= global_log_level
+                   )
+
+    logger.add(info_path,
+               enqueue=True, rotation='100 MB', compression='zip',
+               level=LogLevelEnum.info.value.name,
                filter=partial(exact_level_only,
                               level=LogLevelEnum.info.value.no,
                               global_level=global_log_level)
                )
-    logger.add('/home/dmitriy/1programming/aiohttp-start/tracker/backend/log/error.log',
-               enqueue=True, rotation='100 MB', compression='zip', level='ERROR',
+    logger.add(error_path,
+               enqueue=True, rotation='100 MB', compression='zip',
+               level=LogLevelEnum.error.value.name,
                filter=partial(exact_level_only,
                               level=LogLevelEnum.error.value.no,
                               global_level=global_log_level)
@@ -43,5 +58,5 @@ def setup_logger(global_log_level: str):
     return logger
 
 
-async def close_logger(app):
+async def close_logger(app: Application):
     await app['logger'].complete()

@@ -20,6 +20,8 @@ DEFAULT_CONFIG_PARAMS = {
     'host': '0.0.0.0',
     'port': 8000,
     'log_level': LogLevelEnum.info.value.name.lower(),
+    'error_log_file_path': BASE_DIR / Path('log/app/error.log'),
+    'info_log_file_path': BASE_DIR / Path('log/app/info.log'),
 }
 
 
@@ -30,4 +32,8 @@ def get_config(argv=None) -> dict:
 
     parser = get_arg_parser(params)
     namespace = parser.parse_args(argv)
-    return vars(namespace)
+
+    config = DEFAULT_CONFIG_PARAMS.copy()
+    config.update(vars(namespace))
+
+    return config

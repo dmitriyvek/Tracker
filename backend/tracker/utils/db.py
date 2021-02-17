@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 from types import SimpleNamespace
-# import logging as log
 
 from asyncpgsa import PG
 from aiohttp.web_app import Application
@@ -14,7 +13,6 @@ from tracker.utils.utils import parse_env_file, construct_db_url
 async def setup_db(app: Application) -> PG:
     log = app['logger']
 
-    log.error('Test')
     db_url = app['config']['db_url']
     log.info(f'Connecting to database: {db_url}')
 
