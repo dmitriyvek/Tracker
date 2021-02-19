@@ -1,6 +1,8 @@
 import argparse
 from typing import Callable
 
+from yarl import URL
+
 from tracker.utils.loggers import LogLevelEnum
 
 
@@ -40,7 +42,7 @@ def get_arg_parser(params: dict) -> argparse.ArgumentParser:
                        help='TCP port API server would listen on')
 
     group = parser.add_argument_group('PostgreSQL options')
-    group.add_argument('--db-url', type=str, required=False, default=params['db_url'],
+    group.add_argument('--db-url', type=URL, required=False, default=params['db_url'],
                        help='URL to use to connect to the database')
     group.add_argument('--pg-pool-min-size', type=positive_int, default=params['pg_pool_min_size'],
                        required=False, help='Minimum database connections')

@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from getpass import getuser
 
 from dotenv import load_dotenv
 
@@ -14,7 +15,11 @@ ENV_PATH = Path(__file__).parent.parent.parent / '.env'
 # All required params with default values
 DEFAULT_CONFIG_PARAMS = {
     'debug': False,
-    'db_url': 'sqlite:///tracker.db',
+    'db_url': 'postgres://{user}:{pswd}@{host}:{port}/{db}'.format(
+        user=getuser(), pswd='tracker_pswd',
+        host='localhost', port='5432',
+        db='tracker_db'
+    ),
     'pg_pool_max_size': 10,
     'pg_pool_min_size': 10,
     'host': '0.0.0.0',
@@ -22,6 +27,7 @@ DEFAULT_CONFIG_PARAMS = {
     'log_level': LogLevelEnum.info.value.name.lower(),
     'error_log_file_path': BASE_DIR / Path('log/app/error.log'),
     'info_log_file_path': BASE_DIR / Path('log/app/info.log'),
+    'censored_sign': '***',
 }
 
 

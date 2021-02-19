@@ -36,25 +36,10 @@ def parse_env_file(path_to_file: Path) -> dict:
     return args
 
 
-def construct_db_url(env_values: dict, default_url: str) -> str:
-    '''
-    Reads all pg parameters from .env file and construct pg url
-    if all of them are specified else returns default
-    '''
-    pg_keys = ['pg_name', 'pg_user', 'pg_password', 'pg_host', 'pg_port']
-    if all([env_values.get(key) for key in pg_keys]):
-        return 'postgresql://{user}:{password}@{host}:{port}/{database}'.format(
-            user=env_values[pg_keys[1]],
-            password=env_values[pg_keys[2]],
-            host=env_values[pg_keys[3]],
-            port=env_values[pg_keys[4]],
-            database=env_values[pg_keys[0]]
-        )
-    return default_url
-
-
 def merge_env_with_default(env: dict, default: dict) -> dict:
     '''Merge .env options with default'''
+    from tracker.utils.db import construct_db_url
+
     result = {}
     env['db_url'] = construct_db_url(env, default['db_url'])
     for key, value in default.items():

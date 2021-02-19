@@ -33,7 +33,7 @@ setup(
     author_email=module.__email__,
     license=module.__license__,
     description=module.__doc__,
-    long_description=open('../README.rst').read(),
+    long_description=open('../README.md').read(),
     url='https://github.com/dmitriyvek/Tracker',
     platforms='all',
     classifiers=[
@@ -53,7 +53,9 @@ setup(
     entry_points={
         'console_scripts': [
             '{0}-api = {0}.api.__main__:main'.format(module_name),
-            '{0}-db = {0}.db.__main__:main'.format(module_name)
+            '{0}-migrate = {0}.db.__main__:main'.format(module_name),
+            'init-db-data = {0}.db.init_db_data:init_db_data'.format(
+                module_name)
         ]
     },
     include_package_data=True

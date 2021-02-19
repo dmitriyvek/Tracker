@@ -7,39 +7,52 @@ from aiohttp.web_app import Application
 from alembic.config import Config
 
 from tracker.utils.settings import BASE_DIR, DEFAULT_CONFIG_PARAMS, ENV_PATH
-from tracker.utils.utils import parse_env_file, construct_db_url
+from tracker.utils.utils import parse_env_file
 
 
 async def setup_db(app: Application) -> PG:
+    config = app['config']
     log = app['logger']
 
-    db_url = app['config']['db_url']
-    log.info(f'Connecting to database: {db_url}')
-
-    # TODO: implement sqlite engine
-    if db_url == DEFAULT_CONFIG_PARAMS['db_url']:
-        raise NotImplementedError(
-            'Default sqlite engine is not implemented yet')
+    log_db_url = config['db_url'].with_password(config['censored_sign'])
+    log.info(f'Connecting to database: {log_db_url}')
 
     app['db'] = PG()
     await app['db'].init(
-        str(db_url),
-        min_size=app['config']['pg_pool_min_size'],
-        max_size=app['config']['pg_pool_max_size']
+        str(config['db_url']),
+        min_size=config['pg_pool_min_size'],
+        max_size=config['pg_pool_max_size']
     )
     await app['db'].fetchval('SELECT 1')
-    log.info(f'Connected to database {db_url}')
+    log.info(f'Connected to database {log_db_url}')
 
     try:
         yield
     finally:
-        log.info(f'Disconnecting from database {db_url}')
+        log.info(f'Disconnecting from database {log_db_url}')
         await app['db'].pool.close()
-        log.info(f'Disconnected from database {db_url}')
+        log.info(f'Disconnected from database {log_db_url}')
 
 
-def get_default_db_url() -> str:
-    '''Alembic helper for returning current db url'''
+def construct_db_url(env_values: dict, default_url: str) -> str:
+    '''
+    Reads all pg parameters from .env file and construct pg url
+    if all of them are specified else returns default
+    '''
+    pg_keys = ['pg_name', 'pg_user', 'pg_password', 'pg_host', 'pg_port']
+    if all([env_values.get(key) for key in pg_keys]):
+        return 'postgresql://{user}:{password}@{host}:{port}/{database}'.format(
+            user=env_values[pg_keys[1]],
+            password=env_values[pg_keys[2]],
+            host=env_values[pg_keys[3]],
+            port=env_values[pg_keys[4]],
+            database=env_values[pg_keys[0]]
+        )
+    return default_url
+
+
+def get_db_url() -> str:
+    '''Helper for getting current db url'''
     env_options = parse_env_file(ENV_PATH)
     return construct_db_url(env_options, DEFAULT_CONFIG_PARAMS['db_url'])
 
@@ -61,6 +74,6 @@ def make_alembic_config(cmd_opts: SimpleNamespace,
         config.set_main_option('script_location',
                                os.path.join(base_path, alembic_location))
     if cmd_opts.pg_url:
-        config.set_main_option('sqlalchemy.url', cmd_opts.pg_url)
+        config.set_main_option('sqlalchemy.url', str(cmd_opts.pg_url))
 
     return config

@@ -290,3 +290,4 @@ pip-selfcheck.json
 .venv
 env.yaml
 !bin
+log

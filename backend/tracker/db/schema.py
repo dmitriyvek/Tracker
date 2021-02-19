@@ -88,7 +88,8 @@ Role = sa.Table(
     metadata,
     sa.Column('id', sa.Integer, primary_key=True),
     sa.Column('role', sa.Enum(UserRole, name='role'), nullable=False),
-    sa.Column('assign_at', sa.DateTime, nullable=False),
+    sa.Column('assign_at', sa.DateTime,
+              default=sa.func.current_timestamp(), nullable=False),
     sa.Column('is_deleted', sa.Boolean, nullable=False, default=False),
 
     sa.Column('user_id', sa.Integer, sa.ForeignKey(

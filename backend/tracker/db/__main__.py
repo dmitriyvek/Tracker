@@ -5,11 +5,11 @@ data other than the one specified in the alembic.ini file.
 '''
 import argparse
 import logging
-import os
 
+from yarl import URL
 from alembic.config import CommandLine
 
-from tracker.utils.db import make_alembic_config, get_default_db_url
+from tracker.utils.db import make_alembic_config, get_db_url
 
 
 def main():
@@ -18,8 +18,8 @@ def main():
     alembic = CommandLine()
     alembic.parser.formatter_class = argparse.ArgumentDefaultsHelpFormatter
     alembic.parser.add_argument(
-        '--pg-url', default=os.getenv('ANALYZER_PG_URL', get_default_db_url()),
-        help='Database URL [env var: ANALYZER_PG_URL]'
+        '--db-url', type=URL, default=get_db_url(),
+        help='Database URL'
     )
 
     options = alembic.parser.parse_args()
@@ -27,6 +27,7 @@ def main():
         alembic.parser.error('too few arguments')
         exit(128)
     else:
+        print(options.cmd)
         config = make_alembic_config(options)
         exit(alembic.run_cmd(config, options))
 
