@@ -36,7 +36,7 @@ def setup_logger(global_log_level: str, error_path: PosixPath, info_path: PosixP
 
     if debug:
         logger.add(sys.stderr, enqueue=True,
-                   level=LogLevelEnum.trace.value.name,
+                   level=LogLevelEnum.debug.value.name,
                    filter=lambda record: record['level'].no >= global_log_level
                    )
 

@@ -4,6 +4,7 @@ import sqlalchemy as sa
 from yarl import URL
 
 from tracker.utils.db import get_db_url
+from tracker.api.services import generate_password_hash
 from tracker.db.schema import (
     User, Project, Role, Ticket, Comment,
     UserRole as URole, TicketStatus as TStatus,
@@ -11,7 +12,7 @@ from tracker.db.schema import (
 )
 
 
-USER_PSWD = 'zxcfghuio'
+USER_PSWD = generate_password_hash('zxcfghuio')
 
 
 def init_db_data():
