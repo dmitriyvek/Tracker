@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from types import SimpleNamespace
 
-from asyncpgsa import PG
+from asyncpgsa import pg, PG
 from aiohttp.web_app import Application
 from alembic.config import Config
 
@@ -17,7 +17,7 @@ async def setup_db(app: Application) -> PG:
     log_db_url = config['db_url'].with_password(config['censored_sign'])
     log.info(f'Connecting to database: {log_db_url}')
 
-    app['db'] = PG()
+    app['db'] = pg
     await app['db'].init(
         str(config['db_url']),
         min_size=config['pg_pool_min_size'],

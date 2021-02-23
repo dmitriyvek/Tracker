@@ -9,3 +9,7 @@ class BaseView(View):
     @property
     def db(self) -> PG:
         return self.request.app['db']
+
+    @property
+    def config(self) -> dict:
+        return self.request.app['config']

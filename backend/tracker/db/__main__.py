@@ -27,7 +27,6 @@ def main():
         alembic.parser.error('too few arguments')
         exit(128)
     else:
-        print(options.cmd)
         config = make_alembic_config(options)
         exit(alembic.run_cmd(config, options))
 

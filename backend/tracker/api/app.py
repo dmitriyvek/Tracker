@@ -2,13 +2,13 @@ from functools import partial
 
 from aiohttp import web
 
-from .handlers import HANDLERS
+from tracker.api.handlers import HANDLERS
 from tracker.utils import get_config, setup_db, setup_logger, close_logger
-from tracker.api.middleware import error_middleware
+from tracker.api.middleware import error_middleware, auth_middleware
 
 
 def create_app(argv=None) -> web.Application:
-    app = web.Application(middlewares=[error_middleware])
+    app = web.Application(middlewares=[error_middleware, auth_middleware])
     app['config'] = get_config(argv)
 
     app['logger'] = setup_logger(

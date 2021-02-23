@@ -156,3 +156,14 @@ Comment = sa.Table(
 
     comment='Users comments on tickets'
 )
+
+BlacklistToken = sa.Table(
+    'blacklist_tokens',
+    metadata,
+    sa.Column('id', sa.Integer, primary_key=True),
+    sa.Column('token', sa.String, unique=True, index=True, nullable=False),
+    sa.Column('blacklisted_at', sa.DateTime, default=sa.func.current_timestamp(
+    ), nullable=False),
+
+    comment='Storage for blacklisted jwt auth tokens'
+)

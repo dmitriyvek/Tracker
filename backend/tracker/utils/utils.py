@@ -1,6 +1,8 @@
 import os
 from pathlib import Path, PosixPath
 
+from yarl import URL
+
 
 def init_logs(error_path: PosixPath, info_path: PosixPath) -> None:
     '''Creates log files inside log folder if it does not exist (unix only)'''
@@ -41,7 +43,7 @@ def merge_env_with_default(env: dict, default: dict) -> dict:
     from tracker.utils.db import construct_db_url
 
     result = {}
-    env['db_url'] = construct_db_url(env, default['db_url'])
+    env['db_url'] = URL(construct_db_url(env, default['db_url']))
     for key, value in default.items():
         if env.get(key):
             result[key] = env[key]
