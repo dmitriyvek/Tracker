@@ -2,7 +2,6 @@ from aiohttp.web import json_response, HTTPCreated
 
 from .base import BaseView
 from tracker.api.schema import UserRegistrationSchema
-from tracker.db.schema import User
 from tracker.api.services import validate_input, check_if_user_exists, create_user, generate_auth_token
 
 

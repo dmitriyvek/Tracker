@@ -45,12 +45,12 @@ async def check_if_token_is_blacklisted(db: PG, token: str) -> None:
                                content_type='application/json')
 
 
-async def decode_token(config: dict, token: str, is_auth: bool = True) -> dict:
+async def decode_token(db: PG, config: dict, token: str, is_auth: bool = True) -> dict:
     '''Decodes given token and return payload or raise 401 error if token is invalid.'''
     try:
         payload = jwt.decode(token, config.get(
-            'SECRET_KEY'), algorithms=['HS256'])
-        await check_if_token_is_blacklisted(token)
+            'secret_key'), algorithms=['HS256'])
+        await check_if_token_is_blacklisted(db, token)
 
         # if acoount confirmation token is used
         if (is_auth and payload.get('email')) or (not is_auth and not payload.get('email')):

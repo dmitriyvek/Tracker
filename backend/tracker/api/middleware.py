@@ -1,5 +1,7 @@
 from aiohttp import web
 
+from tracker.api.services import decode_token
+
 
 @web.middleware
 async def error_middleware(request, handler):
@@ -19,4 +21,20 @@ async def error_middleware(request, handler):
 
 @web.middleware
 async def auth_middleware(request, handler):
+    auth_header = request.headers.get('Authorization')
+    auth_token = ''
+
+    if auth_header:
+        auth_credentials = auth_header.split(' ')
+        if auth_credentials[0] == 'Bearer':
+            auth_token = auth_credentials[1]
+
+    if auth_token:
+        payload = await decode_token(
+            request.app['db'],
+            request.app['config'],
+            auth_token
+        )
+        request['user_id'] = payload['sub']
+
     return await handler(request)

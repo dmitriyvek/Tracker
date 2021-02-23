@@ -1,9 +1,7 @@
 from aiohttp.web import json_response, HTTPAccepted
-from sqlalchemy.sql import select
 
 from .base import BaseView
 from tracker.api.schema import UserLoginSchema
-from tracker.db.schema import User
 from tracker.api.services import validate_input, generate_auth_token, get_user
 
 
