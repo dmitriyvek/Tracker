@@ -21,7 +21,7 @@ async def setup_db(app: Application) -> PG:
     await app['db'].init(
         str(config['db_url']),
         min_size=config['pg_pool_min_size'],
-        max_size=config['pg_pool_max_size']
+        max_size=config['pg_pool_max_size'],
     )
     await app['db'].fetchval('SELECT 1')
     log.info(f'Connected to database {log_db_url}')

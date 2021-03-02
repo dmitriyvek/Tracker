@@ -1,22 +1,32 @@
+from functools import partial
+
 from aiohttp import web
 
+from tracker.api.errors import APIException
 from tracker.api.services import decode_token
 
 
-@web.middleware
-async def error_middleware(request, handler):
-    try:
-        return await handler(request)
+class GraphQLErrorMiddleware(object):
 
-    except web.HTTPException as ex:
-        return web.json_response(data=ex.reason, status=ex.status_code)
+    def on_error(self, error, logger, debug: bool):
+        if not isinstance(error, APIException):
+            if debug:
+                logger.exception('GraphQL error middleware')
+            else:
+                logger.error(error)
 
-    except Exception as ex:
-        request.app['logger'].exception('Error middleware')
-        data = {
-            'status': 'fail',
-        }
-        return web.json_response(data=data, status=web.HTTPInternalServerError.status_code)
+            raise APIException('Internal server error.', status=500)
+
+        raise error
+
+    def resolve(self, next, root, info, **args):
+        return next(root, info, **args).catch(
+            partial(
+                self.on_error,
+                logger=info.context['request'].app['logger'],
+                debug=info.context['request'].app['config']['debug']
+            )
+        )
 
 
 @web.middleware
@@ -35,6 +45,7 @@ async def auth_middleware(request, handler):
             request.app['config'],
             auth_token
         )
-        request['user_id'] = payload['sub']
+        if payload:
+            request['user_id'] = payload['sub']
 
     return await handler(request)

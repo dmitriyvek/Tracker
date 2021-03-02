@@ -1,0 +1,62 @@
+import graphene
+
+from ..base import BaseMutationPayload
+from tracker.api.types import UserType
+from tracker.api.status_codes import StatusEnum
+from tracker.api.schema import UserLoginSchema
+from tracker.api.services import validate_input, generate_auth_token, get_user
+
+
+class LoginStatus(graphene.Enum):
+    SUCCESS = StatusEnum.SUCCESS.value
+    BAD_REQUEST = StatusEnum.BAD_REQUEST.value
+    UNAUTHORIZED = StatusEnum.UNAUTHORIZED.value
+    ENPROCESSABLE_ENTITY = StatusEnum.ENPROCESSABLE_ENTITY.value
+
+    @property
+    def description(self):
+        if self == LoginStatus.SUCCESS:
+            return 'Successfully logged in'
+        elif self == LoginStatus.UNAUTHORIZED:
+            return 'Login faild: no user with given credentials'
+        elif self == LoginStatus.BAD_REQUEST:
+            return 'Login failed: bad request'
+        elif self == LoginStatus.ENPROCESSABLE_ENTITY:
+            return 'Login failed: invalid input'
+
+
+class LoginInput(graphene.InputObjectType):
+    username = graphene.String(required=True)
+    password = graphene.String(required=True)
+
+
+class LoginPayload(graphene.ObjectType):
+    auth_token = graphene.String(required=True)
+    record = graphene.Field(UserType, required=True)
+    record_id = graphene.Int(required=True)
+    status = graphene.Field(LoginStatus, required=True)
+
+
+class Login(BaseMutationPayload, graphene.Mutation):
+    '''Register new user'''
+
+    class Arguments:
+        input = LoginInput(required=True)
+
+    login_payload = graphene.Field(LoginPayload, required=True)
+
+    async def mutate(parent, info, input):
+        app = info.context['request'].app
+        data = validate_input(input, UserLoginSchema)
+
+        user = await get_user(app['db'], data)
+        auth_token = generate_auth_token(app['config'], user['id'])
+
+        return Login(
+            login_payload=LoginPayload(
+                record=user,
+                record_id=user['id'],
+                auth_token=auth_token,
+                status=LoginStatus.SUCCESS,
+            )
+        )

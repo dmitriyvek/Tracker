@@ -2,30 +2,21 @@ from functools import wraps
 from typing import Awaitable
 from types import FunctionType
 
-from aiohttp.web import HTTPUnauthorized
-from aiohttp.web_urldispatcher import View
+from tracker.api.errors import APIException
+from tracker.api.status_codes import StatusEnum
 
 
 def login_required(func: FunctionType) -> Awaitable:
-    '''Decorator that checks user\'s authorization. Using only for View subclass methods'''
+    '''Decorator that checks user\'s authorization'''
 
     @wraps(func)
-    async def wrapped_func(cls, *args, **kwargs):
-
-        if not isinstance(cls, View):
-            raise TypeError(
-                'Function that uses login_required should be the method of aiohttp.web_urldispatcher.View subclass')
-
-        user_id = cls.request.get('user_id')
+    async def wrapped_func(parent, info, **kwargs):
+        user_id = info.context['request'].get('user_id')
         if user_id:
-            return await func(*args, **kwargs)
+            return await func(parent, info, **kwargs)
 
         else:
-            error_message = {
-                'status': 'fail',
-                'message': 'Provide a valid auth credentials.'
-            }
-            raise HTTPUnauthorized(reason=error_message,
-                                   content_type='application/json')
+            raise APIException('Provide a valid auth token.',
+                               status=StatusEnum.UNAUTHORIZED.name)
 
     return wrapped_func

@@ -2,13 +2,22 @@ from functools import partial
 
 from aiohttp import web
 
-from tracker.api.handlers import HANDLERS
 from tracker.utils import get_config, setup_db, setup_logger, close_logger
-from tracker.api.middleware import error_middleware, auth_middleware
+from tracker.api.views import gqil_view, gql_view
+from tracker.api.middleware import auth_middleware
+
+
+def init_routes(app):
+    app.router.add_route('GET', '/graphql', gql_view, name='graphql')
+    app.router.add_route('POST', '/graphql', gql_view, name='graphql')
+
+    if app['config']['debug']:
+        app.router.add_route('GET', '/graphiql', gqil_view, name='graphiql')
+        app.router.add_route('POST', '/graphiql', gqil_view, name='graphiql')
 
 
 def create_app(argv=None) -> web.Application:
-    app = web.Application(middlewares=[error_middleware, auth_middleware])
+    app = web.Application(middlewares=[auth_middleware, ])
     app['config'] = get_config(argv)
 
     app['logger'] = setup_logger(
@@ -23,9 +32,6 @@ def create_app(argv=None) -> web.Application:
 
     app.on_shutdown.append(close_logger)
 
-    for handler in HANDLERS:
-        app['logger'].debug(
-            f'Registering handler {handler} as {handler.URL_PATH}')
-        app.router.add_route('*', handler.URL_PATH, handler)
+    init_routes(app)
 
     return app
