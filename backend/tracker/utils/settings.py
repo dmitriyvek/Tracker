@@ -28,6 +28,7 @@ DEFAULT_CONFIG = {
     'log_level': LogLevelEnum.debug.value.name.lower(),
     'error_log_file_path': BASE_DIR / Path('log/app/error.log'),
     'info_log_file_path': BASE_DIR / Path('log/app/info.log'),
+    'request_info_log_file_path': BASE_DIR / Path('log/app/request.log'),
     'censored_sign': '***',
     'token_expiration_time': timedelta(days=1),
 }

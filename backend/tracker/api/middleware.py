@@ -6,7 +6,7 @@ from tracker.api.errors import APIException
 from tracker.api.services import decode_token
 
 
-class GraphQLErrorMiddleware(object):
+class GraphQLErrorMiddleware:
 
     def on_error(self, error, logger, debug: bool):
         if not isinstance(error, APIException):
@@ -19,8 +19,9 @@ class GraphQLErrorMiddleware(object):
 
         raise error
 
-    def resolve(self, next, root, info, **args):
-        return next(root, info, **args).catch(
+    # TODO: is i need async here (guess no)
+    async def resolve(self, next, root, info, **args):
+        return await next(root, info, **args).catch(
             partial(
                 self.on_error,
                 logger=info.context['request'].app['logger'],
@@ -47,5 +48,21 @@ async def auth_middleware(request, handler):
         )
         if payload:
             request['user_id'] = payload['sub']
+
+    return await handler(request)
+
+
+@web.middleware
+async def request_logging_middleware(request, handler):
+    logger = request.app['logger'].bind(request_log=True)
+    request_query = await request.json()
+
+    log_message = '{path}:{query}:{user_id}:{user_ip}'.format(
+        path=request.path,
+        query=request_query,
+        user_id=request.get('user_id', 0),
+        user_ip=request.remote,
+    )
+    logger.info(log_message)
 
     return await handler(request)
