@@ -3,21 +3,21 @@ from graphql import ResolveInfo
 
 from tracker.api.types import UserType
 from tracker.db.schema import User as UserTable
+from tracker.api.wrappers import login_required
+from tracker.api.services import get_user_by_id
 
 
-class UserQuery(graphene.ObjectType):
-    user_list = graphene.List(
+class UserDetailQuery(graphene.ObjectType):
+    user = graphene.Field(
         UserType,
-        description='All registered users.',
+        description='Current auth user detail.',
         required=True
     )
 
-    async def resolve_user_list(parent, info: ResolveInfo):
-        app = info.context['request'].app
-        query = UserTable.select().with_only_columns(
-            [UserTable.c.id, UserTable.c.username,
-             UserTable.c.email, UserTable.c.registered_at
-             ])
-        result = await app['db'].query(query)
-        result = list(map(dict, result))
-        return result
+    @login_required
+    async def resolve_user(parent, info: ResolveInfo):
+        db = info.context['request'].app['db']
+        user_id = info.context['request'].get('user_id')
+
+        user = await get_user_by_id(db, user_id)
+        return user

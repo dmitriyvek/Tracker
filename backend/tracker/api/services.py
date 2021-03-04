@@ -106,7 +106,7 @@ async def create_user(db: PG, data: dict) -> dict:
     return user
 
 
-async def get_user(db: PG, data: dict) -> dict:
+async def check_user_credentials(db: PG, data: dict) -> dict:
     '''Check if user with given credentials exist; if it does then returns this user else raise 401 error'''
     query = select([User.c.id, User.c.username, User.c.email, User.c.password]).where(
         User.c.username == data.get('username'))
@@ -119,6 +119,16 @@ async def get_user(db: PG, data: dict) -> dict:
                            status=StatusEnum.UNAUTHORIZED.name)
 
     return dict(user)
+
+
+async def get_user_by_id(db: PG, user_id: int) -> dict:
+    '''Get user with given id'''
+    query = User.select().with_only_columns(
+        [User.c.id, User.c.username,
+         User.c.email, User.c.registered_at
+         ]).where(User.c.id == user_id)
+    result = await db.fetchrow(query)
+    return dict(result)
 
 
 def validate_input(data: dict, schema) -> dict:
