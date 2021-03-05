@@ -1,6 +1,8 @@
 '''
 Service description
 '''
+__name__ = 'tracker'
+
 __author__ = 'Dmitriy Veksharev'
 __maintainer__ = __author__
 

@@ -16,7 +16,7 @@ def init_routes(app):
         app.router.add_route('POST', '/graphiql', gqil_view, name='graphiql')
 
 
-def create_app(argv=None) -> web.Application:
+def create_app(argv: list = None) -> web.Application:
     app = web.Application(
         middlewares=[auth_middleware, request_logging_middleware, ])
     app['config'] = get_config(argv)

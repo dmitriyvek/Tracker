@@ -1,3 +1,6 @@
 aiohttp-devtools==0.13.1
 autopep8==1.5.5
 ipython==7.20.0
+pytest==6.2.2
+pytest-aiohttp==0.3.0
+sqlalchemy-utils==0.36.8

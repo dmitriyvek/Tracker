@@ -1,11 +1,17 @@
 import os
+import uuid
+from contextlib import contextmanager
 from pathlib import Path
 from types import SimpleNamespace
+from typing import Optional
 
 from asyncpgsa import pg, PG
 from aiohttp.web_app import Application
 from alembic.config import Config
+from sqlalchemy_utils import create_database, drop_database
+from yarl import URL
 
+from tracker import __name__ as project_name
 from tracker.utils.settings import BASE_DIR, DEFAULT_CONFIG, ENV_PATH
 from tracker.utils.utils import parse_env_file
 
@@ -77,3 +83,25 @@ def make_alembic_config(cmd_opts: SimpleNamespace,
         config.set_main_option('sqlalchemy.url', str(cmd_opts.db_url))
 
     return config
+
+
+def get_alembic_config_from_url(db_url: Optional[str] = None) -> Config:
+    '''Provides Python object, representing alembic.ini file.'''
+    cmd_options = SimpleNamespace(
+        config='alembic.ini', name='alembic', db_url=db_url,
+        raiseerr=False, x=None,
+    )
+
+    return make_alembic_config(cmd_options)
+
+
+@contextmanager
+def tmp_database(db_url: str, suffix: str = '', **kwargs):
+    tmp_db_name = '.'.join([uuid.uuid4().hex, project_name, suffix])
+    tmp_db_url = str(URL(db_url).with_path(tmp_db_name))
+    create_database(tmp_db_url, **kwargs)
+
+    try:
+        yield tmp_db_url
+    finally:
+        drop_database(tmp_db_url)

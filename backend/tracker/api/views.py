@@ -41,6 +41,7 @@ GraphQLView = partial(
 
 gqil_view = GraphQLView(
     graphiql=True,
+    header_editor_enabled=True,
 )
 
 gql_view = GraphQLView(

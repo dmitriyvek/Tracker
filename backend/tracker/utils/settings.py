@@ -34,7 +34,7 @@ DEFAULT_CONFIG = {
 }
 
 
-def get_config(argv=None) -> dict:
+def get_config(argv: list = None) -> dict:
     '''Gets config parameters from merging default params, params from .env file and params from argparser'''
     env_options = parse_env_file(ENV_PATH)
     params = merge_env_with_default(env_options, DEFAULT_CONFIG)

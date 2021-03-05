@@ -55,9 +55,11 @@ async def auth_middleware(request, handler):
 @web.middleware
 async def request_logging_middleware(request, handler):
     logger = request.app['logger'].bind(request_log=True)
-    request_query = await request.json()
 
-    log_message = '{path}:{query}:{user_id}:{user_ip}'.format(
+    request_query = await request.json() if request.content_length else {}
+
+    log_message = '{method}:{path}:{query}:{user_id}:{user_ip}'.format(
+        method=request.method,
         path=request.path,
         query=request_query,
         user_id=request.get('user_id', 0),
