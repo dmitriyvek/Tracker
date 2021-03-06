@@ -8,6 +8,7 @@ from yarl import URL
 
 from tracker.api.app import create_app
 from tracker.utils.db import get_db_url, make_alembic_config, tmp_database, get_alembic_config_from_url
+from tracker.utils.loggers import setup_logger
 
 
 @pytest.fixture(scope='session')
@@ -23,7 +24,7 @@ def db(db_url):
 
 
 @pytest.fixture()
-def postgres_engine(db):
+def db_engine(db):
     '''SQLAlchemy engine, bound to temporary database.'''
     engine = create_engine(db, echo=True)
     try:
@@ -64,19 +65,39 @@ def migrated_db(db_url, migrated_db_template):
 
 @pytest.fixture
 def app_args(aiohttp_unused_port, migrated_db):
-    return [
-        '--api-port', str(aiohttp_unused_port()),
-        '--log-level', 'debug',
-        '--db-url', migrated_db,
-        '--api-address', '127.0.0.1'
-    ]
+    port = aiohttp_unused_port()
+    return {
+        'args': [
+            '--api-port', str(port),
+            '--log-level', 'debug',
+            '--db-url', migrated_db,
+            '--api-address', '127.0.0.1'
+        ],
+        'port': port,
+    }
 
 
 @pytest.fixture
 async def client(aiohttp_client, app_args):
-    app = create_app(app_args)
+    app = create_app(app_args['args'])
+
+    # redirect log stream into tests root folder
+    error_log_file_path = str(app['config']['error_log_file_path']).\
+        replace('log', 'tests/log', 1)
+    info_log_file_path = str(app['config']['info_log_file_path']).\
+        replace('log', 'tests/log', 1)
+    request_info_log_file_path = str(app['config']['request_info_log_file_path']).\
+        replace('log', 'tests/log', 1)
+    app['logger'] = setup_logger(
+        app['config']['log_level'],
+        error_log_file_path,
+        info_log_file_path,
+        request_info_log_file_path,
+        app['config']['debug']
+    )
+
     client = await aiohttp_client(app, server_kwargs={
-        'port': int(app_args[1])
+        'port': app_args['port']
     })
 
     try:

@@ -11,3 +11,7 @@ def test_db(db):
 
 def test_app(client):
     pass
+
+
+def test_url(db_url):
+    print(db_url)

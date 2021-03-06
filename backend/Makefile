@@ -6,6 +6,7 @@ all:
 	@echo "make devenv		- Create & setup development virtual environment"
 	@echo "make postgres    - Start postgres container (need to specify .env file)"
 	@echo "make clean		- Remove files created by distutils"
+	@echo "make test	    - Run tests"
 	@exit 0
 
 clean:
@@ -23,3 +24,6 @@ postgres:
 		--env POSTGRES_PASSWORD=${postgres_password} \
 		--env POSTGRES_DB=${postgres_database} \
 		--publish ${postgres_port}:5432 postgres:12
+
+test:
+	env/bin/pytest tests

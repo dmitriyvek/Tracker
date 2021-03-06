@@ -1,6 +1,8 @@
+import importlib
 import os
 import uuid
 from contextlib import contextmanager
+from collections import defaultdict, namedtuple
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Optional
@@ -14,6 +16,9 @@ from yarl import URL
 from tracker import __name__ as project_name
 from tracker.utils.settings import BASE_DIR, DEFAULT_CONFIG, ENV_PATH
 from tracker.utils.utils import parse_env_file
+
+
+MIGRATIONS_PATH = BASE_DIR / Path('alembic/versions/')
 
 
 async def setup_db(app: Application) -> PG:
@@ -97,6 +102,7 @@ def get_alembic_config_from_url(db_url: Optional[str] = None) -> Config:
 
 @contextmanager
 def tmp_database(db_url: str, suffix: str = '', **kwargs):
+    '''Creates tmp database with random name in given db url'''
     tmp_db_name = '.'.join([uuid.uuid4().hex, project_name, suffix])
     tmp_db_url = str(URL(db_url).with_path(tmp_db_name))
     create_database(tmp_db_url, **kwargs)
@@ -105,3 +111,60 @@ def tmp_database(db_url: str, suffix: str = '', **kwargs):
         yield tmp_db_url
     finally:
         drop_database(tmp_db_url)
+
+
+# Represents test for 'data' migration.
+# Contains revision to be tested, it's previous revision, and callbacks that
+# could be used to perform validation.
+MigrationValidationParamsGroup = namedtuple('MigrationData', [
+    'rev_base', 'rev_head', 'on_init', 'on_upgrade', 'on_downgrade'
+])
+
+
+def load_migration_as_module(file: str):
+    '''
+    Allows to import alembic migration as a module.
+    '''
+    return importlib.machinery.SourceFileLoader(
+        file,
+        os.path.join(MIGRATIONS_PATH, file)
+    ).load_module()
+
+
+def make_validation_params_groups(
+        *migrations
+) -> List[MigrationValidationParamsGroup]:
+    '''
+    Creates objects that describe test for data migrations.
+    See examples in tests/data_migrations/migration_*.py.
+    '''
+    data = []
+    for migration in migrations:
+
+        # Ensure migration has all required params
+        for required_param in ['rev_base', 'rev_head']:
+            if not hasattr(migration, required_param):
+                raise RuntimeError(
+                    '{param} not specified for {migration}'.format(
+                        param=required_param,
+                        migration=migration.__name__
+                    )
+                )
+
+        # Set up callbacks
+        callbacks = defaultdict(lambda: lambda *args, **kwargs: None)
+        for callback in ['on_init', 'on_upgrade', 'on_downgrade']:
+            if hasattr(migration, callback):
+                callbacks[callback] = getattr(migration, callback)
+
+        data.append(
+            MigrationValidationParamsGroup(
+                rev_base=migration.rev_base,
+                rev_head=migration.rev_head,
+                on_init=callbacks['on_init'],
+                on_upgrade=callbacks['on_upgrade'],
+                on_downgrade=callbacks['on_downgrade']
+            )
+        )
+
+    return data
