@@ -5,7 +5,7 @@ from contextlib import contextmanager
 from collections import defaultdict, namedtuple
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Optional
+from typing import Optional, List
 
 from asyncpgsa import pg, PG
 from aiohttp.web_app import Application
@@ -18,7 +18,7 @@ from tracker.utils.settings import BASE_DIR, DEFAULT_CONFIG, ENV_PATH
 from tracker.utils.utils import parse_env_file
 
 
-MIGRATIONS_PATH = BASE_DIR / Path('alembic/versions/')
+MIGRATIONS_PATH = BASE_DIR / Path('db/alembic/versions/')
 
 
 async def setup_db(app: Application) -> PG:

@@ -5,6 +5,7 @@ from alembic.command import downgrade, upgrade
 from alembic.config import Config
 from alembic.script import Script, ScriptDirectory
 
+from .migrations_data import migration_680b3748447a
 from tracker.utils.db import get_alembic_config_from_url, make_validation_params_groups
 
 
@@ -33,10 +34,10 @@ def test_migrations_stairway(alembic_config: Config, revision: Script):
 
 def get_data_migrations():
     '''
-    Returns tests for data migrations, from tests/data_migrations folder.
+    Returns tests for data migrations, from tests/migration_data folder.
     '''
     return make_validation_params_groups(
-        # migration_c1c21b1515c7,
+        migration_680b3748447a,
     )
 
 
