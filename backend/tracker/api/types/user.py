@@ -1,6 +1,6 @@
 import graphene
 
-from tracker.db.schema import User as UserTable
+from tracker.db.schema import users_table as UserTable
 
 
 class UserType(graphene.ObjectType):

@@ -24,16 +24,6 @@ def db(db_url):
 
 
 @pytest.fixture()
-def db_engine(db):
-    '''SQLAlchemy engine, bound to temporary database.'''
-    engine = create_engine(db, echo=True)
-    try:
-        yield engine
-    finally:
-        engine.dispose()
-
-
-@pytest.fixture()
 def alembic_config(db):
     '''Alembic configuration object, bound to temporary database.'''
     return get_alembic_config_from_url(db)
@@ -64,40 +54,50 @@ def migrated_db(db_url, migrated_db_template):
 
 
 @pytest.fixture
-def app_args(aiohttp_unused_port, migrated_db):
-    port = aiohttp_unused_port()
-    return {
-        'args': [
-            '--api-port', str(port),
-            '--log-level', 'debug',
-            '--db-url', migrated_db,
-            '--api-address', '127.0.0.1'
-        ],
-        'port': port,
-    }
+def migrated_db_connection(migrated_db):
+    '''SQLAlchemy connection, bound to migrated temporary database.'''
+    engine = create_engine(migrated_db, echo=False)
+    conn = engine.connect()
+    try:
+        yield conn
+    finally:
+        conn.close()
+        engine.dispose()
 
 
 @pytest.fixture
+def app_args(aiohttp_unused_port, migrated_db):
+    port = aiohttp_unused_port()
+    return [
+        '--api-port', str(port),
+        '--log-level', 'debug',
+        '--db-url', migrated_db,
+        '--api-address', '127.0.0.1'
+    ]
+
+
+@pytest.fixture()
 async def client(aiohttp_client, app_args):
-    app = create_app(app_args['args'])
+    app = create_app(app_args)
 
     # redirect log stream into tests root folder
-    error_log_file_path = str(app['config']['error_log_file_path']).\
-        replace('log', 'tests/log', 1)
-    info_log_file_path = str(app['config']['info_log_file_path']).\
-        replace('log', 'tests/log', 1)
-    request_info_log_file_path = str(app['config']['request_info_log_file_path']).\
-        replace('log', 'tests/log', 1)
-    app['logger'] = setup_logger(
-        app['config']['log_level'],
-        error_log_file_path,
-        info_log_file_path,
-        request_info_log_file_path,
-        app['config']['debug']
-    )
+    # error_log_file_path = str(app['config']['error_log_file_path']).\
+    #     replace('log', 'tests/log', 1)
+    # info_log_file_path = str(app['config']['info_log_file_path']).\
+    #     replace('log', 'tests/log', 1)
+    # request_info_log_file_path = str(app['config']['request_info_log_file_path']).\
+    #     replace('log', 'tests/log', 1)
+    # app['logger'] = setup_logger(
+    #     app['config']['log_level'],
+    #     error_log_file_path,
+    #     info_log_file_path,
+    #     request_info_log_file_path,
+    #     app['config']['debug']
+    # )
+    app['logger'].remove()
 
     client = await aiohttp_client(app, server_kwargs={
-        'port': app_args['port']
+        'port': app['config']['api_port']
     })
 
     try:

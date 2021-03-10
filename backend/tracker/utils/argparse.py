@@ -36,9 +36,9 @@ def get_arg_parser(params: dict) -> argparse.ArgumentParser:
                         help='Running application in debug mod if specified')
 
     group = parser.add_argument_group('API options')
-    group.add_argument('--api-address', required=False, default=params['host'],
+    group.add_argument('--api-address', required=False, default=params['api_address'],
                        help='IPv4/IPv6 address API server would listen on')
-    group.add_argument('--api-port', type=positive_int, required=False, default=params['port'],
+    group.add_argument('--api-port', type=positive_int, required=False, default=params['api_port'],
                        help='TCP port API server would listen on')
 
     group = parser.add_argument_group('PostgreSQL options')

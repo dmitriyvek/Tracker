@@ -51,7 +51,7 @@ class TicketType(Enum):
     other = 4
 
 
-User = sa.Table(
+users_table = sa.Table(
     'users',
     metadata,
     sa.Column('id', sa.Integer, primary_key=True),
@@ -66,7 +66,7 @@ User = sa.Table(
     comment='Representation of user'
 )
 
-Project = sa.Table(
+projects_table = sa.Table(
     'projects',
     metadata,
     sa.Column('id', sa.Integer, primary_key=True),
@@ -83,7 +83,7 @@ Project = sa.Table(
     comment='Representation of project (collection of tickets and user roles)'
 )
 
-Role = sa.Table(
+roles_table = sa.Table(
     'roles',
     metadata,
     sa.Column('id', sa.Integer, primary_key=True),
@@ -107,7 +107,7 @@ Role = sa.Table(
     comment='Description of what role the user has in which project'
 )
 
-Ticket = sa.Table(
+tickets_table = sa.Table(
     'tickets',
     metadata,
     sa.Column('id', sa.Integer, primary_key=True),
@@ -137,7 +137,7 @@ Ticket = sa.Table(
     ), nullable=False),
 )
 
-Comment = sa.Table(
+comments_table = sa.Table(
     'comments',
     metadata,
     sa.Column('id', sa.Integer, primary_key=True),
@@ -157,7 +157,7 @@ Comment = sa.Table(
     comment='Users comments on tickets'
 )
 
-BlacklistToken = sa.Table(
+blacklist_tokens_table = sa.Table(
     'blacklist_tokens',
     metadata,
     sa.Column('id', sa.Integer, primary_key=True),

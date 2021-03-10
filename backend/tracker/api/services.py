@@ -11,7 +11,7 @@ from marshmallow.exceptions import ValidationError
 
 from tracker.api.errors import APIException
 from tracker.api.status_codes import StatusEnum
-from tracker.db.schema import BlacklistToken, User
+from tracker.db.schema import blacklist_tokens_table, users_table
 
 
 def generate_auth_token(config: dict, user_id: int, email: str = '') -> bytes:
@@ -31,9 +31,9 @@ def generate_auth_token(config: dict, user_id: int, email: str = '') -> bytes:
 
 
 async def check_if_token_is_blacklisted(db: PG, token: str) -> None:
-    '''Check if token is in the BlacklistToken table'''
-    query = select([BlacklistToken.c.id]).where(
-        BlacklistToken.c.token == token)
+    '''Check if token is in the blacklist_tokens_table table'''
+    query = select([blacklist_tokens_table.c.id]).where(
+        blacklist_tokens_table.c.token == token)
     result = await db.fetchrow(query)
     if result:
         raise jwt.ExpiredSignatureError('Signature is expired.')
@@ -64,7 +64,7 @@ async def decode_token(db: PG, config: dict, token: str, is_auth: bool = True) -
 
 async def create_blacklist_token(db: PG, auth_token: str) -> None:
     '''Creates blacklist token'''
-    await db.fetchval(BlacklistToken.insert().values({'token': auth_token}))
+    await db.fetchval(blacklist_tokens_table.insert().values({'token': auth_token}))
 
 
 def generate_password_hash(password: str, salt_rounds: int = 12) -> str:
@@ -85,9 +85,9 @@ def check_password_hash(encoded: str, password: str) -> bool:
 
 async def check_if_user_exists(db: PG, data: dict) -> None:
     '''Checks if user with given username or email is already exist if yes raises 400 error'''
-    query = select([User.c.id]).where(or_(
-        User.c.username == data['username'],
-        User.c.email == data['email']
+    query = select([users_table.c.id]).where(or_(
+        users_table.c.username == data['username'],
+        users_table.c.email == data['email']
     ))
     result = await db.fetchrow(query)
     if result:
@@ -98,8 +98,8 @@ async def check_if_user_exists(db: PG, data: dict) -> None:
 async def create_user(db: PG, data: dict) -> dict:
     '''Creates and returns new user'''
     data['password'] = generate_password_hash(data['password'])
-    query = User.insert().\
-        returning(User.c.id, User.c.username, User.c.email).\
+    query = users_table.insert().\
+        returning(users_table.c.id, users_table.c.username, users_table.c.email).\
         values(data)
     user = dict(await db.fetchrow(query))
 
@@ -108,8 +108,8 @@ async def create_user(db: PG, data: dict) -> dict:
 
 async def check_user_credentials(db: PG, data: dict) -> dict:
     '''Check if user with given credentials exist; if it does then returns this user else raise 401 error'''
-    query = select([User.c.id, User.c.username, User.c.email, User.c.password]).where(
-        User.c.username == data.get('username'))
+    query = select([users_table.c.id, users_table.c.username, users_table.c.email, users_table.c.password]).where(
+        users_table.c.username == data.get('username'))
     user = await db.fetchrow(query)
 
     if not (user and check_password_hash(
@@ -123,10 +123,10 @@ async def check_user_credentials(db: PG, data: dict) -> dict:
 
 async def get_user_by_id(db: PG, user_id: int) -> dict:
     '''Get user with given id'''
-    query = User.select().with_only_columns(
-        [User.c.id, User.c.username,
-         User.c.email, User.c.registered_at
-         ]).where(User.c.id == user_id)
+    query = users_table.select().with_only_columns(
+        [users_table.c.id, users_table.c.username,
+         users_table.c.email, users_table.c.registered_at
+         ]).where(users_table.c.id == user_id)
     result = await db.fetchrow(query)
     return dict(result)
 

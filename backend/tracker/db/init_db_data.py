@@ -6,7 +6,7 @@ from yarl import URL
 from tracker.utils.db import get_db_url
 from tracker.api.services import generate_password_hash
 from tracker.db.schema import (
-    User, Project, Role, Ticket, Comment,
+    users_table, projects_table, roles_table, tickets_table, comments_table,
     UserRole as URole, TicketStatus as TStatus,
     TicketPriority as TPriority, TicketType as TType
 )
@@ -115,7 +115,7 @@ def init_db_data():
     # check if tables are empty
     with engine.connect() as conn:
         query = sa.select([
-            User.c.id, Project.c.id, Ticket.c.id, Role.c.id, Comment.c.id
+            users_table.c.id, projects_table.c.id, tickets_table.c.id, roles_table.c.id, comments_table.c.id
         ]).limit(1)
         if conn.execute(query).rowcount:
             print('Tables not empty - can not initialize test data')
@@ -123,11 +123,11 @@ def init_db_data():
 
     # init transaction connection
     with engine.begin() as conn:
-        conn.execute(User.insert(), user_list)
-        conn.execute(Project.insert(), project_list)
-        conn.execute(Role.insert(), role_list)
-        conn.execute(Ticket.insert(), ticket_list)
-        conn.execute(Comment.insert(), comment_list)
+        conn.execute(users_table.insert(), user_list)
+        conn.execute(projects_table.insert(), project_list)
+        conn.execute(roles_table.insert(), role_list)
+        conn.execute(tickets_table.insert(), ticket_list)
+        conn.execute(comments_table.insert(), comment_list)
 
     print('Successfully initialized db with test data')
 

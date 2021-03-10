@@ -19,9 +19,8 @@ class GraphQLErrorMiddleware:
 
         raise error
 
-    # TODO: is i need async here (guess no)
-    async def resolve(self, next, root, info, **args):
-        return await next(root, info, **args).catch(
+    def resolve(self, next, root, info, **args):
+        return next(root, info, **args).catch(
             partial(
                 self.on_error,
                 logger=info.context['request'].app['logger'],
@@ -58,9 +57,9 @@ async def request_logging_middleware(request, handler):
 
     request_query = await request.json() if request.content_length else {}
 
-    log_message = '{method}:{path}:{query}:{user_id}:{user_ip}'.format(
+    log_message = '{method}:{path_qs}:{query}:{user_id}:{user_ip}'.format(
         method=request.method,
-        path=request.path,
+        path_qs=request.path_qs,
         query=request_query,
         user_id=request.get('user_id', 0),
         user_ip=request.remote,
