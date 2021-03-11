@@ -49,7 +49,6 @@ def url_string(**url_params):
 def make_request_coroutines(
     client,
     query: str,
-    variables: Optional[dict] = None,
     auth_token: Optional[str] = None
 ) -> List[CoroutineType]:
     '''Returns list of get and post request coroutines'''
@@ -66,15 +65,11 @@ def make_request_coroutines(
     post_headers = get_headers.copy()
     post_headers['content-type'] = 'application/json'
 
-    post_data = {
-        'query': query,
-    }
-    if variables:
-        post_data['variables'] = json.dumps(variables)
-
     post_request = client.post(
         '/graphql',
-        data=json.dumps(post_data),
+        data=json.dumps({
+            'query': query,
+        }),
         headers=post_headers,
     )
 

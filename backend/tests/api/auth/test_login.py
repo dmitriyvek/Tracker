@@ -52,6 +52,10 @@ async def test_login_mutation(migrated_db_connection, client):
             'content-type': 'application/json',
         },
     )
+
+    # if something will go wrong there will be response body output
+    print(await response.text())
+
     assert response.status == 200
 
     data = await response.json()

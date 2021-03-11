@@ -39,6 +39,10 @@ async def test_logout_mutation(migrated_db_connection, client):
             'Authorization': f'Bearer {auth_token}'
         },
     )
+
+    # if something will go wrong there will be response body output
+    print(await response.text())
+
     assert response.status == 200
 
     data = await response.json()

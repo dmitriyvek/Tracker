@@ -37,6 +37,9 @@ async def test_detail_mutation(migrated_db_connection, client):
     for request_coroutine in request_coroutine_list:
         response = await request_coroutine
 
+        # if something will go wrong there will be response body output
+        print(await response.text())
+
         assert response.status == 200
 
         data = await response.json()

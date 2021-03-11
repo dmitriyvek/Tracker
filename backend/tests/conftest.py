@@ -23,12 +23,6 @@ def db(db_url):
         yield tmp_url
 
 
-@pytest.fixture()
-def alembic_config(db):
-    '''Alembic configuration object, bound to temporary database.'''
-    return get_alembic_config_from_url(db)
-
-
 @pytest.fixture(scope='session')
 def migrated_db_template(db_url):
     '''
