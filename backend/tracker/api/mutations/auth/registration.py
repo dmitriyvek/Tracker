@@ -3,8 +3,9 @@ import graphene
 from ..base import BaseMutationPayload
 from tracker.api.types import UserType
 from tracker.api.status_codes import StatusEnum
-from tracker.api.schema import UserRegistrationSchema
-from tracker.api.services import validate_input, check_if_user_exists, create_user, generate_auth_token
+from tracker.api.schemas.auth import RegistrationSchema
+from tracker.api.services import validate_input
+from tracker.api.services.auth import check_if_user_exists, create_user, generate_auth_token
 
 
 class RegisterStatus(graphene.Enum):
@@ -45,7 +46,7 @@ class Registration(BaseMutationPayload, graphene.Mutation):
 
     async def mutate(parent, info, input):
         app = info.context['request'].app
-        data = validate_input(input, UserRegistrationSchema)
+        data = validate_input(input, RegistrationSchema)
         await check_if_user_exists(app['db'], data)
 
         user = await create_user(app['db'], data)

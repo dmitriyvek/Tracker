@@ -4,7 +4,7 @@ import pytest
 
 from tests.utils import generate_user, make_request_coroutines
 from tracker.db.schema import users_table
-from tracker.api.services import generate_password_hash, generate_auth_token
+from tracker.api.services.auth import generate_password_hash, generate_auth_token
 
 
 async def test_detail_mutation(migrated_db_connection, client):
@@ -20,7 +20,7 @@ async def test_detail_mutation(migrated_db_connection, client):
 
     query = '''
         {
-            auth {
+            users {
                 detail {
                     record {
                         id
@@ -43,7 +43,7 @@ async def test_detail_mutation(migrated_db_connection, client):
         assert response.status == 200
 
         data = await response.json()
-        data = data['data']['auth']['detail']['record']
+        data = data['data']['users']['detail']['record']
 
         id = base64.b64decode(data['id']).decode('utf-8').split(':')[1]
         assert int(id) == db_record_id

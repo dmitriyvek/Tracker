@@ -3,7 +3,7 @@ from functools import partial
 from aiohttp import web
 
 from tracker.api.errors import APIException
-from tracker.api.services import decode_token
+from tracker.api.services.auth import decode_token
 
 
 class GraphQLErrorMiddleware:

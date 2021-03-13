@@ -5,7 +5,7 @@ import jwt
 
 from tests.utils import generate_user
 from tracker.db.schema import users_table
-from tracker.api.services import check_password_hash
+from tracker.api.services.auth import check_password_hash
 
 
 async def test_register_mutation(migrated_db_connection, client):

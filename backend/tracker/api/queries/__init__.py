@@ -1,15 +1,15 @@
 import graphene
 from graphene.relay import Node
 
-from .auth import AuthQuery
+from .users import UsersQuery
 
 
 class Query(graphene.ObjectType):
     '''
     The main GraphQL query point.
     '''
-    auth = graphene.Field(AuthQuery)
+    users = graphene.Field(UsersQuery)
     node = Node.Field()
 
-    def resolve_auth(self, info):
+    def resolve_users(self, info):
         return {}

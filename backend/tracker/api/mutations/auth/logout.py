@@ -2,7 +2,7 @@ import graphene
 
 from ..base import BaseMutationPayload
 from tracker.api.status_codes import StatusEnum
-from tracker.api.services import create_blacklist_token
+from tracker.api.services.auth import create_blacklist_token
 from tracker.api.wrappers import login_required
 
 

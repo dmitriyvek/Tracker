@@ -1,9 +1,9 @@
 import graphene
 
-from .user import UserDetailQuery
+from .detail import UserDetailQuery
 
 
-class AuthQuery(graphene.ObjectType):
+class UsersQuery(graphene.ObjectType):
     detail = graphene.Field(UserDetailQuery)
 
     def resolve_detail(parent, info):

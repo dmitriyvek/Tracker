@@ -4,7 +4,7 @@ from graphql import ResolveInfo
 from tracker.api.types import UserType
 from tracker.db.schema import users_table as UserTable
 from tracker.api.wrappers import login_required
-from tracker.api.services import get_user_by_id
+from tracker.api.services.users import get_user_by_id
 
 
 class UserDetailQuery(graphene.ObjectType):

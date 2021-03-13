@@ -7,14 +7,14 @@ from tracker.api.errors import APIException
 from tracker.api.status_codes import StatusEnum
 
 
-class UserRegistrationSchema(Schema):
+class RegistrationSchema(Schema):
     username = Str(required=True, validate=Length(min=4, max=64))
     password = Str(required=True, validate=Length(min=6, max=64))
     email = Str(required=True, validate=Email(
         error='Not a valid email address'))
 
 
-class UserLoginSchema(Schema):
+class LoginSchema(Schema):
     username = Str(required=True)
     password = Str(required=True)
 
