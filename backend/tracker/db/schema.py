@@ -66,6 +66,7 @@ users_table = sa.Table(
     comment='Representation of user'
 )
 
+# TODO: index on title
 projects_table = sa.Table(
     'projects',
     metadata,

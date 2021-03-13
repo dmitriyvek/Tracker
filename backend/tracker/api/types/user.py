@@ -1,6 +1,7 @@
 import graphene
+from sqlalchemy import and_
 
-from tracker.db.schema import users_table as UserTable
+from tracker.db.schema import users_table
 
 
 class UserType(graphene.ObjectType):
@@ -17,7 +18,7 @@ class UserType(graphene.ObjectType):
     )
     registered_at = graphene.DateTime(
         required=True,
-        description='Timestamp user\'s registration',
+        description='User registration timestamp',
     )
 
     class Meta:
@@ -27,14 +28,17 @@ class UserType(graphene.ObjectType):
     async def get_node(cls, info, id):
         id = int(id)
         app = info.context['request'].app
-        query = UserTable.select().\
+        query = users_table.select().\
             with_only_columns([
-                UserTable.c.id,
-                UserTable.c.username,
-                UserTable.c.email,
-                UserTable.c.registered_at
+                users_table.c.id,
+                users_table.c.username,
+                users_table.c.email,
+                users_table.c.registered_at
             ]).\
-            where(UserTable.c.id == id)
+            where(and_(
+                users_table.c.id == id,
+                users_table.c.is_deleted.is_(False)
+            ))
         user = await app['db'].fetchrow(query)
         user = cls(**user)
         return user

@@ -6,7 +6,7 @@ from typing import Union
 import bcrypt
 import jwt
 from asyncpgsa import PG
-from sqlalchemy.sql import select, or_
+from sqlalchemy.sql import select, or_, and_
 
 from tracker.api.errors import APIException
 from tracker.api.status_codes import StatusEnum
@@ -85,8 +85,14 @@ def check_password_hash(encoded: str, password: str) -> bool:
 async def check_if_user_exists(db: PG, data: dict) -> None:
     '''Checks if user with given username or email is already exist if yes raises 400 error'''
     query = select([users_table.c.id]).where(or_(
-        users_table.c.username == data['username'],
-        users_table.c.email == data['email']
+        and_(
+            users_table.c.username == data['username'],
+            users_table.c.is_deleted.is_(False)
+        ),
+        and_(
+            users_table.c.email == data['email'],
+            users_table.c.is_deleted.is_(False)
+        )
     ))
     result = await db.fetchrow(query)
     if result:
@@ -107,8 +113,11 @@ async def create_user(db: PG, data: dict) -> dict:
 
 async def check_user_credentials(db: PG, data: dict) -> dict:
     '''Check if user with given credentials exist; if it does then returns this user else raise 401 error'''
-    query = select([users_table.c.id, users_table.c.username, users_table.c.email, users_table.c.password]).where(
-        users_table.c.username == data.get('username'))
+    query = select([users_table.c.id, users_table.c.username, users_table.c.email, users_table.c.password]).\
+        where(and_(
+            users_table.c.username == data.get('username'),
+            users_table.c.is_deleted.is_(False)
+        ))
     user = await db.fetchrow(query)
 
     if not (user and check_password_hash(
