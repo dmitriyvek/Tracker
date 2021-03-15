@@ -1,6 +1,10 @@
 import graphene
 from sqlalchemy import and_
 
+from graphene.types import ResolveInfo
+from tracker.api.types.role import RoleType
+from tracker.api.services.projects import get_user_project
+from tracker.api.wrappers import login_required
 from tracker.db.schema import projects_table
 
 
@@ -17,25 +21,28 @@ class ProjectType(graphene.ObjectType):
         required=True,
         description='Project creation timestamp',
     )
+    # role_list = graphene.List(
+    #     RoleType,
+    #     required=True,
+    #     description='List of all roles in given project'
+    # )
+    my_role = graphene.Field(
+        RoleType,
+        required=True,
+        description='Role of the current user in given project'
+    )
 
     class Meta:
         interfaces = (graphene.relay.Node, )
 
     @classmethod
-    async def get_node(cls, info, id):
-        id = int(id)
-        app = info.context['request'].app
-        query = projects_table.select().\
-            with_only_columns([
-                projects_table.c.id,
-                projects_table.c.title,
-                projects_table.c.description,
-                projects_table.c.created_at
-            ]).\
-            where(and_(
-                projects_table.c.id == id,
-                projects_table.c.is_deleted.is_(False)
-            ))
-        user = await app['db'].fetchrow(query)
-        user = cls(**user)
-        return user
+    @login_required
+    async def get_node(cls, info, project_id):
+        project_id = int(project_id)
+        user_id = info.context['request']['user_id']
+        db = info.context['request'].app['db']
+
+        record = await get_user_project(db, info, project_id, user_id)
+        record = cls(**record)
+
+        return record

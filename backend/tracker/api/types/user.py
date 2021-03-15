@@ -1,6 +1,8 @@
 import graphene
 from sqlalchemy import and_
 
+from tracker.api.wrappers import login_required
+from tracker.api.services.users import get_user_by_id
 from tracker.db.schema import users_table
 
 
@@ -25,20 +27,12 @@ class UserType(graphene.ObjectType):
         interfaces = (graphene.relay.Node, )
 
     @classmethod
-    async def get_node(cls, info, id):
-        id = int(id)
-        app = info.context['request'].app
-        query = users_table.select().\
-            with_only_columns([
-                users_table.c.id,
-                users_table.c.username,
-                users_table.c.email,
-                users_table.c.registered_at
-            ]).\
-            where(and_(
-                users_table.c.id == id,
-                users_table.c.is_deleted.is_(False)
-            ))
-        user = await app['db'].fetchrow(query)
-        user = cls(**user)
-        return user
+    @login_required
+    async def get_node(cls, info, user_id):
+        user_id = int(user_id)
+        db = info.context['request'].app['db']
+
+        record = await get_user_by_id(db, user_id)
+        record = cls(**record)
+
+        return record
