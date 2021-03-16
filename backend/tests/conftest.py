@@ -75,20 +75,20 @@ async def client(aiohttp_client, app_args):
     app = create_app(app_args)
 
     # redirect log stream into tests root folder
-    # error_log_file_path = str(app['config']['error_log_file_path']).\
-    #     replace('log', 'tests/log', 1)
-    # info_log_file_path = str(app['config']['info_log_file_path']).\
-    #     replace('log', 'tests/log', 1)
-    # request_info_log_file_path = str(app['config']['request_info_log_file_path']).\
-    #     replace('log', 'tests/log', 1)
-    # app['logger'] = setup_logger(
-    #     app['config']['log_level'],
-    #     error_log_file_path,
-    #     info_log_file_path,
-    #     request_info_log_file_path,
-    #     app['config']['debug']
-    # )
-    app['logger'].remove()
+    error_log_file_path = str(app['config']['error_log_file_path']).\
+        replace('log', 'tests/log', 1)
+    info_log_file_path = str(app['config']['info_log_file_path']).\
+        replace('log', 'tests/log', 1)
+    request_info_log_file_path = str(app['config']['request_info_log_file_path']).\
+        replace('log', 'tests/log', 1)
+    app['logger'] = setup_logger(
+        app['config']['log_level'],
+        error_log_file_path,
+        info_log_file_path,
+        request_info_log_file_path,
+        app['config']['debug']
+    )
+    # app['logger'].remove()
 
     client = await aiohttp_client(app, server_kwargs={
         'port': app['config']['api_port']

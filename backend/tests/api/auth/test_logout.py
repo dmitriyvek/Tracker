@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import generate_user
+from tests.utils import generate_user_data
 from tracker.db.schema import users_table, blacklist_tokens_table
 from tracker.api.services.auth import generate_password_hash, generate_auth_token
 
@@ -10,13 +10,13 @@ from tracker.api.services.auth import generate_password_hash, generate_auth_toke
 async def test_logout_mutation(migrated_db_connection, client):
     app = client.server.app
 
-    user = generate_user()
+    user = generate_user_data()
     raw_password = user['password']
     user['password'] = generate_password_hash(raw_password)
     db_query = users_table.insert().values(user).returning(users_table.c.id)
-    db_record_id = migrated_db_connection.execute(db_query).fetchone()[0]
+    user_id = migrated_db_connection.execute(db_query).fetchone()[0]
 
-    auth_token = generate_auth_token(app['config'], db_record_id)
+    auth_token = generate_auth_token(app['config'], user_id)
 
     query = '''
         mutation{

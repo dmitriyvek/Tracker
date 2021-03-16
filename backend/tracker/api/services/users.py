@@ -20,4 +20,5 @@ async def get_user_by_id(db: PG, user_id: int) -> dict:
         ))
 
     result = await db.fetchrow(query)
+    print(result)
     return dict(result)

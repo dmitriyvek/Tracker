@@ -3,13 +3,13 @@ import json
 import pytest
 import jwt
 
-from tests.utils import generate_user
+from tests.utils import generate_user_data
 from tracker.db.schema import users_table
 from tracker.api.services.auth import check_password_hash
 
 
 async def test_register_mutation(migrated_db_connection, client):
-    user = generate_user()
+    user = generate_user_data()
     query = '''
         mutation register($input: RegisterInput!) {
             auth {

@@ -11,7 +11,7 @@ fake = Faker()
 # Faker.seed(4321)
 
 
-def generate_user(
+def generate_user_data(
     id: Optional[int] = None,
     username: Optional[str] = None,
     password: Optional[str] = None,

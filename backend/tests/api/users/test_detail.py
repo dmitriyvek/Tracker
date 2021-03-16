@@ -2,21 +2,21 @@ import base64
 
 import pytest
 
-from tests.utils import generate_user, make_request_coroutines
+from tests.utils import generate_user_data, make_request_coroutines
 from tracker.db.schema import users_table
 from tracker.api.services.auth import generate_password_hash, generate_auth_token
 
 
-async def test_detail_mutation(migrated_db_connection, client):
+async def test_user_detail_query(migrated_db_connection, client):
     app = client.server.app
 
-    user = generate_user()
+    user = generate_user_data()
     raw_password = user['password']
     user['password'] = generate_password_hash(raw_password)
     db_query = users_table.insert().values(user).returning(users_table.c.id)
-    db_record_id = migrated_db_connection.execute(db_query).fetchone()[0]
+    user_id = migrated_db_connection.execute(db_query).fetchone()[0]
 
-    auth_token = generate_auth_token(app['config'], db_record_id)
+    auth_token = generate_auth_token(app['config'], user_id)
 
     query = '''
         {
@@ -46,6 +46,6 @@ async def test_detail_mutation(migrated_db_connection, client):
         data = data['data']['users']['detail']['record']
 
         id = base64.b64decode(data['id']).decode('utf-8').split(':')[1]
-        assert int(id) == db_record_id
+        assert int(id) == user_id
         assert data['username'] == user['username']
         assert data['email'] == user['email']

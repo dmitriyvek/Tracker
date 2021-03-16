@@ -7,7 +7,7 @@ from sqlalchemy import and_
 
 from tracker.api.errors import APIException
 from tracker.api.status_codes import StatusEnum
-from tracker.db.schema import projects_table, roles_table
+from tracker.db.schema import UserRole, projects_table, roles_table
 
 
 PROJECTS_REQUIRED_FIELDS = [
@@ -162,14 +162,25 @@ async def check_if_project_exists(db: PG, data: dict) -> None:
 
 
 async def create_project(db: PG, data: dict) -> dict:
-    '''Creates and returns new project'''
-    query = projects_table.insert().\
-        returning(
-            *PROJECTS_REQUIRED_FIELDS
-    ).\
-        values(data)
+    '''Creates and returns new project and role'''
 
-    project = dict(await db.fetchrow(query))
+    async with db.transaction() as conn:
+        project_query = projects_table.insert().\
+            returning(*PROJECTS_REQUIRED_FIELDS).\
+            values(data)
+        project = dict(await conn.fetchrow(project_query))
+
+        role_query = roles_table.insert().\
+            returning(*ROLES_REQUIRED_FIELDS).\
+            values({
+                'role': UserRole.project_manager,
+                'user_id': data['created_by'],
+                'project_id': project['id'],
+                'assign_by': data['created_by'],
+            })
+        role = dict(await conn.fetchrow(role_query))
+
+    project['my_role'] = role
     return project
 
 

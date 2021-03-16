@@ -6,6 +6,7 @@ from tracker.api.status_codes import StatusEnum
 from tracker.api.schemas.projects import ProjectCreationSchema
 from tracker.api.services import validate_input
 from tracker.api.services.projects import check_if_project_exists, create_project
+from tracker.api.wrappers import login_required
 
 
 class ProjectCreationStatus(graphene.Enum):
@@ -43,11 +44,12 @@ class ProjectCreation(BaseMutationPayload, graphene.Mutation):
     project_creation_payload = graphene.Field(
         ProjectCreationPayload, required=True)
 
+    @login_required
     async def mutate(parent, info, input):
         app = info.context['request'].app
         data = validate_input(input, ProjectCreationSchema)
-        data['created_by'] = info.context['request']['user_id']
         await check_if_project_exists(app['db'], data)
+        data['created_by'] = info.context['request']['user_id']
 
         project = await create_project(app['db'], data)
 
