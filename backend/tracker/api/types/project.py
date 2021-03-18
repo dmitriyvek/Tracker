@@ -3,7 +3,7 @@ from sqlalchemy import and_
 
 from graphene.types import ResolveInfo
 from tracker.api.types.role import RoleType
-from tracker.api.services.projects import get_user_project
+from tracker.api.services.projects import get_project_node
 from tracker.api.wrappers import login_required
 from tracker.db.schema import projects_table
 
@@ -42,7 +42,7 @@ class ProjectType(graphene.ObjectType):
         user_id = info.context['request']['user_id']
         db = info.context['request'].app['db']
 
-        record = await get_user_project(db, info, project_id, user_id)
+        record = await get_project_node(db, info, project_id, user_id)
         record = cls(**record)
 
         return record
