@@ -2,9 +2,9 @@ import base64
 
 import pytest
 
-from tests.utils import generate_user_data, make_request_coroutines
-from tracker.db.schema import users_table
 from tracker.api.services.auth import generate_password_hash, generate_auth_token
+from tracker.db.schema import users_table
+from tests.utils import generate_user_data, make_request_coroutines, create_projects_in_db
 
 
 async def test_user_detail_query(migrated_db_connection, client):
@@ -18,6 +18,8 @@ async def test_user_detail_query(migrated_db_connection, client):
 
     auth_token = generate_auth_token(app['config'], user_id)
 
+    create_projects_in_db(migrated_db_connection, user_id, record_number=5)
+
     query = '''
         {
             users {
@@ -25,7 +27,12 @@ async def test_user_detail_query(migrated_db_connection, client):
                     record {
                         id
                         username
-                        email
+                        projectList {
+                            title
+                            myRole {
+                                role
+                            }
+                        }
                     }
                 }
             }
@@ -48,4 +55,5 @@ async def test_user_detail_query(migrated_db_connection, client):
         id = base64.b64decode(data['id']).decode('utf-8').split(':')[1]
         assert int(id) == user_id
         assert data['username'] == user['username']
-        assert data['email'] == user['email']
+
+        assert data['projectList']

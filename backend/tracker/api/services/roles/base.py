@@ -1,6 +1,7 @@
 from tracker.db.schema import roles_table
 
 
+# fields of tracker.api.types.role.RoleType
 ROLES_REQUIRED_FIELDS = [
     roles_table.c.role,
     roles_table.c.user_id,

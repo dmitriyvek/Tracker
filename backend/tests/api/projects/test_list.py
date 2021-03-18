@@ -1,11 +1,10 @@
 import pytest
 
-from tests.utils import generate_user_data, make_request_coroutines
-from tracker.db.schema import users_table
 from tracker.api.services.auth import generate_password_hash, generate_auth_token
+from tracker.db.schema import users_table
+from tests.utils import generate_user_data, make_request_coroutines, generate_project_data, create_projects_in_db
 
 
-# TODO: need to create projects in db
 async def test_projects_list_query(migrated_db_connection, client):
     app = client.server.app
 
@@ -16,6 +15,8 @@ async def test_projects_list_query(migrated_db_connection, client):
     user_id = migrated_db_connection.execute(db_query).fetchone()[0]
 
     auth_token = generate_auth_token(app['config'], user_id)
+
+    create_projects_in_db(migrated_db_connection, user_id, record_number=5)
 
     query = '''
         {
@@ -49,4 +50,4 @@ async def test_projects_list_query(migrated_db_connection, client):
         data = await response.json()
         data = data['data']['projects']['list']['records']
 
-        assert not data
+        assert data

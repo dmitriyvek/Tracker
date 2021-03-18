@@ -1,8 +1,11 @@
 import graphene
+from graphene.types import ResolveInfo
 from sqlalchemy import and_
 
-from tracker.api.wrappers import login_required
 from tracker.api.services.users import get_user_by_id
+from tracker.api.services.projects import get_user_project_list
+from tracker.api.types.project import ProjectType
+from tracker.api.wrappers import login_required
 from tracker.db.schema import users_table
 
 
@@ -22,9 +25,21 @@ class UserType(graphene.ObjectType):
         required=True,
         description='User registration timestamp',
     )
+    project_list = graphene.List(
+        ProjectType,
+        required=True,
+        description='List of projects in which user participates',
+    )
 
     class Meta:
         interfaces = (graphene.relay.Node, )
+
+    async def resolve_project_list(parent, info: ResolveInfo):
+        user_id = info.context['request']['user_id']
+        db = info.context['request'].app['db']
+
+        records = await get_user_project_list(db, info, user_id)
+        return records
 
     @classmethod
     @login_required

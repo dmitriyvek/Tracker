@@ -5,6 +5,7 @@ from asyncpg import Record
 from tracker.db.schema import projects_table
 
 
+# fields of tracker.api.types.projects.ProjectType
 PROJECTS_REQUIRED_FIELDS = [
     projects_table.c.id,
     projects_table.c.title,
