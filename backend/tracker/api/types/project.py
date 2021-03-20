@@ -3,7 +3,7 @@ from sqlalchemy import and_
 
 from graphene.types import ResolveInfo
 from tracker.api.types.role import RoleType
-from tracker.api.services.projects import get_project_node
+from tracker.api.services.projects import get_project_node, get_total_count_of_user_projects
 from tracker.api.wrappers import login_required
 from tracker.db.schema import projects_table
 
@@ -46,3 +46,20 @@ class ProjectType(graphene.ObjectType):
         record = cls(**record)
 
         return record
+
+
+class ProjectConnection(graphene.relay.Connection):
+    total_count = graphene.Int(
+        required=True,
+        description='Total number of user\'s projects'
+    )
+
+    class Meta:
+        node = ProjectType
+
+    def resolve_total_count(parent, info: ResolveInfo):
+        db = info.context['request'].app['db']
+        user_id = info.context['request']['user_id']
+
+        total_count = get_total_count_of_user_projects(db, user_id)
+        return total_count
