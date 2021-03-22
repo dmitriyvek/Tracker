@@ -1,10 +1,11 @@
 import graphene
 from graphql import ResolveInfo
 
-from tracker.api.types import ProjectType, ProjectConnection
+from tracker.api.connections import validate_connection_params, create_connection_from_records_list
+from tracker.api.connections.projects import ProjectConnection
+from tracker.api.types import ProjectType
 from tracker.api.wrappers import login_required
 from tracker.api.services.projects import get_user_project_list
-from tracker.api.connections import validate_connection_params, create_connection_from_records_list
 
 
 class ProjectListQuery(graphene.ObjectType):

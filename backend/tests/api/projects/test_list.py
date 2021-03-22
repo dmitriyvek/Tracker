@@ -19,22 +19,25 @@ async def test_projects_list_query(migrated_db_connection, client):
     create_projects_in_db(migrated_db_connection, user_id, record_number=5)
 
     query = '''
-        {
-            projects {
-                list {
-                    records {
+    {
+        projects {
+            list(first: 10) {
+                edges {
+                    cursor
+                    node {
                         id
-                        myRole {
-                            role
-                            assignAt
-                        }
                         title
-                        createdAt
-                        description
                     }
+                }
+                pageInfo {
+                    startCursor
+                    endCursor
+                    hasNextPage
+                    hasPreviousPage
                 }
             }
         }
+    }
     '''
     request_coroutine_list = make_request_coroutines(
         client=client, query=query, auth_token=auth_token)
@@ -48,6 +51,6 @@ async def test_projects_list_query(migrated_db_connection, client):
         assert response.status == 200
 
         data = await response.json()
-        data = data['data']['projects']['list']['records']
+        data = data['data']['projects']['list']['edges']
 
         assert data

@@ -27,10 +27,20 @@ async def test_user_detail_query(migrated_db_connection, client):
                     record {
                         id
                         username
-                        projectList {
-                            title
-                            myRole {
-                                role
+                        projectList(first: 5, last:3) {
+                            totalCount
+                            edges {
+                                cursor
+                                node {
+                                    title
+                                    id
+                                }
+                            }
+                            pageInfo {
+                                endCursor
+                                startCursor
+                                hasNextPage
+                                hasPreviousPage
                             }
                         }
                     }

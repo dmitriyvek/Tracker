@@ -2,6 +2,8 @@ import graphene
 from graphene.types import ResolveInfo
 from sqlalchemy import and_
 
+from tracker.api.connections import create_connection_from_records_list, validate_connection_params
+from tracker.api.connections.projects import ProjectConnection
 from tracker.api.services.users import get_user_by_id
 from tracker.api.services.projects import get_user_project_list
 from tracker.api.types.project import ProjectType
@@ -25,8 +27,8 @@ class UserType(graphene.ObjectType):
         required=True,
         description='User registration timestamp',
     )
-    project_list = graphene.List(
-        ProjectType,
+    project_list = graphene.relay.ConnectionField(
+        ProjectConnection,
         required=True,
         description='List of projects in which user participates',
     )
@@ -34,12 +36,28 @@ class UserType(graphene.ObjectType):
     class Meta:
         interfaces = (graphene.relay.Node, )
 
-    async def resolve_project_list(parent, info: ResolveInfo):
+    async def resolve_project_list(
+        parent,
+        info: ResolveInfo,
+        **connection_params
+    ):
         user_id = info.context['request']['user_id']
         db = info.context['request'].app['db']
 
-        records = await get_user_project_list(db, info, user_id)
-        return records
+        connection_params = validate_connection_params(
+            connection_params,
+            ProjectType
+        )
+        record_list = await get_user_project_list(
+            db, info, user_id, connection_params
+        )
+
+        return create_connection_from_records_list(
+            record_list,
+            connection_params,
+            ProjectConnection,
+            ProjectType
+        )
 
     @classmethod
     @login_required
