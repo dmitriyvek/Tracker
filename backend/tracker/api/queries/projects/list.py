@@ -3,7 +3,8 @@ from graphql import ResolveInfo
 
 from tracker.api.types import ProjectType, ProjectConnection
 from tracker.api.wrappers import login_required
-from tracker.api.services.projects import get_user_project_list, validate_connection_params
+from tracker.api.services.projects import get_user_project_list
+from tracker.api.connections import validate_connection_params, create_connection_from_records_list
 
 
 class ProjectListQuery(graphene.ObjectType):
@@ -18,9 +19,17 @@ class ProjectListQuery(graphene.ObjectType):
         db = info.context['request'].app['db']
         user_id = info.context['request'].get('user_id')
 
-        connection_params = validate_connection_params(connection_params)
-        records = await get_user_project_list(
+        connection_params = validate_connection_params(
+            connection_params,
+            ProjectType
+        )
+        record_list = await get_user_project_list(
             db, info, user_id, connection_params
         )
 
-        return records
+        return create_connection_from_records_list(
+            record_list,
+            connection_params,
+            ProjectConnection,
+            ProjectType
+        )
