@@ -2,7 +2,7 @@ import graphene
 from graphene.types import ResolveInfo
 from sqlalchemy import and_
 
-from tracker.api.connections import create_connection_from_records_list, validate_connection_params
+from tracker.api.connections import CustomPageInfo, create_connection_from_records_list, validate_connection_params
 from tracker.api.connections.projects import ProjectConnection
 from tracker.api.services.users import get_user_by_id
 from tracker.api.services.projects import get_user_project_list
@@ -43,10 +43,14 @@ class UserType(graphene.ObjectType):
     ):
         user_id = info.context['request']['user_id']
         db = info.context['request'].app['db']
+        max_fetch_number = info.context['request'].app.\
+            get('config', {}).\
+            get('max_fetch_number')
 
         connection_params = validate_connection_params(
             connection_params,
-            ProjectType
+            ProjectType,
+            max_fetch_number
         )
         record_list = await get_user_project_list(
             db, info, user_id, connection_params
@@ -56,7 +60,8 @@ class UserType(graphene.ObjectType):
             record_list,
             connection_params,
             ProjectConnection,
-            ProjectType
+            ProjectType,
+            CustomPageInfo
         )
 
     @classmethod

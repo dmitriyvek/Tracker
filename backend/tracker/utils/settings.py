@@ -31,6 +31,7 @@ DEFAULT_CONFIG = {
     'request_info_log_file_path': BASE_DIR / Path('log/app/request.log'),
     'censored_sign': '***',
     'token_expiration_time': timedelta(days=1),
+    'max_fetch_number': 10,
 }
 
 

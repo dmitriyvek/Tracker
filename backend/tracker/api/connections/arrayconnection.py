@@ -11,19 +11,33 @@ from tracker.api.errors import APIException
 from tracker.api.status_codes import StatusEnum
 
 
+class CustomPageInfo(PageInfo):
+
+    class Meta:
+        description = (
+            "The Relay compliant `PageInfo` type, containing data necessary to"
+            " paginate this connection. Max fetch number = 20"
+        )
+
+
 def validate_connection_params(
     params: Dict[str, str],
-    node_type: graphene.ObjectType
+    node_type: graphene.ObjectType,
+    max_fetch_number: int = 20,
 ) -> Dict[str, Union[str, int]]:
     '''
     Validate connection params. Returns dict with
-    decoded (as integer) "after" and "before" cursors if given
+    decoded (as integer) "after" and "before" cursors if given.
+    Set "first" to max_fetch_number if not given or greater
     '''
 
     if params:
 
         for key in ('first', 'last'):
             param = params.get(key)
+
+            if param and param > max_fetch_number:
+                params[key] = max_fetch_number
 
             if param and param < 0:
                 raise APIException(
@@ -45,6 +59,9 @@ def validate_connection_params(
                         f'value of "{key}" is not a valid cursor',
                         status=StatusEnum.BAD_REQUEST.name
                     )
+
+    if not params.get('first'):
+        params['first'] = max_fetch_number
 
     return params
 
@@ -107,11 +124,11 @@ def create_connection_from_records_list(
     record_list: List[Union[Dict[str, Any], Record]],
     connection_params: Dict[str, str],
     connection_type: Connection,
-    node_type: graphene.ObjectType
+    node_type: graphene.ObjectType,
+    pageinfo_type: PageInfo = PageInfo,
 ) -> Connection:
 
     edge_type = connection_type.Edge
-    pageinfo_type = PageInfo
 
     after = connection_params.get('after')
     before = connection_params.get('before')
