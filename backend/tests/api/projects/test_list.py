@@ -1,11 +1,8 @@
 import pytest
 from base64 import b64decode, b64encode
 
+from .conftest import NUMBER_OF_PROJECTS
 from tests.utils import make_request_coroutines
-
-
-# should be greater then 15 or max_fetch_number
-NUMBER_OF_PROJECTS = 25
 
 
 base_query = '''

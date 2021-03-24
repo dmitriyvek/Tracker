@@ -1,9 +1,12 @@
 import pytest
 
-from .test_list import NUMBER_OF_PROJECTS
 from tracker.api.services.auth import generate_password_hash, generate_auth_token
 from tracker.db.schema import users_table
 from tests.utils import generate_user_data, create_projects_in_db
+
+
+# should be greater then 15 or max_fetch_number
+NUMBER_OF_PROJECTS = 25
 
 
 @pytest.fixture()

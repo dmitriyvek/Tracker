@@ -22,7 +22,7 @@ def check_role_requested_in_list(info: ResolveInfo) -> bool:
     return False
 
 
-async def get_total_count_of_user_projects(db: PG, user_id: int):
+async def get_total_count_of_user_projects(db: PG, user_id: int) -> int:
     '''Getting the total number of projects in which the user participates'''
     query = projects_table.\
         join(
