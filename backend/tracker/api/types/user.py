@@ -36,6 +36,7 @@ class UserType(graphene.ObjectType):
     class Meta:
         interfaces = (graphene.relay.Node, )
 
+    @staticmethod
     async def resolve_project_list(
         parent,
         info: ResolveInfo,

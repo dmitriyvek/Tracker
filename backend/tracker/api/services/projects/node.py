@@ -3,6 +3,7 @@ from typing import Union, Dict
 from asyncpg import Record
 from asyncpgsa import PG
 from graphene.types import ResolveInfo
+from graphql.language.ast import InlineFragment
 from sqlalchemy import and_
 
 from .base import PROJECTS_REQUIRED_FIELDS, format_project_type
@@ -17,14 +18,15 @@ def check_role_requested_in_node(info: ResolveInfo) -> bool:
     '''Parses projectType node\'s field_asts and check if current user role is requested'''
 
     # TODO: assumed concrete field_asts structure, is it always the same?
-    for inline_fragment in info.field_asts[0].selection_set.selections:
-        if inline_fragment.type_condition.name.value == 'ProjectType':
+    for field in info.field_asts[0].selection_set.selections:
+        if isinstance(field, InlineFragment):
+            if field.type_condition.name.value == 'ProjectType':
 
-            for field in inline_fragment.selection_set.selections:
-                if field.name.value == 'myRole':
-                    return True
+                for field in field.selection_set.selections:
+                    if field.name.value == 'myRole':
+                        return True
 
-            return False
+                return False
 
 
 async def get_user_project_role(db: PG, project_id: int, user_id: int) -> Record:

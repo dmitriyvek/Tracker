@@ -77,6 +77,9 @@ async def test_logout_mutation(migrated_db_connection, client):
     )
     assert response.status == 200
 
+    # if something will go wrong there will be response body output
+    print(await response.text())
+
     data = await response.json()
     assert 'errors' in data
     assert data['errors'][0]['status'] == 'UNAUTHORIZED'

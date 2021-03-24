@@ -11,6 +11,7 @@ from tracker.api.errors import APIException
 from tracker.api.status_codes import StatusEnum
 
 
+# TODO: use it in doc explorer
 class CustomPageInfo(PageInfo):
 
     class Meta:
@@ -60,7 +61,7 @@ def validate_connection_params(
                         status=StatusEnum.BAD_REQUEST.name
                     )
 
-    if not params.get('first'):
+    if not params.get('first') and not params.get('last'):
         params['first'] = max_fetch_number
 
     return params
@@ -146,6 +147,7 @@ def create_connection_from_records_list(
 
         if after:
             has_previous_page = True
+
         # assuming that id in cursor is valid
         # (not made too large by some client)
         if before:
@@ -155,15 +157,10 @@ def create_connection_from_records_list(
             if result_length == first + 1:
                 has_next_page = True
                 record_list.pop()
-            else:
-                has_next_page = False
 
-        elif last:
-            if result_length == last + 1:
-                has_previous_page = True
-                record_list.pop(0)
-            else:
-                has_previous_page = False
+        elif last and result_length == last + 1:
+            has_previous_page = True
+            record_list.pop(0)
 
     edge_list = [
         edge_type(

@@ -15,6 +15,7 @@ class ProjectListQuery(graphene.ObjectType):
         required=True
     )
 
+    @staticmethod
     @login_required
     async def resolve_list(parent, info: ResolveInfo, **connection_params):
         db = info.context['request'].app['db']

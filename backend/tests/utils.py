@@ -33,7 +33,7 @@ def generate_project_data(
         record['is_deleted'] = is_deleted
 
     record['created_by'] = created_by
-    record['title'] = title if title else fake.word()
+    record['title'] = title if title else fake.unique.word()
     record['description'] = description if description else fake.paragraph(
         nb_sentences=2)
 
@@ -60,9 +60,9 @@ def generate_user_data(
     if is_deleted:
         record['is_deleted'] = is_deleted
 
-    record['username'] = username if username else fake.first_name()
+    record['username'] = username if username else fake.unique.first_name()
     record['password'] = password if password else fake.password(length=9)
-    record['email'] = email if email else fake.email(domain=None)
+    record['email'] = email if email else fake.unique.email(domain=None)
 
     return record
 

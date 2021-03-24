@@ -1,44 +1,45 @@
 import pytest
+from base64 import b64decode, b64encode
 
-from tracker.api.services.auth import generate_password_hash, generate_auth_token
-from tracker.db.schema import users_table
-from tests.utils import generate_user_data, make_request_coroutines, generate_project_data, create_projects_in_db
+from tests.utils import make_request_coroutines
 
 
-async def test_projects_list_query(migrated_db_connection, client):
-    app = client.server.app
+# should be greater then 15 or max_fetch_number
+NUMBER_OF_PROJECTS = 25
 
-    user = generate_user_data()
-    raw_password = user['password']
-    user['password'] = generate_password_hash(raw_password)
-    db_query = users_table.insert().values(user).returning(users_table.c.id)
-    user_id = migrated_db_connection.execute(db_query).fetchone()[0]
 
-    auth_token = generate_auth_token(app['config'], user_id)
-
-    create_projects_in_db(migrated_db_connection, user_id, record_number=5)
-
-    query = '''
-    {
-        projects {
-            list(first: 10) {
-                edges {
+base_query = '''
+    {{
+        projects {{
+            list{params} {{
+                edges {{
                     cursor
-                    node {
+                    node {{
                         id
                         title
-                    }
-                }
-                pageInfo {
+                    }}
+                }}
+                pageInfo {{
                     startCursor
                     endCursor
                     hasNextPage
                     hasPreviousPage
-                }
-            }
-        }
-    }
+                }}
+            }}
+        }}
+    }}
     '''
+
+
+async def test_projects_list_query_with_no_params(
+    client,
+    setup_project_list_test_retrun_auth_token
+):
+    auth_token = setup_project_list_test_retrun_auth_token
+
+    max_fetch_number = client.server.app['config']['max_fetch_number']
+
+    query = base_query.format(params='')
     request_coroutine_list = make_request_coroutines(
         client=client, query=query, auth_token=auth_token)
 
@@ -51,6 +52,238 @@ async def test_projects_list_query(migrated_db_connection, client):
         assert response.status == 200
 
         data = await response.json()
-        data = data['data']['projects']['list']['edges']
+        data = data['data']['projects']['list']
+        pageinfo = data['pageInfo']
 
-        assert data
+        assert len(data['edges']) == max_fetch_number
+        assert pageinfo['hasNextPage']
+        assert not pageinfo['hasPreviousPage']
+
+        decoded_cursor = b64decode(pageinfo['startCursor']).decode()
+        assert decoded_cursor == 'ProjectType:1'
+        decoded_cursor = b64decode(pageinfo['endCursor']).decode()
+        assert decoded_cursor == f'ProjectType:{max_fetch_number}'
+
+
+async def test_projects_list_query_with_first_only(
+    client,
+    setup_project_list_test_retrun_auth_token
+):
+    auth_token = setup_project_list_test_retrun_auth_token
+
+    query = base_query.format(params='(first: 5)')
+    request_coroutine_list = make_request_coroutines(
+        client=client, query=query, auth_token=auth_token)
+
+    for request_coroutine in request_coroutine_list:
+        response = await request_coroutine
+
+        # if something will go wrong there will be response body output
+        print(await response.text())
+
+        assert response.status == 200
+
+        data = await response.json()
+        data = data['data']['projects']['list']
+        pageinfo = data['pageInfo']
+
+        assert len(data['edges']) == 5
+        assert pageinfo['hasNextPage']
+        assert not pageinfo['hasPreviousPage']
+
+        decoded_cursor = b64decode(pageinfo['startCursor']).decode()
+        assert decoded_cursor == 'ProjectType:1'
+        decoded_cursor = b64decode(pageinfo['endCursor']).decode()
+        assert decoded_cursor == 'ProjectType:5'
+
+    # query with first greater then max_fetch_number
+    max_fetch_number = client.server.app['config']['max_fetch_number']
+
+    query = base_query.format(params=f'(first: {max_fetch_number + 10})')
+    request_coroutine_list = make_request_coroutines(
+        client=client, query=query, auth_token=auth_token)
+
+    for request_coroutine in request_coroutine_list:
+        response = await request_coroutine
+
+        # if something will go wrong there will be response body output
+        print(await response.text())
+
+        assert response.status == 200
+
+        data = await response.json()
+        data = data['data']['projects']['list']
+        pageinfo = data['pageInfo']
+
+        assert len(data['edges']) == max_fetch_number
+        assert pageinfo['hasNextPage']
+        assert not pageinfo['hasPreviousPage']
+
+        decoded_cursor = b64decode(pageinfo['startCursor']).decode()
+        assert decoded_cursor == 'ProjectType:1'
+        decoded_cursor = b64decode(pageinfo['endCursor']).decode()
+        assert decoded_cursor == 'ProjectType:10'
+
+
+async def test_projects_list_query_with_first_and_last(
+    client,
+    setup_project_list_test_retrun_auth_token
+):
+    auth_token = setup_project_list_test_retrun_auth_token
+
+    query = base_query.format(params='(first: 10, last: 5)')
+    request_coroutine_list = make_request_coroutines(
+        client=client, query=query, auth_token=auth_token)
+
+    for request_coroutine in request_coroutine_list:
+        response = await request_coroutine
+
+        # if something will go wrong there will be response body output
+        print(await response.text())
+
+        assert response.status == 200
+
+        data = await response.json()
+        data = data['data']['projects']['list']
+        pageinfo = data['pageInfo']
+
+        assert len(data['edges']) == 5
+        assert not pageinfo['hasNextPage']
+        assert pageinfo['hasPreviousPage']
+
+        decoded_cursor = b64decode(pageinfo['startCursor']).decode()
+        assert decoded_cursor == 'ProjectType:6'
+        decoded_cursor = b64decode(pageinfo['endCursor']).decode()
+        assert decoded_cursor == 'ProjectType:10'
+
+
+async def test_projects_list_query_with_last_only(
+    client,
+    setup_project_list_test_retrun_auth_token
+):
+    auth_token = setup_project_list_test_retrun_auth_token
+
+    query = base_query.format(params='(last: 5)')
+    request_coroutine_list = make_request_coroutines(
+        client=client, query=query, auth_token=auth_token)
+
+    for request_coroutine in request_coroutine_list:
+        response = await request_coroutine
+
+        # if something will go wrong there will be response body output
+        print(await response.text())
+
+        assert response.status == 200
+
+        data = await response.json()
+        data = data['data']['projects']['list']
+        pageinfo = data['pageInfo']
+
+        assert len(data['edges']) == 5
+        assert not pageinfo['hasNextPage']
+        assert pageinfo['hasPreviousPage']
+
+        decoded_cursor = b64decode(pageinfo['startCursor']).decode()
+        assert decoded_cursor == f'ProjectType:{NUMBER_OF_PROJECTS - 4}'
+        decoded_cursor = b64decode(pageinfo['endCursor']).decode()
+        assert decoded_cursor == f'ProjectType:{NUMBER_OF_PROJECTS}'
+
+    # query with last greater then max_fetch_number
+    max_fetch_number = client.server.app['config']['max_fetch_number']
+
+    query = base_query.format(params=f'(last: {max_fetch_number + 10})')
+    request_coroutine_list = make_request_coroutines(
+        client=client, query=query, auth_token=auth_token)
+
+    for request_coroutine in request_coroutine_list:
+        response = await request_coroutine
+
+        # if something will go wrong there will be response body output
+        print(await response.text())
+
+        assert response.status == 200
+
+        data = await response.json()
+        data = data['data']['projects']['list']
+        pageinfo = data['pageInfo']
+
+        assert len(data['edges']) == max_fetch_number
+        assert not pageinfo['hasNextPage']
+        assert pageinfo['hasPreviousPage']
+
+        decoded_cursor = b64decode(pageinfo['startCursor']).decode()
+        assert decoded_cursor == \
+            f'ProjectType:{NUMBER_OF_PROJECTS - max_fetch_number + 1}'
+        decoded_cursor = b64decode(pageinfo['endCursor']).decode()
+        assert decoded_cursor == f'ProjectType:{NUMBER_OF_PROJECTS}'
+
+
+async def test_projects_list_query_with_after_only(
+    client,
+    setup_project_list_test_retrun_auth_token
+):
+    auth_token = setup_project_list_test_retrun_auth_token
+
+    max_fetch_number = client.server.app['config']['max_fetch_number']
+    s = 'ProjectType:3'
+    cursor = b64encode(s.encode('utf-8')).decode('utf-8')
+
+    query = base_query.format(params=f'(after: "{cursor}")')
+    request_coroutine_list = make_request_coroutines(
+        client=client, query=query, auth_token=auth_token)
+
+    for request_coroutine in request_coroutine_list:
+        response = await request_coroutine
+
+        # if something will go wrong there will be response body output
+        print(await response.text())
+
+        assert response.status == 200
+
+        data = await response.json()
+        data = data['data']['projects']['list']
+        pageinfo = data['pageInfo']
+
+        assert len(data['edges']) == max_fetch_number
+        assert pageinfo['hasNextPage']
+        assert pageinfo['hasPreviousPage']
+
+        decoded_cursor = b64decode(pageinfo['startCursor']).decode()
+        assert decoded_cursor == 'ProjectType:4'
+        decoded_cursor = b64decode(pageinfo['endCursor']).decode()
+        assert decoded_cursor == f'ProjectType:{max_fetch_number + 3}'
+
+
+async def test_projects_list_query_with_before_only(
+    client,
+    setup_project_list_test_retrun_auth_token
+):
+    auth_token = setup_project_list_test_retrun_auth_token
+
+    s = 'ProjectType:5'
+    cursor = b64encode(s.encode('utf-8')).decode('utf-8')
+
+    query = base_query.format(params=f'(before: "{cursor}")')
+    request_coroutine_list = make_request_coroutines(
+        client=client, query=query, auth_token=auth_token)
+
+    for request_coroutine in request_coroutine_list:
+        response = await request_coroutine
+
+        # if something will go wrong there will be response body output
+        print(await response.text())
+
+        assert response.status == 200
+
+        data = await response.json()
+        data = data['data']['projects']['list']
+        pageinfo = data['pageInfo']
+
+        assert len(data['edges']) == 4
+        assert pageinfo['hasNextPage']
+        assert not pageinfo['hasPreviousPage']
+
+        decoded_cursor = b64decode(pageinfo['startCursor']).decode()
+        assert decoded_cursor == 'ProjectType:1'
+        decoded_cursor = b64decode(pageinfo['endCursor']).decode()
+        assert decoded_cursor == 'ProjectType:4'

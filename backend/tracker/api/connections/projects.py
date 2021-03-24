@@ -14,6 +14,7 @@ class ProjectConnection(graphene.relay.Connection):
     class Meta:
         node = ProjectType
 
+    @staticmethod
     def resolve_total_count(parent, info: ResolveInfo):
         db = info.context['request'].app['db']
         user_id = info.context['request']['user_id']
