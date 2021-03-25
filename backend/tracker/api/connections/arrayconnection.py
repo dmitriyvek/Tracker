@@ -37,14 +37,15 @@ def validate_connection_params(
         for key in ('first', 'last'):
             param = params.get(key)
 
-            if param and param > max_fetch_number:
-                params[key] = max_fetch_number
+            if param:
+                if param > max_fetch_number:
+                    params[key] = max_fetch_number
 
-            if param and param < 0:
-                raise APIException(
-                    f'value of "{key}" parameter must be greater then 0',
-                    status=StatusEnum.BAD_REQUEST.name
-                )
+                if param < 0:
+                    raise APIException(
+                        f'value of "{key}" parameter must be greater then 0',
+                        status=StatusEnum.BAD_REQUEST.name
+                    )
 
         for key in ('after', 'before'):
             if param := params.get(key):
@@ -60,6 +61,9 @@ def validate_connection_params(
                         f'value of "{key}" is not a valid cursor',
                         status=StatusEnum.BAD_REQUEST.name
                     )
+
+    if params.get('first') == params.get('last') != None:
+        params['last'] = None
 
     if not params.get('first') and not params.get('last'):
         params['first'] = max_fetch_number
@@ -104,7 +108,7 @@ def modify_query_by_connection_params(
     last = params.get('last')
 
     if first := params.get('first'):
-        if not last or first == last:
+        if not last:
             query = query.order_by(table.c.id.asc()).limit(first + 1)
 
         else:
@@ -140,7 +144,7 @@ def create_connection_from_records_list(
     has_next_page = False
     result_length = len(record_list)
 
-    if last and first != last:
+    if last:
         record_list.reverse()
 
     if result_length:
@@ -153,10 +157,9 @@ def create_connection_from_records_list(
         if before:
             has_next_page = True
 
-        if first and not last or first == last != None:
-            if result_length == first + 1:
-                has_next_page = True
-                record_list.pop()
+        if first and not last and result_length == first + 1:
+            has_next_page = True
+            record_list.pop()
 
         elif last and result_length == last + 1:
             has_previous_page = True
