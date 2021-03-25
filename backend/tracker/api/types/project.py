@@ -5,10 +5,12 @@ from graphene.types import ResolveInfo
 
 from tracker.api.connections import CustomPageInfo, validate_connection_params, create_connection_from_records_list
 from tracker.api.connections.roles import RoleConnection
+from tracker.api.dataloaders import get_generic_loader
 from tracker.api.types.role import RoleType
 from tracker.api.services.projects import get_project_node
 from tracker.api.services.roles import get_projects_role_list
 from tracker.api.wrappers import login_required
+from tracker.db.schema import roles_table
 
 
 class ProjectType(graphene.ObjectType):
@@ -55,25 +57,56 @@ class ProjectType(graphene.ObjectType):
 
     @staticmethod
     async def resolve_role_list(parent, info, **connection_params):
-        project_id = info.context['request']['project_id']
-        db = info.context['request'].app['db']
-        max_fetch_number = info.context['request'].app.\
-            get('config', {}).\
-            get('max_fetch_number')
+        if project_id := info.context['request'].get('project_id'):
+            db = info.context['request'].app['db']
+            max_fetch_number = info.context['request'].app.\
+                get('config', {}).\
+                get('max_fetch_number')
 
-        connection_params = validate_connection_params(
-            connection_params,
-            RoleType,
-            max_fetch_number
-        )
-        record_list = await get_projects_role_list(
-            db, info, project_id, connection_params
-        )
+            connection_params = validate_connection_params(
+                connection_params,
+                RoleType,
+                max_fetch_number
+            )
+            record_list = await get_projects_role_list(
+                db, info, project_id, connection_params
+            )
 
-        return create_connection_from_records_list(
-            record_list,
-            connection_params,
-            RoleConnection,
-            RoleType,
-            CustomPageInfo
-        )
+            return create_connection_from_records_list(
+                record_list,
+                connection_params,
+                RoleConnection,
+                RoleType,
+                CustomPageInfo
+            )
+
+        else:
+            # initialize data loader
+            if not info.context.get('loader'):
+                db = info.context['request'].app['db']
+                max_fetch_number = info.context['request'].app.\
+                    get('config', {}).\
+                    get('max_fetch_number')
+
+                connection_params = validate_connection_params(
+                    connection_params,
+                    RoleType,
+                    max_fetch_number
+                )
+
+                info.context['loader'] = get_generic_loader(
+                    db,
+                    roles_table,
+                    'project_id',
+                    connection_params,
+                )()
+
+            record_list = await info.context['loader'].load(parent['id'])
+
+            return create_connection_from_records_list(
+                record_list,
+                connection_params,
+                RoleConnection,
+                RoleType,
+                CustomPageInfo
+            )

@@ -35,7 +35,9 @@ GraphQLView = partial(
     executor=AsyncioExecutor(loop=asyncio.get_event_loop()),
     enable_async=True,
     error_formatter=format_error,
-    middleware=[GraphQLErrorMiddleware(), ]
+    middleware=[
+        GraphQLErrorMiddleware(),
+    ]
 )
 
 

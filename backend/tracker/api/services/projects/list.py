@@ -12,14 +12,22 @@ from tracker.api.status_codes import StatusEnum
 from tracker.db.schema import roles_table, projects_table
 
 
-def check_role_requested_in_list(info: ResolveInfo) -> bool:
-    '''Parses project list query asts and checks if current user role is requested'''
+def check_fields_requested_in_list(
+    info: ResolveInfo,
+    field_list: List[str]
+) -> bool:
+    '''Parses info field asts and checks if given fields is requested'''
+    result = {field: False for field in field_list}
 
     for field in info.field_asts[0].selection_set.selections:
-        if field.name.value == 'myRole':
-            return True
+        if field.name.value == 'edges':
+            for edge in field.selection_set.selections:
+                if edge.name.value == 'node':
+                    for type_field in edge.selection_set.selections:
+                        if type_field.name.value in field_list:
+                            result[type_field.name.value] = True
 
-    return False
+    return result
 
 
 async def get_total_count_of_user_projects(db: PG, user_id: int) -> int:
@@ -52,9 +60,13 @@ async def get_user_project_list(
     '''Get a list of all projects in which the user participates'''
 
     required_columns = [*PROJECTS_REQUIRED_FIELDS]
-    role_in_request = check_role_requested_in_list(info)
+    requested_fields = check_fields_requested_in_list(
+        info,
+        ['myRole']
+    )
+    my_role = requested_fields['myRole']
 
-    if role_in_request:
+    if my_role:
         required_columns.extend(ROLES_REQUIRED_FIELDS)
 
     query = projects_table.\
@@ -74,7 +86,7 @@ async def get_user_project_list(
 
     result = await db.query(query)
 
-    if role_in_request:
+    if requested_fields['myRole']:
         result = list(map(format_project_type, result))
     else:
         result = list(map(lambda record: dict(record), result))
