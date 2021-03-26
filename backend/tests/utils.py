@@ -1,5 +1,6 @@
 import datetime
 import json
+from random import randint
 from typing import Optional, List
 from types import CoroutineType
 from urllib.parse import urlencode
@@ -106,10 +107,17 @@ def make_request_coroutines(
     return [get_request, post_request]
 
 
-def create_projects_in_db(db_conn: Connection, user_id: int, record_number: int = 5) -> dict:
-    '''Creates several projects with associated roles of given user in database'''
+def create_projects_in_db(
+    db_conn: Connection,
+    user_id: int,
+    project_number: int = 5,
+    role_number: int = 5,
+) -> dict:
+    '''
+    Creates several projects with several associated roles in database
+    '''
     project_list = [
-        generate_project_data(created_by=user_id) for _ in range(record_number)
+        generate_project_data(created_by=user_id) for _ in range(project_number)
     ]
 
     query = projects_table.insert().values(
@@ -120,12 +128,24 @@ def create_projects_in_db(db_conn: Connection, user_id: int, record_number: int 
     for project in result.fetchall():
         projects_id_list.append(project['id'])
 
-    role_list = [{
-        'role': UserRole.project_manager,
-        'user_id': user_id,
-        'assign_by': user_id,
-        'project_id': project_id
-    } for project_id in projects_id_list]
+    role_pool = [key.name for key in UserRole]
+    role_pool_len = len(role_pool)
+
+    role_list = []
+    for project_id in projects_id_list:
+        role_list.append({
+            'role': UserRole.project_manager,
+            'user_id': user_id,
+            'assign_by': user_id,
+            'project_id': project_id
+        })
+        for _ in range(role_number - 1):
+            role_list.append({
+                'role': role_pool[randint(0, role_pool_len - 1)],
+                'user_id': user_id,
+                'assign_by': user_id,
+                'project_id': project_id
+            })
 
     query = roles_table.insert().values(
         role_list).returning(roles_table.c.id)

@@ -7,6 +7,8 @@ from tests.utils import generate_user_data, create_projects_in_db
 
 # should be greater then 15 or max_fetch_number
 NUMBER_OF_PROJECTS = 25
+# should be greater then 10
+NUMBER_OF_ROLES = 12
 
 
 @pytest.fixture()
@@ -24,7 +26,8 @@ def setup_project_list_test_retrun_auth_token(client, migrated_db_connection):
     create_projects_in_db(
         migrated_db_connection,
         user_id,
-        record_number=NUMBER_OF_PROJECTS
+        project_number=NUMBER_OF_PROJECTS,
+        role_number=NUMBER_OF_ROLES
     )
 
     return auth_token

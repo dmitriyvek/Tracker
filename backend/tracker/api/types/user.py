@@ -2,7 +2,7 @@ import graphene
 from graphene.types import ResolveInfo
 from sqlalchemy import and_
 
-from tracker.api.connections import CustomPageInfo, create_connection_from_records_list, validate_connection_params
+from tracker.api.connections import CustomPageInfo, create_connection_from_record_list, validate_connection_params
 from tracker.api.connections.projects import ProjectConnection
 from tracker.api.services.users import get_user_by_id
 from tracker.api.services.projects import get_user_project_list
@@ -57,7 +57,7 @@ class UserType(graphene.ObjectType):
             db, info, user_id, connection_params
         )
 
-        return create_connection_from_records_list(
+        return create_connection_from_record_list(
             record_list,
             connection_params,
             ProjectConnection,

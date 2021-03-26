@@ -5,7 +5,8 @@ import graphene
 from asyncpg import Record
 from graphene.relay import Connection, PageInfo
 from graphql_relay import from_global_id, to_global_id
-from sqlalchemy.schema import Table
+from sqlalchemy import and_, func
+from sqlalchemy.sql.schema import Column, Table
 
 from tracker.api.errors import APIException
 from tracker.api.status_codes import StatusEnum
@@ -16,8 +17,8 @@ class CustomPageInfo(PageInfo):
 
     class Meta:
         description = (
-            "The Relay compliant `PageInfo` type, containing data necessary to"
-            " paginate this connection. Max fetch number = 20"
+            "The Relay compliant `PageInfo` type, containing data "
+            "necessary to paginate this connection. Max fetch number = 20"
         )
 
 
@@ -25,11 +26,13 @@ def validate_connection_params(
     params: Dict[str, str],
     node_type: graphene.ObjectType,
     max_fetch_number: int = 20,
+    nested_connection: bool = False,
 ) -> Dict[str, Union[str, int]]:
     '''
     Validate connection params. Returns dict with
     decoded (as integer) "after" and "before" cursors if given.
-    Set "first" to max_fetch_number if not given or greater
+    Set "first" to max_fetch_number if not given or greater.
+    If connection is nested, then raise an error on "after" or "before"
     '''
 
     if params:
@@ -49,6 +52,14 @@ def validate_connection_params(
 
         for key in ('after', 'before'):
             if param := params.get(key):
+
+                if nested_connection:
+                    raise APIException(
+                        'nested connections don\'t support'
+                        '"after" or "before" cursors',
+                        status=StatusEnum.BAD_REQUEST.name
+                    )
+
                 try:
                     param = from_global_id(param)
                     if param[0] != node_type.__name__ or int(param[1]) < 0:
@@ -95,9 +106,11 @@ def cursor_to_id(cursor):
 def modify_query_by_connection_params(
     query,
     table: Table,
-    params: Dict[str, Union[str, int]]
+    params: Dict[str, Union[str, int]],
 ):
-    '''Modify the database query according to the connection parameters'''
+    '''
+    Modify the database query according to the connection parameters
+    '''
 
     if after := params.get('after'):
         query = query.where(table.c.id > after)
@@ -125,7 +138,51 @@ def modify_query_by_connection_params(
     return query
 
 
-def create_connection_from_records_list(
+def modify_query_by_nested_connection_params(
+    query,
+    table: Table,
+    params: Dict[str, int],
+    partition_by: Union[str, Column],
+):
+    '''
+    Modify the database query according to the nested connection 
+    parameters ("first" and "last" only)
+    '''
+
+    first = params.get('first')
+    last = params.get('last')
+
+    if isinstance(partition_by, str):
+        partition_by = getattr(table.c, partition_by)
+    order_by = table.c.id.desc() if last and not first else table.c.id.asc()
+
+    query.append_column(
+        func.row_number().over(
+            partition_by=partition_by,
+            order_by=order_by
+        ).label('number')
+    )
+    sub_query = query.alias('sub_query')
+
+    if last and first:
+        query = sub_query.\
+            select().\
+            where(and_(
+                sub_query.c.number <= first,
+                sub_query.c.number >= first - last
+            )).\
+            order_by(sub_query.c.id.desc())
+
+    elif last:
+        query = sub_query.select().where(sub_query.c.number <= last + 1)
+
+    else:
+        query = sub_query.select().where(sub_query.c.number <= first + 1)
+
+    return query
+
+
+def create_connection_from_record_list(
     record_list: List[Union[Dict[str, Any], Record]],
     connection_params: Dict[str, str],
     connection_type: Connection,
