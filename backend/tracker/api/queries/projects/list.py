@@ -1,7 +1,10 @@
 import graphene
 from graphql import ResolveInfo
 
-from tracker.api.connections import CustomPageInfo, validate_connection_params, create_connection_from_record_list
+from tracker.api.connections import (
+    CustomPageInfo, create_connection_from_record_list,
+    validate_connection_params
+)
 from tracker.api.connections.projects import ProjectConnection
 from tracker.api.types import ProjectType
 from tracker.api.wrappers import login_required
@@ -11,7 +14,8 @@ from tracker.api.services.projects import get_user_project_list
 class ProjectListQuery(graphene.ObjectType):
     list = graphene.relay.ConnectionField(
         ProjectConnection,
-        description='List of all projects in which the currently loged user participates',
+        description='List of all projects in which \
+            the currently loged user participates',
         required=True
     )
 

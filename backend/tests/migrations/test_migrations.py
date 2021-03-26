@@ -6,7 +6,9 @@ from alembic.config import Config
 from alembic.script import Script, ScriptDirectory
 
 from .migrations_data import migration_680b3748447a
-from tracker.utils.db import get_alembic_config_from_url, make_validation_params_groups
+from tracker.utils.db import (
+    get_alembic_config_from_url, make_validation_params_groups
+)
 
 
 def get_revisions():

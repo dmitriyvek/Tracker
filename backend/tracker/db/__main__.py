@@ -1,7 +1,7 @@
 '''
 Utility for managing the state of the database, wrapper over alembic.
-Can be called from any directory, and also specify an arbitrary DSN for the base
-data other than the one specified in the alembic.ini file. 
+Can be called from any directory, and also specify an arbitrary DSN for
+the base data other than the one specified in the alembic.ini file.
 '''
 import argparse
 import logging

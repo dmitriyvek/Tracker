@@ -3,12 +3,17 @@ from sqlalchemy import and_
 
 from graphene.types import ResolveInfo
 
-from tracker.api.connections import CustomPageInfo, validate_connection_params, create_connection_from_record_list
+from tracker.api.connections import (
+    CustomPageInfo, create_connection_from_record_list,
+    validate_connection_params
+)
 from tracker.api.connections.roles import RoleConnection
 from tracker.api.dataloaders import get_generic_loader
 from tracker.api.types.role import RoleType
 from tracker.api.services.projects import get_project_node
-from tracker.api.services.roles import ROLES_REQUIRED_FIELDS, get_projects_role_list
+from tracker.api.services.roles import (
+    ROLES_REQUIRED_FIELDS, get_projects_role_list
+)
 from tracker.api.wrappers import login_required
 from tracker.db.schema import roles_table
 

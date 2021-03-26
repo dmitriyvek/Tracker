@@ -2,7 +2,10 @@ import graphene
 from graphene.types import ResolveInfo
 from sqlalchemy import and_
 
-from tracker.api.connections import CustomPageInfo, create_connection_from_record_list, validate_connection_params
+from tracker.api.connections import (
+    CustomPageInfo, create_connection_from_record_list,
+    validate_connection_params
+)
 from tracker.api.connections.projects import ProjectConnection
 from tracker.api.services.users import get_user_by_id
 from tracker.api.services.projects import get_user_project_list
@@ -13,7 +16,8 @@ from tracker.db.schema import users_table
 
 class UserType(graphene.ObjectType):
     '''
-    A user is an individual's account on current api that can take part in projects.
+    A user is an individual's account on current api
+    that can take part in projects.
     '''
     username = graphene.String(
         required=True,

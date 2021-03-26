@@ -5,13 +5,15 @@ import jwt
 from asyncpgsa import PG
 from sqlalchemy.sql import select
 
-from tracker.api.errors import APIException
-from tracker.api.status_codes import StatusEnum
 from tracker.db.schema import blacklist_tokens_table
 
 
 def generate_auth_token(config: dict, user_id: int, email: str = '') -> bytes:
-    '''Generates the Auth Token with the given user_id. If the email was also given then adds it to the payload (the token will be used for account confirmation).'''
+    '''
+    Generates the Auth Token with the given user_id.
+    If the email was also given then adds it to the payload
+    (the token will be used for account confirmation).
+    '''
     payload = {
         'exp': datetime.utcnow() + config.get('token_expiration_time'),
         'iat': datetime.utcnow(),
@@ -37,15 +39,24 @@ async def check_if_token_is_blacklisted(db: PG, token: str) -> None:
         #                    status=StatusEnum.UNAUTHORIZED.name)
 
 
-async def decode_token(db: PG, config: dict, token: str, is_auth: bool = True) -> Union[dict, None]:
-    '''Decodes given token and return payload or None if token is invalid.'''
+async def decode_token(
+    db: PG,
+    config: dict,
+    token: str,
+    is_auth: bool = True
+) -> Union[dict, None]:
+    '''
+    Decodes given token and return payload or None if token is invalid.
+    '''
+
     try:
         payload = jwt.decode(token, config.get(
             'secret_key'), algorithms=['HS256'])
         await check_if_token_is_blacklisted(db, token)
 
         # if acoount confirmation token is used
-        if (is_auth and payload.get('email')) or (not is_auth and not payload.get('email')):
+        if (is_auth and payload.get('email')) or \
+                (not is_auth and not payload.get('email')):
             raise jwt.InvalidTokenError('Email confirmation token is used')
             # raise APIException('Invalid auth token is used.',
             #                    status=StatusEnum.UNAUTHORIZED.name)

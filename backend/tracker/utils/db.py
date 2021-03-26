@@ -52,13 +52,14 @@ def construct_db_url(env_values: dict, default_url: str) -> str:
     '''
     pg_keys = ['pg_name', 'pg_user', 'pg_password', 'pg_host', 'pg_port']
     if all([env_values.get(key) for key in pg_keys]):
-        return 'postgresql://{user}:{password}@{host}:{port}/{database}'.format(
-            user=env_values[pg_keys[1]],
-            password=env_values[pg_keys[2]],
-            host=env_values[pg_keys[3]],
-            port=env_values[pg_keys[4]],
-            database=env_values[pg_keys[0]]
-        )
+        return 'postgresql://{user}:{password}@{host}:{port}/{database}'.\
+            format(
+                user=env_values[pg_keys[1]],
+                password=env_values[pg_keys[2]],
+                host=env_values[pg_keys[3]],
+                port=env_values[pg_keys[4]],
+                database=env_values[pg_keys[0]]
+            )
     return default_url
 
 
@@ -72,7 +73,7 @@ def make_alembic_config(cmd_opts: SimpleNamespace,
                         base_path: str = BASE_DIR) -> Config:
     '''
     Creates alembic config object based on command line arguments,
-    replaces relative paths with absolute ones 
+    replaces relative paths with absolute ones
     '''
     if not os.path.isabs(cmd_opts.config):
         cmd_opts.config = os.path.join(base_path, cmd_opts.config)

@@ -1,6 +1,5 @@
 import json
 
-import pytest
 import jwt
 
 from tests.utils import generate_user_data

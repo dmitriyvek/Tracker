@@ -1,4 +1,3 @@
-import os
 import sys
 from datetime import timedelta
 from pathlib import Path
@@ -36,12 +35,16 @@ DEFAULT_CONFIG = {
 
 
 def get_config(argv: list = None) -> dict:
-    '''Gets config parameters from merging default params, params from .env file and params from argparser'''
+    '''
+    Gets config parameters from merging default params,
+    params from .env file and params from argparser
+    '''
     env_options = parse_env_file(ENV_PATH)
     params = merge_env_with_default(env_options, DEFAULT_CONFIG)
     config = DEFAULT_CONFIG.copy()
 
-    # if app started with aiohttp-devtools runserver then we does not need arg parser
+    # if app started with aiohttp-devtools runserver
+    # then we does not need arg parser
     if 'runserver' in sys.argv:
         config.update(params)
     else:

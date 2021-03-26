@@ -16,7 +16,8 @@ def login_required(func: FunctionType) -> Awaitable:
 
         if not isinstance(info, ResolveInfo):
             raise TypeError(
-                'login_required decorator should be used only with graphene resolvers'
+                'login_required decorator should be \
+                used only with graphene resolvers'
             )
 
         user_id = info.context['request'].get('user_id')

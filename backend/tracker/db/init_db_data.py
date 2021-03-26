@@ -7,8 +7,8 @@ from tracker.utils.db import get_db_url
 from tracker.api.services import generate_password_hash
 from tracker.db.schema import (
     users_table, projects_table, roles_table, tickets_table, comments_table,
-    UserRole as URole, TicketStatus as TStatus,
-    TicketPriority as TPriority, TicketType as TType
+    UserRole as URole, TicketStatus as TS,
+    TicketPriority as TP, TicketType as TT
 )
 
 
@@ -16,7 +16,9 @@ USER_PSWD = generate_password_hash('zxcfghuio')
 
 
 def init_db_data():
-    '''Initialized db with test data (working with empty tables only)'''
+    '''
+    Initialized db with test data (working with empty tables only)
+    '''
     user_list = [{
         'username': f'user{i}',
         'password': USER_PSWD,
@@ -67,21 +69,21 @@ def init_db_data():
         'priority': priority,
         'type': type
     } for i, project_id, by_id, to_id, status, priority, type in (
-        (1, 1, 1, 4, TStatus.open, TPriority.hight, TType.feature_request),
-        (2, 1, 1, 3, TStatus.in_progress, TPriority.medium, TType.feature_request),
-        (3, 1, 1, 5, TStatus.done, TPriority.hight, TType.bug_or_error),
-        (4, 1, 1, 6, TStatus.open, TPriority.none, TType.document_request),
-        (5, 1, 2, 4, TStatus.done, TPriority.medium, TType.bug_or_error),
-        (6, 1, 2, 3, TStatus.in_progress, TPriority.hight, TType.feature_request),
-        (7, 1, 2, 5, TStatus.open, TPriority.none, TType.feature_request),
-        (8, 2, 2, 1, TStatus.open, TPriority.medium, TType.feature_request),
-        (9, 2, 2, 1, TStatus.done, TPriority.hight, TType.bug_or_error),
-        (10, 2, 2, 3, TStatus.in_progress, TPriority.none, TType.feature_request),
-        (11, 2, 2, 1, TStatus.in_progress, TPriority.medium, TType.document_request),
-        (12, 2, 2, 1, TStatus.open, TPriority.hight, TType.feature_request),
-        (13, 3, 3, 1, TStatus.open, TPriority.hight, TType.feature_request),
-        (14, 3, 3, 1, TStatus.done, TPriority.none, TType.document_request),
-        (15, 3, 3, 2, TStatus.open, TPriority.medium, TType.feature_request)
+        (1, 1, 1, 4, TS.open, TP.hight, TT.feature_request),
+        (2, 1, 1, 3, TS.in_progress, TP.medium, TT.feature_request),
+        (3, 1, 1, 5, TS.done, TP.hight, TT.bug_or_error),
+        (4, 1, 1, 6, TS.open, TP.none, TT.document_request),
+        (5, 1, 2, 4, TS.done, TP.medium, TT.bug_or_error),
+        (6, 1, 2, 3, TS.in_progress, TP.hight, TT.feature_request),
+        (7, 1, 2, 5, TS.open, TP.none, TT.feature_request),
+        (8, 2, 2, 1, TS.open, TP.medium, TT.feature_request),
+        (9, 2, 2, 1, TS.done, TP.hight, TT.bug_or_error),
+        (10, 2, 2, 3, TS.in_progress, TP.none, TT.feature_request),
+        (11, 2, 2, 1, TS.in_progress, TP.medium, TT.document_request),
+        (12, 2, 2, 1, TS.open, TP.hight, TT.feature_request),
+        (13, 3, 3, 1, TS.open, TP.hight, TT.feature_request),
+        (14, 3, 3, 1, TS.done, TP.none, TT.document_request),
+        (15, 3, 3, 2, TS.open, TP.medium, TT.feature_request)
     )]
 
     comment_list = [{
@@ -115,7 +117,11 @@ def init_db_data():
     # check if tables are empty
     with engine.connect() as conn:
         query = sa.select([
-            users_table.c.id, projects_table.c.id, tickets_table.c.id, roles_table.c.id, comments_table.c.id
+            users_table.c.id,
+            projects_table.c.id,
+            tickets_table.c.id,
+            roles_table.c.id,
+            comments_table.c.id,
         ]).limit(1)
         if conn.execute(query).rowcount:
             print('Tables not empty - can not initialize test data')

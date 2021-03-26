@@ -8,7 +8,10 @@ from tracker.db.schema import UserRole, projects_table, roles_table
 
 
 async def check_if_project_exists(db: PG, data: dict) -> None:
-    '''Checks if project with given title is already exist if yes raises 400 error'''
+    '''
+    Checks if project with given title is already exist 
+    if yes raises 400 error
+    '''
     query = projects_table.\
         select().\
         with_only_columns([projects_table.c.id]).\
@@ -43,7 +46,3 @@ async def create_project(db: PG, data: dict) -> dict:
 
     project['my_role'] = role
     return project
-
-
-# query = union(projects_table.select().with_only_columns([literal_column('1').label('num'), projects_table.c.id]).where(projects_table.c.id == 2), roles_table.select(
-# ).with_only_columns([literal_column('2').label('num'), roles_table.c.user_id]).where(roles_table.c.project_id == 2)).order_by('num')

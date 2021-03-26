@@ -5,7 +5,9 @@ from tracker.api.types import ProjectType
 from tracker.api.status_codes import StatusEnum
 from tracker.api.schemas.projects import ProjectCreationSchema
 from tracker.api.services import validate_input
-from tracker.api.services.projects import check_if_project_exists, create_project
+from tracker.api.services.projects import (
+    check_if_project_exists, create_project
+)
 from tracker.api.wrappers import login_required
 
 

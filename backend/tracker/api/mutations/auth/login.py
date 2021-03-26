@@ -1,11 +1,13 @@
 import graphene
 
 from ..base import BaseMutationPayload
-from tracker.api.types import UserType
-from tracker.api.status_codes import StatusEnum
 from tracker.api.schemas.auth import LoginSchema
 from tracker.api.services import validate_input
-from tracker.api.services.auth import generate_auth_token, check_user_credentials
+from tracker.api.services.auth import (
+    check_user_credentials, generate_auth_token
+)
+from tracker.api.status_codes import StatusEnum
+from tracker.api.types import UserType
 
 
 class LoginStatus(graphene.Enum):

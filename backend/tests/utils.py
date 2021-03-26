@@ -117,7 +117,8 @@ def create_projects_in_db(
     Creates several projects with several associated roles in database
     '''
     project_list = [
-        generate_project_data(created_by=user_id) for _ in range(project_number)
+        generate_project_data(created_by=user_id)
+        for _ in range(project_number)
     ]
 
     query = projects_table.insert().values(

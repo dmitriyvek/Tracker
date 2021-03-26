@@ -6,8 +6,6 @@ from pathlib import PosixPath
 from aiohttp.web_app import Application
 from loguru import logger
 
-from tracker.utils.utils import init_logs
-
 
 @unique
 class LogLevelEnum(Enum):
@@ -22,9 +20,14 @@ class LogLevelEnum(Enum):
 
 
 def exact_level_only(record, level: int, global_level: int) -> bool:
-    '''Passing only logs with a specified level and if this level is greater then global log level'''
+    '''
+    Passing only logs with a specified level
+    and if this level is greater then global log level
+    '''
     record_level = record['level'].no
-    return not record['extra'] and record_level == level and record_level >= global_level
+    return not record['extra'] and \
+        record_level == level and \
+        record_level >= global_level
 
 
 def request_log_filter(record, global_level: int) -> bool:

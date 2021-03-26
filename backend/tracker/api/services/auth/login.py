@@ -19,8 +19,17 @@ def check_password_hash(encoded: str, password: str) -> bool:
 
 
 async def check_user_credentials(db: PG, data: dict) -> dict:
-    '''Check if user with given credentials exist; if it does then returns this user else raise 401 error'''
-    query = select([users_table.c.id, users_table.c.username, users_table.c.email, users_table.c.password]).\
+    '''
+    Check if user with given credentials exist; 
+    if it does then returns this user else raise 401 error
+    '''
+
+    query = select([
+        users_table.c.id,
+        users_table.c.username,
+        users_table.c.email,
+        users_table.c.password
+    ]).\
         where(and_(
             users_table.c.username == data.get('username'),
             users_table.c.is_deleted.is_(False)

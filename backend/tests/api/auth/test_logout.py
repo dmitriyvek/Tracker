@@ -1,10 +1,10 @@
 import json
 
-import pytest
-
-from tests.utils import generate_user_data
+from tracker.api.services.auth import (
+    generate_auth_token, generate_password_hash
+)
 from tracker.db.schema import users_table, blacklist_tokens_table
-from tracker.api.services.auth import generate_password_hash, generate_auth_token
+from tests.utils import generate_user_data
 
 
 async def test_logout_mutation(migrated_db_connection, client):

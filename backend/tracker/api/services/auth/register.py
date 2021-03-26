@@ -17,7 +17,10 @@ def generate_password_hash(password: str, salt_rounds: int = 12) -> str:
 
 
 async def check_if_user_exists(db: PG, data: dict) -> None:
-    '''Checks if user with given username or email is already exist if yes raises 400 error'''
+    '''
+    Checks if user with given username or email is already exist
+    if yes raises 400 error
+    '''
     query = select([users_table.c.id]).where(or_(
         and_(
             users_table.c.username == data['username'],
@@ -31,14 +34,20 @@ async def check_if_user_exists(db: PG, data: dict) -> None:
     result = await db.fetchrow(query)
     if result:
         raise APIException(
-            'User with given username or email is already exist.', status=StatusEnum.BAD_REQUEST.name)
+            'User with given username or email is already exist.',
+            status=StatusEnum.BAD_REQUEST.name
+        )
 
 
 async def create_user(db: PG, data: dict) -> dict:
     '''Creates and returns new user'''
     data['password'] = generate_password_hash(data['password'])
     query = users_table.insert().\
-        returning(users_table.c.id, users_table.c.username, users_table.c.email).\
+        returning(
+            users_table.c.id,
+            users_table.c.username,
+            users_table.c.email
+    ).\
         values(data)
     user = dict(await db.fetchrow(query))
 

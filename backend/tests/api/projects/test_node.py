@@ -1,7 +1,5 @@
 from base64 import b64decode, b64encode
 
-import pytest
-
 from tests.utils import make_request_coroutines
 
 

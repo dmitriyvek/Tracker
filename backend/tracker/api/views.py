@@ -12,7 +12,9 @@ from tracker.api.middleware import GraphQLErrorMiddleware
 
 
 def format_error(error):
-    '''Custom error formater that adds all arguments from exception.context'''
+    '''
+    Custom error formater that adds all arguments from exception.context
+    '''
     formatted_error = default_format_error(error)
 
     try:

@@ -5,7 +5,10 @@ from tracker.api.status_codes import StatusEnum
 
 
 def validate_input(data: dict, schema) -> dict:
-    '''Validate given data with given Schema. If data is not valid abort 422 Response or 400 if no data provided.'''
+    '''
+    Validate given data with given Schema. 
+    If data is not valid abort 422 Response or 400 if no data provided.
+    '''
     if not data:
         raise APIException('No data provided.',
                            status=StatusEnum.BAD_REQUEST.name)

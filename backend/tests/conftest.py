@@ -1,5 +1,3 @@
-from types import SimpleNamespace
-
 import pytest
 from pytest_aiohttp import aiohttp_unused_port, aiohttp_client
 from alembic.command import upgrade
@@ -7,7 +5,9 @@ from sqlalchemy import create_engine
 from yarl import URL
 
 from tracker.api.app import create_app
-from tracker.utils.db import get_db_url, make_alembic_config, tmp_database, get_alembic_config_from_url
+from tracker.utils.db import (
+    get_alembic_config_from_url, get_db_url, tmp_database
+)
 from tracker.utils.loggers import setup_logger
 
 
@@ -79,8 +79,9 @@ async def client(aiohttp_client, app_args):
         replace('log', 'tests/log', 1)
     info_log_file_path = str(app['config']['info_log_file_path']).\
         replace('log', 'tests/log', 1)
-    request_info_log_file_path = str(app['config']['request_info_log_file_path']).\
-        replace('log', 'tests/log', 1)
+    request_info_log_file_path = str(
+        app['config']['request_info_log_file_path']
+    ).replace('log', 'tests/log', 1)
     app['logger'] = setup_logger(
         app['config']['log_level'],
         error_log_file_path,
