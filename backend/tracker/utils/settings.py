@@ -34,7 +34,7 @@ DEFAULT_CONFIG = {
 }
 
 
-def get_config(argv: list = None) -> dict:
+def get_config() -> dict:
     '''
     Gets config parameters from merging default params,
     params from .env file and params from argparser
@@ -49,7 +49,7 @@ def get_config(argv: list = None) -> dict:
         config.update(params)
     else:
         parser = get_arg_parser(params)
-        namespace = parser.parse_args(argv)
+        namespace = parser.parse_args()
         config.update(vars(namespace))
 
     return config

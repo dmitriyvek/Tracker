@@ -61,4 +61,4 @@ async def test_user_detail_query(
         data = data['data']['node']
         role_list = data['roleList']
 
-        assert len(role_list['edges']) == 1
+        assert len(role_list['edges']) == 5

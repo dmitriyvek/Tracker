@@ -20,7 +20,9 @@ async def test_user_detail_query(migrated_db_connection, client):
 
     auth_token = generate_auth_token(app['config'], user_id)
 
-    create_projects_in_db(migrated_db_connection, user_id, record_number=5)
+    create_projects_in_db(
+        migrated_db_connection, user_id, project_number=5
+    )
 
     query = '''
         {

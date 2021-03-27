@@ -8,7 +8,9 @@ from urllib.parse import urlencode
 from faker import Faker
 from sqlalchemy.engine import Connection
 
-from tracker.db.schema import UserRole, projects_table, roles_table
+from tracker.db.schema import (
+    UserRole, projects_table, roles_table, users_table
+)
 
 
 fake = Faker()
@@ -116,6 +118,21 @@ def create_projects_in_db(
     '''
     Creates several projects with several associated roles in database
     '''
+    # create users for roles
+    user_list = [
+        generate_user_data()
+        for _ in range(role_number - 1)
+    ]
+
+    query = users_table.insert().values(
+        user_list).returning(users_table.c.id)
+    result = db_conn.execute(query)
+
+    users_id_list = []
+    for user in result.fetchall():
+        users_id_list.append(user['id'])
+
+    # create projects
     project_list = [
         generate_project_data(created_by=user_id)
         for _ in range(project_number)
@@ -129,6 +146,7 @@ def create_projects_in_db(
     for project in result.fetchall():
         projects_id_list.append(project['id'])
 
+    # create roles
     role_pool = [key.name for key in UserRole]
     role_pool_len = len(role_pool)
 
@@ -140,10 +158,10 @@ def create_projects_in_db(
             'assign_by': user_id,
             'project_id': project_id
         })
-        for _ in range(role_number - 1):
+        for i in range(role_number - 1):
             role_list.append({
                 'role': role_pool[randint(0, role_pool_len - 1)],
-                'user_id': user_id,
+                'user_id': users_id_list[i],
                 'assign_by': user_id,
                 'project_id': project_id
             })

@@ -1,4 +1,5 @@
 import pytest
+import sys
 from pytest_aiohttp import aiohttp_unused_port, aiohttp_client
 from alembic.command import upgrade
 from sqlalchemy import create_engine
@@ -72,7 +73,11 @@ def app_args(aiohttp_unused_port, migrated_db):
 
 @pytest.fixture()
 async def client(aiohttp_client, app_args):
-    app = create_app(app_args)
+    # get rid of pytest params
+    sys.argv = [sys.argv[0]]
+    # set params needed for creating an app
+    sys.argv.extend(app_args)
+    app = create_app()
 
     # redirect log stream into tests root folder
     error_log_file_path = str(app['config']['error_log_file_path']).\
