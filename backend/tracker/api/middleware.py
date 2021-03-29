@@ -48,7 +48,8 @@ async def auth_middleware(request, handler):
         if payload:
             request['user_id'] = payload['sub']
 
-    # request['user_id'] = 1
+    # TODO: not forget
+    request['user_id'] = 1
     return await handler(request)
 
 
