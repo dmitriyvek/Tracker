@@ -9,34 +9,26 @@ from tracker.api.middleware import auth_middleware, request_logging_middleware
 
 
 def init_routes(app, cors):
-    # app.router.add_route('GET', '/graphql', gql_view, name='graphql')
-    # app.router.add_route('POST', '/graphql', gql_view, name='graphql')
-
-    resource = cors.add(app.router.add_resource("/graphql"))
-    cors.add(
-        resource.add_route('POST', gql_view), {
-            "http://localhost:3000": aiohttp_cors.ResourceOptions(
-                allow_credentials=True,
-                expose_headers='*',
-                allow_headers='*',
-                max_age=3600,
-            )
-        }
+    cors_resourse_options = aiohttp_cors.ResourceOptions(
+        allow_methods=['POST', 'GET', 'OPTIONS'],
+        allow_credentials=True,
+        expose_headers=(),
+        allow_headers=('Content-Type', ),
+        max_age=3600,
     )
-    cors.add(
-        resource.add_route('GET', gql_view), {
-            "http://localhost:3000": aiohttp_cors.ResourceOptions(
-                allow_credentials=True,
-                expose_headers='*',
-                allow_headers='*',
-                max_age=3600,
-            )
-        }
-    )
+    cors_options = {
+        'http://localhost:3000': cors_resourse_options,
+    }
 
     if app['config']['debug']:
         app.router.add_route('GET', '/graphiql', gqil_view, name='graphiql')
         app.router.add_route('POST', '/graphiql', gqil_view, name='graphiql')
+        # add cors for apollo sudio
+        cors_options['https://studio.apollographql.com'] = cors_resourse_options
+
+    resource = cors.add(app.router.add_resource("/graphql"), cors_options)
+    cors.add(resource.add_route('POST', gql_view))
+    cors.add(resource.add_route('GET', gql_view))
 
 
 def create_app() -> web.Application:

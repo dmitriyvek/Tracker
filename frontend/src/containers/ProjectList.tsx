@@ -1,60 +1,79 @@
-import axios, { AxiosResponse } from 'axios';
-import React from 'react';
-import { List, Avatar, Button, Skeleton } from 'antd';
+import axios, { AxiosResponse } from "axios";
+import React, { useState, useEffect } from "react";
+import { useQuery, gql } from "@apollo/client";
+import { List, Avatar, Button, Skeleton } from "antd";
 
-const count = 3;
-const fakeDataUrl = `https://randomuser.me/api/?results=${count}&inc=name,gender,email,nat&noinfo`;
+import type { ProjectListType, ProjectListResponseType } from "../types";
 
-type NameType = {
-    type: string,
-    first: string,
-    last: string
-}
-type ItemType = {
-    loading: boolean,
-    gender: string,
-    name: NameType,
-    email: string,
-    nat: string
-}
+const recordNumber = 3;
+
+type ProjectNodeType = Readonly<{
+  id: string;
+  title: string;
+  description: string;
+  createdAt: string;
+}>;
+
+type ProjectNodeWithLoadingType = {
+  loading: boolean;
+  node: ProjectNodeType;
+};
+
 type StateType = {
-    initLoading: boolean,
-    loading: boolean,
-    data: ItemType[],
-    list: []
-}
+  initLoad: boolean;
+  loading: boolean;
+  list: ProjectNodeWithLoadingType[];
+};
 
-type ResponseDataType = {
-    results: ItemType[]
-}
+type getProjectListType = () => ProjectNodeWithLoadingType[];
 
-type CallbackType = (res: ResponseDataType) => void
+const ProjectList = () => {
+  const [initLoad, setInitLoad] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [list, setList] = useState<ProjectNodeWithLoadingType[]>([]);
 
-class ProjectList extends React.Component {
-  state: StateType = {
-    initLoading: true,
-    loading: false,
-    data: [],
-    list: [],
-  };
-
-  componentDidMount() {
-    this.getData((res: ResponseDataType) => {
-      this.setState({
-        initLoading: false,
-        data: res.results,
-        list: res.results,
-      });
+  const getProjectList: getProjectListType = () => {
+    const GET_PROJECT_LIST = gql`
+      query GetProjectList($first: Int) {
+        projects {
+          list(first: $first) {
+            edges {
+              node {
+                id
+                title
+                description
+              }
+            }
+          }
+        }
+      }
+    `;
+    const { loading, error, data } = useQuery(GET_PROJECT_LIST, {
+      variables: { first: recordNumber },
     });
-  }
 
-  getData = (callback: CallbackType) => {
-    axios
-    //   .post('localhost:8000/grapiql', {
+    if (loading) {
+      setLoading(true);
+    }
+    if (error) {
+      console.log(error);
+      return null;
+    }
+
+    setLoading(false);
+
+    if (!data) {
+      return null;
+    }
+
+    return data.projects.list.edges;
+
+    // axios
+    //   .post("localhost:8000/grapiql", {
     //     query: `
     //         {
     //             projects {
-    //                 list(first: ${count}) {
+    //                 list(first: ${recordNumber}) {
     //                     edges {
     //                         node {
     //                             id
@@ -68,75 +87,75 @@ class ProjectList extends React.Component {
     //         }
     //     `,
     //   })
-      .get<ResponseDataType>(fakeDataUrl)
-      .then((response: AxiosResponse) => callback(response.data))
-      .catch((err) => {
-        console.log(err);
-      });
+    //   .then((response: AxiosResponse) => {
+    //     console.log(response.data.projects.list);
+    //     return response.data.projects.list;
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   });
   };
 
-  onLoadMore = () => {
+  useEffect(() => {
+    setList(getProjectList());
+    setInitLoad(true);
+  });
 
-    this.setState({
-      loading: true,
-      list: this.state.data.concat([...new Array(count)].map(() => ({ loading: true, name: {} } as ItemType))),
-    });
-    this.getData((res: ResponseDataType) => {
-      const data = this.state.data.concat(res.results);
-      this.setState(
-        {
-          data,
-          list: data,
-          loading: false,
-        },
-        () => {
-          // Resetting window's offsetTop so as to display react-virtualized demo underfloor.
-          // In real scene, you can using public method of react-virtualized:
-          // https://stackoverflow.com/questions/46700726/how-to-use-public-method-updateposition-of-react-virtualized
-          window.dispatchEvent(new Event('resize'));
-        },
-      );
-    });
-  };
-
-  render() {
-    const { initLoading, loading, list } = this.state;
-    const loadMore =
-      !initLoading && !loading ? (
-        <div
-          style={{
-            textAlign: 'center',
-            marginTop: 12,
-            height: 32,
-            lineHeight: '32px',
-          }}
-        >
-          <Button onClick={this.onLoadMore}>loading more</Button>
-        </div>
-      ) : null;
-
-    return (
-      <List
-        className="demo-loadmore-list"
-        loading={initLoading}
-        itemLayout="horizontal"
-        loadMore={loadMore}
-        dataSource={list}
-        renderItem={(item: ItemType) => (
-          <List.Item actions={[<a key="list-loadmore-edit">edit</a>, <a key="list-loadmore-more">more</a>]}>
-            <Skeleton avatar title={false} loading={item.loading} active>
-              <List.Item.Meta
-                avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
-                title={<a href="https://ant.design">{item.name.last}</a>}
-                description="Ant Design, a design language for background applications, is refined by Ant UED Team"
-              />
-              <div>content</div>
-            </Skeleton>
-          </List.Item>
-        )}
-      />
+  const onLoadMore = () => {
+    setLoading(true);
+    setList(
+      list.concat(
+        [...new Array(recordNumber)].map(
+          () =>
+            ({
+              loading: true,
+              node: {
+                id: "",
+                title: "",
+                description: "",
+              },
+            } as ProjectNodeWithLoadingType),
+        ),
+      ),
     );
-  }
-}
+    setList(getProjectList());
+  };
+
+  const loadMore =
+    initLoad && !loading ? (
+      <div
+        style={{
+          textAlign: "center",
+          marginTop: 12,
+          height: 32,
+          lineHeight: "32px",
+        }}
+      >
+        <Button onClick={onLoadMore}>loading more</Button>
+      </div>
+    ) : null;
+
+  return (
+    <List
+      className="demo-loadmore-list"
+      loading={!initLoad}
+      itemLayout="horizontal"
+      loadMore={loadMore}
+      dataSource={list}
+      renderItem={(item: ProjectNodeWithLoadingType) => (
+        <List.Item actions={[<a key="list-loadmore-edit">edit</a>, <a key="list-loadmore-more">more</a>]}>
+          <Skeleton avatar title={false} loading={item.loading} active>
+            <List.Item.Meta
+              avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
+              title={<a href="https://ant.design">{item.node.title}</a>}
+              description={item.node.description}
+            />
+            <div>content</div>
+          </Skeleton>
+        </List.Item>
+      )}
+    />
+  );
+};
 
 export { ProjectList };
