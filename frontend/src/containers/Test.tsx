@@ -38,25 +38,27 @@ export const TestView: React.FC = () => {
     error,
     data,
     refetch,
-    startPolling,
-    stopPolling,
+    // startPolling,
+    // stopPolling,
     networkStatus,
     fetchMore,
   } = useQuery(GET_PROJECT_LIST, {
     variables: { first: recordNumber },
     notifyOnNetworkStatusChange: true,
-    pollInterval: 100000, // ms
+    // pollInterval: 1000000, // ms
   });
 
   if (networkStatus === NetworkStatus.refetch) return <p>'Refetching!'</p>;
   if (loading) return <p>"Loading..."</p>;
   if (error) return <p>`Error! ${error}`</p>;
 
-  console.log(data);
+  console.log(data, "data data data");
 
   return (
     <>
       {data.projects &&
+        // data.projects.list &&
+        // data.projects.list.edges &&
         data.projects.list.edges.map(({ node }: NodeType) => (
           <div key={node.id}>
             <p>{node.id}</p>

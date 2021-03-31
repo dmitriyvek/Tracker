@@ -4,10 +4,11 @@ import ReactDOM from "react-dom";
 
 import "./index.css";
 import App from "./App";
+import { cache } from "./cache";
 
 const client = new ApolloClient({
   uri: "http://localhost:8000/graphql",
-  cache: new InMemoryCache(),
+  cache: cache,
 });
 
 ReactDOM.render(

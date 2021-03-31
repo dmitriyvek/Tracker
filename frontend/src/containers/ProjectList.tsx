@@ -34,7 +34,7 @@ const ProjectList = () => {
 
   const getProjectList: getProjectListType = () => {
     const GET_PROJECT_LIST = gql`
-      query GetProjectList($first: Int) {
+      query GetProjectList_2($first: Int) {
         projects {
           list(first: $first) {
             edges {
@@ -143,10 +143,14 @@ const ProjectList = () => {
       loadMore={loadMore}
       dataSource={list}
       renderItem={(item: ProjectNodeWithLoadingType) => (
-        <List.Item actions={[<a key="list-loadmore-edit">edit</a>, <a key="list-loadmore-more">more</a>]}>
+        <List.Item
+          actions={[<a key="list-loadmore-edit">edit</a>, <a key="list-loadmore-more">more</a>]}
+        >
           <Skeleton avatar title={false} loading={item.loading} active>
             <List.Item.Meta
-              avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
+              avatar={
+                <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
+              }
               title={<a href="https://ant.design">{item.node.title}</a>}
               description={item.node.description}
             />
