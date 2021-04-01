@@ -52,8 +52,6 @@ export const TestView: React.FC = () => {
   if (loading) return <p>"Loading..."</p>;
   if (error) return <p>`Error! ${error}`</p>;
 
-  console.log(data, "data data data");
-
   return (
     <>
       {data.projects &&
@@ -64,6 +62,7 @@ export const TestView: React.FC = () => {
             <p>{node.id}</p>
             <p>{node.title}</p>
             <p>{node.description}</p>
+            <hr></hr>
           </div>
         ))}
       <button onClick={() => refetch()}>Refetch!</button>
@@ -79,6 +78,14 @@ export const TestView: React.FC = () => {
                 variables: {
                   first: recordNumber,
                   after: data.projects.list.pageInfo.endCursor,
+                  // updateQuery: (prev: any, { fetchMoreResult }) => {
+                  //   console.log(prev, "blyaaaaaaaa", fetchMoreResult);
+
+                  //   if (!fetchMoreResult) {
+                  //     return prev;
+                  //   }
+                  //   return Object.assign(prev, fetchMoreResult);
+                  // },
                 },
               });
               setIsLoadingMore(false);
