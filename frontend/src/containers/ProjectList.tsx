@@ -1,11 +1,10 @@
-import axios, { AxiosResponse } from "axios";
 import React, { useState, useEffect } from "react";
 import { useQuery, gql } from "@apollo/client";
 import { List, Avatar, Button, Skeleton } from "antd";
 
 import type { ProjectListType, ProjectListResponseType } from "../types";
 
-const recordNumber = 3;
+const recordNumber = 2;
 
 type ProjectNodeType = Readonly<{
   id: string;
@@ -25,104 +24,62 @@ type StateType = {
   list: ProjectNodeWithLoadingType[];
 };
 
-type getProjectListType = () => ProjectNodeWithLoadingType[];
-
 const ProjectList = () => {
   const [initLoad, setInitLoad] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [list, setList] = useState<ProjectNodeWithLoadingType[]>([]);
+  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
+  const [dataList, setDataList] = useState<ProjectNodeWithLoadingType[]>([]);
 
-  const getProjectList: getProjectListType = () => {
-    const GET_PROJECT_LIST = gql`
-      query GetProjectList_2($first: Int) {
-        projects {
-          list(first: $first) {
-            edges {
-              node {
-                id
-                title
-                description
-              }
+  const GET_PROJECT_LIST = gql`
+    query GetProjectList($first: Int, $after: String) {
+      projects {
+        list(first: $first, after: $after) {
+          edges {
+            node {
+              id
+              title
+              description
             }
+            isLoading @client
+          }
+          pageInfo {
+            hasNextPage
+            endCursor
           }
         }
       }
-    `;
-    const { loading, error, data } = useQuery(GET_PROJECT_LIST, {
-      variables: { first: recordNumber },
-    });
-
-    if (loading) {
-      setLoading(true);
     }
-    if (error) {
-      console.log(error);
-      return null;
-    }
-
-    setLoading(false);
-
-    if (!data) {
-      return null;
-    }
-
-    return data.projects.list.edges;
-
-    // axios
-    //   .post("localhost:8000/grapiql", {
-    //     query: `
-    //         {
-    //             projects {
-    //                 list(first: ${recordNumber}) {
-    //                     edges {
-    //                         node {
-    //                             id
-    //                             title
-    //                             createdAt
-    //                             description
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     `,
-    //   })
-    //   .then((response: AxiosResponse) => {
-    //     console.log(response.data.projects.list);
-    //     return response.data.projects.list;
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
-  };
-
-  useEffect(() => {
-    setList(getProjectList());
-    setInitLoad(true);
+  `;
+  const { loading, error, data, fetchMore } = useQuery(GET_PROJECT_LIST, {
+    variables: { first: recordNumber },
+    notifyOnNetworkStatusChange: true,
   });
 
-  const onLoadMore = () => {
-    setLoading(true);
-    setList(
-      list.concat(
-        [...new Array(recordNumber)].map(
-          () =>
-            ({
-              loading: true,
-              node: {
-                id: "",
-                title: "",
-                description: "",
-              },
-            } as ProjectNodeWithLoadingType),
-        ),
-      ),
-    );
-    setList(getProjectList());
+  useEffect(() => {
+    if (!loading && data) setInitLoad(true);
+  }, [loading, data]);
+
+  // useEffect(() => {
+  //   if (data) data.projects.list.edges.map((item) => ({ ...item, loading: false }));
+  // }, [data]);
+
+  console.log(data);
+
+  // if (loading) return <p>"Loading..."</p>;
+  if (error) console.log(error);
+
+  const onFetchMore = async () => {
+    setIsLoadingMore(true);
+    await fetchMore({
+      variables: {
+        first: recordNumber,
+        after: data.projects.list.pageInfo.endCursor,
+      },
+    });
+    setIsLoadingMore(false);
   };
 
   const loadMore =
-    initLoad && !loading ? (
+    initLoad && !loading && data.projects.list.pageInfo.hasNextPage ? (
       <div
         style={{
           textAlign: "center",
@@ -131,7 +88,7 @@ const ProjectList = () => {
           lineHeight: "32px",
         }}
       >
-        <Button onClick={onLoadMore}>loading more</Button>
+        <Button onClick={onFetchMore}>loading more</Button>
       </div>
     ) : null;
 
@@ -141,12 +98,12 @@ const ProjectList = () => {
       loading={!initLoad}
       itemLayout="horizontal"
       loadMore={loadMore}
-      dataSource={list}
-      renderItem={(item: ProjectNodeWithLoadingType) => (
+      dataSource={data ? data.projects.list.edges : []}
+      renderItem={(item: any) => (
         <List.Item
           actions={[<a key="list-loadmore-edit">edit</a>, <a key="list-loadmore-more">more</a>]}
         >
-          <Skeleton avatar title={false} loading={item.loading} active>
+          <Skeleton avatar title={false} loading={item.isLoading} active>
             <List.Item.Meta
               avatar={
                 <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
@@ -154,7 +111,7 @@ const ProjectList = () => {
               title={<a href="https://ant.design">{item.node.title}</a>}
               description={item.node.description}
             />
-            <div>content</div>
+            {/* <div>content</div> */}
           </Skeleton>
         </List.Item>
       )}

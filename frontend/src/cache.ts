@@ -25,6 +25,16 @@ const cache = new InMemoryCache({
       },
     },
 
+    ProjectEdge: {
+      fields: {
+        isLoading: {
+          read(_) {
+            return false;
+          },
+        },
+      },
+    },
+
     ProjectType: {
       fields: {
         title: {
