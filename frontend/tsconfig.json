@@ -16,7 +16,7 @@
     "jsx": "react-jsx",
     "sourceMap": true,
     "declaration": true,
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "incremental": true,

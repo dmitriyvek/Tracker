@@ -23,7 +23,7 @@ type RoleListType = {
   pageInfo: PageInfoType;
 };
 
-type ProjectNodeType = Readonly<{
+type ProjectNodeType = Partial<{
   id: string;
   title: string;
   description: string;
