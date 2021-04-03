@@ -11,7 +11,7 @@ type ProjectWithLoadingType = {
   node: ProjectNodeType;
 };
 
-const ProjectList = () => {
+const ProjectList: React.FC = () => {
   const [initLoad, setInitLoad] = useState<boolean>(false);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [dataList, setDataList] = useState<ProjectWithLoadingType[]>([]);

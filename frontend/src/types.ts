@@ -42,11 +42,33 @@ type ProjectListType = {
 };
 
 type ProjectListResponseType = {
-  data: {
-    projects: {
-      list: ProjectListType;
+  projects: {
+    list: ProjectListType;
+  };
+};
+
+enum MutatianStatusEnum {
+  Success = "SUCCESS",
+  Fail = "FAIL",
+}
+
+type UserLoginType = {
+  username: string;
+};
+
+type LoginPayloadType = {
+  authToken: string;
+  recordId: number;
+  status: MutatianStatusEnum;
+  record: UserLoginType;
+};
+
+type LoginMutationResponseType = {
+  auth: {
+    login: {
+      loginPayload: LoginPayloadType;
     };
   };
 };
 
-export type { ProjectNodeType, ProjectListType, ProjectListResponseType };
+export type { ProjectNodeType, LoginMutationResponseType };

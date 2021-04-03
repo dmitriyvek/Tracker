@@ -13,7 +13,7 @@ def init_routes(app, cors):
         allow_methods=['POST', 'GET', 'OPTIONS'],
         allow_credentials=True,
         expose_headers=(),
-        allow_headers=('Content-Type', ),
+        allow_headers=('Content-Type', 'Authorization'),
         max_age=3600,
     )
     cors_options = {
