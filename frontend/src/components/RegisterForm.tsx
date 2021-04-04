@@ -16,41 +16,28 @@ const tailLayout = {
   },
 };
 
-type LoginFormItemsType = {
+type RegisterFormItemsType = {
   username: string;
-  password: string;
-  remember: boolean;
-};
-
-type LoginRequirementsType = {
-  username: string;
+  email: string;
   password: string;
 };
 
-type LoginFormPropsType = {
+type RegisterFormPropsType = {
   isLoading: boolean;
   onChangeFormTypeClick: () => void;
-  onFormFinish: (values: LoginFormItemsType) => void;
+  onFormFinish: (values: RegisterFormItemsType) => void;
   onFormFinishFailed: (errorInfo: any) => void;
 };
 
-const LoginForm: React.FC<LoginFormPropsType> = ({
+const RegisterForm: React.FC<RegisterFormPropsType> = ({
   isLoading,
   onFormFinish,
   onFormFinishFailed,
   onChangeFormTypeClick,
-}: LoginFormPropsType) => {
+}: RegisterFormPropsType) => {
   return (
     <Spin spinning={isLoading} delay={0} size="small">
-      <Form
-        {...layout}
-        name="basic"
-        initialValues={{
-          remember: true,
-        }}
-        onFinish={onFormFinish}
-        onFinishFailed={onFormFinishFailed}
-      >
+      <Form {...layout} name="basic" onFinish={onFormFinish} onFinishFailed={onFormFinishFailed}>
         <Form.Item
           required={false}
           label="Username"
@@ -61,6 +48,21 @@ const LoginForm: React.FC<LoginFormPropsType> = ({
               message: "Please input your username!",
             },
             { min: 4, message: "Username is too short." },
+          ]}
+        >
+          <Input />
+        </Form.Item>
+
+        <Form.Item
+          required={false}
+          label="Email"
+          name="email"
+          rules={[
+            {
+              required: true,
+              message: "Please input your email!",
+            },
+            { type: "email", message: "The input is not valid email!" },
           ]}
         >
           <Input />
@@ -81,19 +83,15 @@ const LoginForm: React.FC<LoginFormPropsType> = ({
           <Input.Password />
         </Form.Item>
 
-        <Form.Item {...tailLayout} name="remember" valuePropName="checked">
-          <Checkbox>Remember me</Checkbox>
-        </Form.Item>
-
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit">
-            Login
+            Register
           </Button>
         </Form.Item>
 
         <Form.Item {...tailLayout}>
           <Button type="primary" ghost onClick={onChangeFormTypeClick}>
-            Register form
+            Login form
           </Button>
         </Form.Item>
       </Form>
@@ -101,5 +99,5 @@ const LoginForm: React.FC<LoginFormPropsType> = ({
   );
 };
 
-export { LoginForm };
-export type { LoginFormItemsType, LoginRequirementsType };
+export { RegisterForm };
+export type { RegisterFormItemsType };

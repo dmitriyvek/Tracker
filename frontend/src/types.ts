@@ -52,21 +52,28 @@ enum MutatianStatusEnum {
   Fail = "FAIL",
 }
 
-type UserLoginType = {
+type UserType = {
   username: string;
 };
 
-type LoginPayloadType = {
+type LoginAndRegisterPayloadType = {
   authToken: string;
   recordId: number;
   status: MutatianStatusEnum;
-  record: UserLoginType;
+  record: UserType;
 };
 
 type LoginMutationResponseType = {
   auth: {
     login: {
-      loginPayload: LoginPayloadType;
+      loginPayload: LoginAndRegisterPayloadType;
+    };
+  };
+};
+type RegisterMutationResponseType = {
+  auth: {
+    register: {
+      registerPayload: LoginAndRegisterPayloadType;
     };
   };
 };
@@ -81,6 +88,11 @@ type LogoutMutationResponseType = {
   };
 };
 
-export type { ProjectNodeType, LoginMutationResponseType, LogoutMutationResponseType };
+export type {
+  ProjectNodeType,
+  LoginMutationResponseType,
+  LogoutMutationResponseType,
+  RegisterMutationResponseType,
+};
 
 export { MutatianStatusEnum };

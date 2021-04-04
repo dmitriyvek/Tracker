@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useQuery, gql } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { List, Avatar, Button, Skeleton } from "antd";
 
+import { PROJECT_LIST_QUERY } from "../gqlQueries";
 import type { ProjectNodeType } from "../types";
 import { useLogout } from "../hooks";
-
 const recordNumber = 2;
 
 type ProjectWithLoadingType = {
@@ -26,27 +26,7 @@ const ProjectList: React.FC = () => {
     // setDataList([]);
   };
 
-  const GET_PROJECT_LIST = gql`
-    query GetProjectList($first: Int, $after: String) {
-      projects {
-        list(first: $first, after: $after) {
-          edges {
-            node {
-              id
-              title
-              description
-            }
-            isLoading @client
-          }
-          pageInfo {
-            hasNextPage
-            endCursor
-          }
-        }
-      }
-    }
-  `;
-  const { loading, error, data, fetchMore } = useQuery(GET_PROJECT_LIST, {
+  const { loading, error, data, fetchMore } = useQuery(PROJECT_LIST_QUERY, {
     variables: { first: recordNumber },
     notifyOnNetworkStatusChange: true,
     skip: skipQuery,

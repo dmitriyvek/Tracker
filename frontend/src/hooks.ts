@@ -1,6 +1,7 @@
-import { useApolloClient, gql, useMutation } from "@apollo/client";
+import { useApolloClient, useMutation } from "@apollo/client";
 import { useCookies } from "react-cookie";
 
+import { LOGOUT_MUTATION } from "./gqlQueries";
 import type { LogoutMutationResponseType } from "./types";
 import { MutatianStatusEnum } from "./types";
 
@@ -19,18 +20,6 @@ const useAuthToken = () => {
 };
 
 const useLogout = () => {
-  const LOGOUT_MUTATION = gql`
-    mutation LogoutMutation {
-      auth {
-        logout {
-          logoutPayload {
-            status
-          }
-        }
-      }
-    }
-  `;
-
   const [, , removeAuthToken] = useAuthToken();
   const apolloClient = useApolloClient();
 
