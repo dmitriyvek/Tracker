@@ -1,5 +1,6 @@
-import { ApolloError, MutationResult, useMutation } from "@apollo/client";
+import { ApolloError, useMutation } from "@apollo/client";
 import React, { useState } from "react";
+import { GraphQLError } from "graphql";
 
 import { REGISTER_MUTATION, LOGIN_MUTATION } from "../gqlQueries";
 import { useAuthToken } from "../hooks";
@@ -15,26 +16,6 @@ type RegisterFuncType = (input: RegisterFormItemsType) => Promise<any>;
 
 const AuthPage: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
-
-  const useLoginMutation: () => [LoginFuncType, MutationResult<LoginMutationResponseType>] = () => {
-    const [authToken, setAuthToken, removeAuthToken] = useAuthToken();
-
-    const [mutation, mutationResults] = useMutation(LOGIN_MUTATION, {
-      onCompleted: (response: LoginMutationResponseType) => {
-        setAuthToken(response.auth.login.loginPayload.authToken);
-      },
-    });
-
-    const login: LoginFuncType = (input) => {
-      if (authToken) removeAuthToken();
-      return mutation({
-        variables: {
-          input,
-        },
-      });
-    };
-    return [login, mutationResults];
-  };
 
   const [authToken, setAuthToken, removeAuthToken] = useAuthToken();
 
@@ -95,6 +76,7 @@ const AuthPage: React.FC = () => {
           isLoading={loginIsLoading}
           onFormFinish={onLoginFormFinish}
           onFormFinishFailed={onFormFinishFailed}
+          error={loginError}
         />
       ) : (
         <RegisterForm
@@ -102,10 +84,9 @@ const AuthPage: React.FC = () => {
           isLoading={registerIsLoading}
           onFormFinish={onRegisterFormFinish}
           onFormFinishFailed={onFormFinishFailed}
+          error={registerError}
         />
       )}
-      {loginError && <p>{loginError.message}</p>}
-      {registerError && <p>{registerError.message}</p>}
     </>
   );
 };

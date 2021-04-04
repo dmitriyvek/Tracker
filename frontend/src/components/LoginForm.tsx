@@ -1,5 +1,6 @@
-import React from "react";
-import { Form, Input, Button, Checkbox, Spin } from "antd";
+import { ApolloError } from "@apollo/client";
+import React, { useEffect } from "react";
+import { message, Form, Input, Button, Checkbox, Spin } from "antd";
 
 const layout = {
   labelCol: {
@@ -32,6 +33,7 @@ type LoginFormPropsType = {
   onChangeFormTypeClick: () => void;
   onFormFinish: (values: LoginFormItemsType) => void;
   onFormFinishFailed: (errorInfo: any) => void;
+  error: ApolloError | undefined;
 };
 
 const LoginForm: React.FC<LoginFormPropsType> = ({
@@ -39,7 +41,17 @@ const LoginForm: React.FC<LoginFormPropsType> = ({
   onFormFinish,
   onFormFinishFailed,
   onChangeFormTypeClick,
+  error,
 }: LoginFormPropsType) => {
+  useEffect(() => {
+    if (error)
+      message.error({
+        content: error.message,
+        duration: 5,
+        key: "loginErrorMessage",
+      });
+  }, [error]);
+
   return (
     <Spin spinning={isLoading} delay={0} size="small">
       <Form

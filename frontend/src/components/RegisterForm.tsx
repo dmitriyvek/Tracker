@@ -1,5 +1,6 @@
-import React from "react";
-import { Form, Input, Button, Checkbox, Spin } from "antd";
+import { ApolloError } from "@apollo/client";
+import React, { useEffect } from "react";
+import { message, Form, Input, Button, Spin } from "antd";
 
 const layout = {
   labelCol: {
@@ -27,6 +28,7 @@ type RegisterFormPropsType = {
   onChangeFormTypeClick: () => void;
   onFormFinish: (values: RegisterFormItemsType) => void;
   onFormFinishFailed: (errorInfo: any) => void;
+  error: ApolloError | undefined;
 };
 
 const RegisterForm: React.FC<RegisterFormPropsType> = ({
@@ -34,7 +36,17 @@ const RegisterForm: React.FC<RegisterFormPropsType> = ({
   onFormFinish,
   onFormFinishFailed,
   onChangeFormTypeClick,
+  error,
 }: RegisterFormPropsType) => {
+  useEffect(() => {
+    if (error)
+      message.error({
+        content: error.message,
+        duration: 5,
+        key: "registerErrorMessage",
+      });
+  }, [error]);
+
   return (
     <Spin spinning={isLoading} delay={0} size="small">
       <Form {...layout} name="basic" onFinish={onFormFinish} onFinishFailed={onFormFinishFailed}>
