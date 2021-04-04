@@ -14,10 +14,17 @@ type ProjectWithLoadingType = {
 
 const ProjectList: React.FC = () => {
   const [initLoad, setInitLoad] = useState<boolean>(false);
+  const [skipQuery, setSkipQuery] = useState<boolean>(false);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [dataList, setDataList] = useState<ProjectWithLoadingType[]>([]);
 
   const logout = useLogout();
+  const onLogoutClick = () => {
+    setSkipQuery(true);
+    logout();
+    setInitLoad(false);
+    // setDataList([]);
+  };
 
   const GET_PROJECT_LIST = gql`
     query GetProjectList($first: Int, $after: String) {
@@ -42,22 +49,17 @@ const ProjectList: React.FC = () => {
   const { loading, error, data, fetchMore } = useQuery(GET_PROJECT_LIST, {
     variables: { first: recordNumber },
     notifyOnNetworkStatusChange: true,
+    skip: skipQuery,
   });
 
   useEffect(() => {
-    if (!loading) {
-      if (data) {
-        setDataList(data.projects.list.edges);
-        setInitLoad(true);
-      } else {
-        setDataList([]);
-        setInitLoad(false);
-      }
+    if (!loading && data) {
+      setDataList(data.projects.list.edges);
+      setInitLoad(true);
     }
   }, [loading, data]);
 
-  // if (loading) return <p>"Loading..."</p>;
-  if (error) console.log(error);
+  if (error) console.log("Error in project list", error);
 
   const onFetchMore = async () => {
     setIsLoadingMore(true);
@@ -76,7 +78,7 @@ const ProjectList: React.FC = () => {
   };
 
   const loadMore =
-    initLoad && !isLoadingMore && !loading && data.projects.list.pageInfo.hasNextPage ? (
+    initLoad && !isLoadingMore && data && data.projects.list.pageInfo.hasNextPage ? (
       <div
         style={{
           textAlign: "center",
@@ -91,7 +93,7 @@ const ProjectList: React.FC = () => {
 
   return (
     <>
-      <Button danger onClick={logout}>
+      <Button danger onClick={onLogoutClick}>
         Log out
       </Button>
       <List

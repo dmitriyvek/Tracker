@@ -1,6 +1,7 @@
 import React from "react";
 import { Route } from "react-router-dom";
-import { LoginForm } from "./components/LoginForm";
+
+import { AuthPage } from "./containers/AuthPage";
 import { ProjectList } from "./containers/ProjectList";
 
 type BaseRouterPropsType = {
@@ -13,7 +14,7 @@ const BaseRouter: React.FC<BaseRouterPropsType> = ({ isAuthenticated }: BaseRout
       {isAuthenticated ? (
         <Route path="/" component={ProjectList} />
       ) : (
-        <Route exact path="/" component={LoginForm} />
+        <Route exact path="/" component={AuthPage} />
       )}
     </>
   );

@@ -1,4 +1,3 @@
-import { gql, MutationResult, useMutation } from "@apollo/client";
 import React from "react";
 import { Form, Input, Button, Checkbox, Spin } from "antd";
 
@@ -31,60 +30,21 @@ type LoginRequirementsType = {
   password: string;
 };
 
+type LoginFormPropsType = {
+  isLoading: boolean;
+  onFormFinish: (values: LoginFormItemsType) => void;
+  onFormFinishFailed: (errorInfo: any) => void;
+};
+
 type LoginFuncType = (input: LoginRequirementsType) => Promise<any>;
 
-const LoginForm: React.FC = () => {
-  const LOGIN_MUTATION = gql`
-    mutation LoginMutation($input: LoginInput!) {
-      auth {
-        login(input: $input) {
-          loginPayload {
-            status
-            recordId
-            authToken
-            record {
-              username
-            }
-          }
-        }
-      }
-    }
-  `;
-
-  const useLoginMutation: () => [LoginFuncType, MutationResult<LoginMutationResponseType>] = () => {
-    const [authToken, setAuthToken, removeAuthToken] = useAuthToken();
-
-    const [mutation, mutationResults] = useMutation(LOGIN_MUTATION, {
-      onCompleted: (response: LoginMutationResponseType) => {
-        setAuthToken(response.auth.login.loginPayload.authToken);
-      },
-    });
-
-    const login: LoginFuncType = (input) => {
-      if (authToken) removeAuthToken();
-      return mutation({
-        variables: {
-          input,
-        },
-      });
-    };
-    return [login, mutationResults];
-  };
-
-  const [login, loginResult] = useLoginMutation();
-
-  const onFormFinish = (values: LoginFormItemsType) => {
-    const input = { username: values.username, password: values.password };
-    // TODO: add to local storage on remember = true
-    login(input);
-  };
-
-  const onFormFinishFailed = (errorInfo: any) => {
-    console.log("Login form failed:", errorInfo);
-  };
-
+const LoginForm: React.FC<LoginFormPropsType> = ({
+  isLoading,
+  onFormFinish,
+  onFormFinishFailed,
+}: LoginFormPropsType) => {
   return (
-    <Spin spinning={loginResult.loading} delay={0} size="small">
+    <Spin spinning={isLoading} delay={0} size="small">
       <Form
         {...layout}
         name="basic"
