@@ -11,6 +11,7 @@ import { BaseRouter } from "./routes";
 const App: React.FC = () => {
   const apolloClient = useAppApolloClient();
   const [authToken] = useAuthToken();
+  console.log(apolloClient);
 
   return (
     <ApolloProvider client={apolloClient}>

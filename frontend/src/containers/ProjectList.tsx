@@ -3,6 +3,7 @@ import { useQuery, gql } from "@apollo/client";
 import { List, Avatar, Button, Skeleton } from "antd";
 
 import type { ProjectNodeType } from "../types";
+import { useLogout } from "../hooks";
 
 const recordNumber = 2;
 
@@ -15,6 +16,8 @@ const ProjectList: React.FC = () => {
   const [initLoad, setInitLoad] = useState<boolean>(false);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [dataList, setDataList] = useState<ProjectWithLoadingType[]>([]);
+
+  const logout = useLogout();
 
   const GET_PROJECT_LIST = gql`
     query GetProjectList($first: Int, $after: String) {
@@ -42,9 +45,14 @@ const ProjectList: React.FC = () => {
   });
 
   useEffect(() => {
-    if (!loading && data) {
-      setInitLoad(true);
-      setDataList(data.projects.list.edges);
+    if (!loading) {
+      if (data) {
+        setDataList(data.projects.list.edges);
+        setInitLoad(true);
+      } else {
+        setDataList([]);
+        setInitLoad(false);
+      }
     }
   }, [loading, data]);
 
@@ -82,30 +90,35 @@ const ProjectList: React.FC = () => {
     ) : null;
 
   return (
-    <List
-      className="demo-loadmore-list"
-      loading={!initLoad}
-      itemLayout="horizontal"
-      loadMore={loadMore}
-      // dataSource={data ? data.projects.list.edges : []}
-      dataSource={dataList}
-      renderItem={(item: ProjectWithLoadingType) => (
-        <List.Item
-          actions={[<a key="list-loadmore-edit">edit</a>, <a key="list-loadmore-more">more</a>]}
-        >
-          <Skeleton avatar title={false} loading={item.isLoading} active>
-            <List.Item.Meta
-              avatar={
-                <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
-              }
-              title={<a href="https://ant.design">{item.node.title}</a>}
-              description={item.node.description}
-            />
-            {/* <div>content</div> */}
-          </Skeleton>
-        </List.Item>
-      )}
-    />
+    <>
+      <Button danger onClick={logout}>
+        Log out
+      </Button>
+      <List
+        className="demo-loadmore-list"
+        loading={!initLoad}
+        itemLayout="horizontal"
+        loadMore={loadMore}
+        // dataSource={data ? data.projects.list.edges : []}
+        dataSource={dataList}
+        renderItem={(item: ProjectWithLoadingType) => (
+          <List.Item
+            actions={[<a key="list-loadmore-edit">edit</a>, <a key="list-loadmore-more">more</a>]}
+          >
+            <Skeleton avatar title={false} loading={item.isLoading} active>
+              <List.Item.Meta
+                avatar={
+                  <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
+                }
+                title={<a href="https://ant.design">{item.node.title}</a>}
+                description={item.node.description}
+              />
+              {/* <div>content</div> */}
+            </Skeleton>
+          </List.Item>
+        )}
+      />
+    </>
   );
 };
 

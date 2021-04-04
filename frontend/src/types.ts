@@ -71,4 +71,16 @@ type LoginMutationResponseType = {
   };
 };
 
-export type { ProjectNodeType, LoginMutationResponseType };
+type LogoutMutationResponseType = {
+  auth: {
+    logout: {
+      logoutPayload: {
+        status: MutatianStatusEnum;
+      };
+    };
+  };
+};
+
+export type { ProjectNodeType, LoginMutationResponseType, LogoutMutationResponseType };
+
+export { MutatianStatusEnum };

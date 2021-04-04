@@ -1,4 +1,5 @@
 import { ApolloClient, HttpLink, ApolloLink, NormalizedCacheObject } from "@apollo/client";
+import { useMemo } from "react";
 
 import { cache } from "./cache";
 import { useAuthToken } from "./hooks";
@@ -22,10 +23,15 @@ type useAppApolloClientType = () => ApolloClient<NormalizedCacheObject>;
 
 const useAppApolloClient: useAppApolloClientType = () => {
   const [authToken] = useAuthToken();
-  return new ApolloClient({
-    link: authMiddleware(authToken).concat(httpLink),
-    cache,
-  });
+  // TODO: how to use memo here
+  return useMemo(
+    () =>
+      new ApolloClient({
+        link: authMiddleware(authToken).concat(httpLink),
+        cache,
+      }),
+    [authToken],
+  );
 };
 
 export { useAppApolloClient };

@@ -52,7 +52,7 @@ const LoginForm: React.FC = () => {
   `;
 
   const useLoginMutation: () => [LoginFuncType, MutationResult<LoginMutationResponseType>] = () => {
-    const [_, setAuthToken] = useAuthToken();
+    const [authToken, setAuthToken, removeAuthToken] = useAuthToken();
 
     const [mutation, mutationResults] = useMutation(LOGIN_MUTATION, {
       onCompleted: (response: LoginMutationResponseType) => {
@@ -61,6 +61,7 @@ const LoginForm: React.FC = () => {
     });
 
     const login: LoginFuncType = (input) => {
+      if (authToken) removeAuthToken();
       return mutation({
         variables: {
           input,
