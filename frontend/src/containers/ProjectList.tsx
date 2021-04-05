@@ -1,64 +1,50 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useQuery } from "@apollo/client";
-import { List, Avatar, Button, Skeleton } from "antd";
+import { List, Avatar, Button, Spin } from "antd";
 
 import { PROJECT_LIST_QUERY } from "../gqlQueries";
-import type { ProjectNodeType } from "../types";
+import type { ProjectNodeType, ProjectListResponseType } from "../types";
 import { useLogout } from "../hooks";
-const recordNumber = 2;
 
-type ProjectWithLoadingType = {
-  isLoading: boolean;
-  node: ProjectNodeType;
-};
+const recordNumber = 2;
 
 const ProjectList: React.FC = () => {
   const [initLoad, setInitLoad] = useState<boolean>(false);
   const [skipQuery, setSkipQuery] = useState<boolean>(false);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
-  const [dataList, setDataList] = useState<ProjectWithLoadingType[]>([]);
 
   const logout = useLogout();
   const onLogoutClick = () => {
     setSkipQuery(true);
     logout();
     setInitLoad(false);
-    // setDataList([]);
   };
 
   const { loading, error, data, fetchMore } = useQuery(PROJECT_LIST_QUERY, {
     variables: { first: recordNumber },
     notifyOnNetworkStatusChange: true,
     skip: skipQuery,
-  });
-
-  useEffect(() => {
-    if (!loading && data) {
-      setDataList(data.projects.list.edges);
+    onCompleted: (response: ProjectListResponseType) => {
       setInitLoad(true);
-    }
-  }, [loading, data]);
+    },
+  });
 
   if (error) console.log("Error in project list", error);
 
   const onFetchMore = async () => {
     setIsLoadingMore(true);
-    setDataList((prevState) => [
-      ...prevState,
-      ...[...new Array(recordNumber)].map(() => ({ isLoading: true, node: {} })),
-    ]);
 
     await fetchMore({
       variables: {
         first: recordNumber,
-        after: data.projects.list.pageInfo.endCursor,
+        after: data?.projects.list.pageInfo.endCursor,
       },
     });
     setIsLoadingMore(false);
   };
 
   const loadMore =
-    initLoad && !isLoadingMore && data && data.projects.list.pageInfo.hasNextPage ? (
+    initLoad && data && data.projects.list.pageInfo.hasNextPage ? (
       <div
         style={{
           textAlign: "center",
@@ -67,7 +53,10 @@ const ProjectList: React.FC = () => {
           lineHeight: "32px",
         }}
       >
-        <Button onClick={onFetchMore}>loading more</Button>
+        {isLoadingMore && <Spin delay={500} />}
+        {data.projects.list.pageInfo.hasNextPage && !isLoadingMore && (
+          <Button onClick={onFetchMore}>loading more</Button>
+        )}
       </div>
     ) : null;
 
@@ -81,22 +70,19 @@ const ProjectList: React.FC = () => {
         loading={!initLoad}
         itemLayout="horizontal"
         loadMore={loadMore}
-        // dataSource={data ? data.projects.list.edges : []}
-        dataSource={dataList}
-        renderItem={(item: ProjectWithLoadingType) => (
+        dataSource={data && data.projects.list.edges}
+        renderItem={({ node }: ProjectNodeType) => (
           <List.Item
             actions={[<a key="list-loadmore-edit">edit</a>, <a key="list-loadmore-more">more</a>]}
           >
-            <Skeleton avatar title={false} loading={item.isLoading} active>
-              <List.Item.Meta
-                avatar={
-                  <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
-                }
-                title={<a href="https://ant.design">{item.node.title}</a>}
-                description={item.node.description}
-              />
-              {/* <div>content</div> */}
-            </Skeleton>
+            <List.Item.Meta
+              avatar={
+                <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
+              }
+              title={<a href="https://ant.design">{node.title}</a>}
+              description={node.description}
+            />
+            {/* <div>content</div> */}
           </List.Item>
         )}
       />

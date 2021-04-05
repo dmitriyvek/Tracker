@@ -17,6 +17,26 @@ const LOGIN_MUTATION = gql`
   }
 `;
 
+const USERNAME_DUPLICATION_CHECK_QUERY = gql`
+  query UsernameDuplicationCheckQuery($username: Username!) {
+    auth {
+      duplicationCheck {
+        username(username: $username)
+      }
+    }
+  }
+`;
+
+const EMAIL_DUPLICATION_CHECK_QUERY = gql`
+  query EmailDuplicationCheckQuery($email: Email!) {
+    auth {
+      duplicationCheck {
+        email(email: $email)
+      }
+    }
+  }
+`;
+
 const REGISTER_MUTATION = gql`
   mutation RegisterMutation($input: RegisterInput!) {
     auth {
@@ -56,7 +76,6 @@ const PROJECT_LIST_QUERY = gql`
             title
             description
           }
-          isLoading @client
         }
         pageInfo {
           hasNextPage
@@ -67,4 +86,11 @@ const PROJECT_LIST_QUERY = gql`
   }
 `;
 
-export { REGISTER_MUTATION, LOGIN_MUTATION, LOGOUT_MUTATION, PROJECT_LIST_QUERY };
+export {
+  REGISTER_MUTATION,
+  LOGIN_MUTATION,
+  LOGOUT_MUTATION,
+  PROJECT_LIST_QUERY,
+  USERNAME_DUPLICATION_CHECK_QUERY,
+  EMAIL_DUPLICATION_CHECK_QUERY,
+};

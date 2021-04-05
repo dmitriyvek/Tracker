@@ -1,44 +1,19 @@
-type PageInfoType = {
+type ProjectListPageInfoType = {
   hasNextPage: boolean;
-  hasPreviousPage: boolean;
-  startCursor: string;
   endCursor: string;
-  __typename: string;
 };
 
-type RoleNodeType = Readonly<{
-  role: string;
-  userId: number;
-  projectId: number;
-  assignBy: number;
-  assignAt: string;
-}>;
-
-type RoleListType = {
-  totalCount: number;
-  edges: {
-    cursor: string;
-    node: RoleNodeType;
-  }[];
-  pageInfo: PageInfoType;
+type ProjectNodeType = {
+  node: {
+    id: string;
+    title: string;
+    description: string;
+  };
 };
-
-type ProjectNodeType = Partial<{
-  id: string;
-  title: string;
-  description: string;
-  createdAt: string;
-  myRole: RoleNodeType;
-  roleList: RoleListType;
-}>;
 
 type ProjectListType = {
-  totalCount: number;
-  edges: {
-    cursor: string;
-    node: ProjectNodeType;
-  }[];
-  pageInfo: PageInfoType;
+  edges: ProjectNodeType[];
+  pageInfo: ProjectListPageInfoType;
 };
 
 type ProjectListResponseType = {
@@ -90,6 +65,7 @@ type LogoutMutationResponseType = {
 
 export type {
   ProjectNodeType,
+  ProjectListResponseType,
   LoginMutationResponseType,
   LogoutMutationResponseType,
   RegisterMutationResponseType,

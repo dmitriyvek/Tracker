@@ -53,7 +53,7 @@ const LoginForm: React.FC<LoginFormPropsType> = ({
   }, [error]);
 
   return (
-    <Spin spinning={isLoading} delay={0} size="small">
+    <Spin spinning={isLoading} delay={500} size="small">
       <Form
         {...layout}
         name="basic"
@@ -75,7 +75,7 @@ const LoginForm: React.FC<LoginFormPropsType> = ({
             { min: 4, message: "Username is too short." },
           ]}
         >
-          <Input />
+          <Input autoComplete="on" />
         </Form.Item>
 
         <Form.Item
@@ -90,7 +90,7 @@ const LoginForm: React.FC<LoginFormPropsType> = ({
             { min: 6, message: "Password is too short." },
           ]}
         >
-          <Input.Password />
+          <Input.Password autoComplete="on" />
         </Form.Item>
 
         <Form.Item {...tailLayout} name="remember" valuePropName="checked">
