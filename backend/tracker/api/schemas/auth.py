@@ -13,6 +13,15 @@ class RegistrationSchema(Schema):
         error='Not a valid email address'))
 
 
+class EmailDuplicationCheckSchema(Schema):
+    email = Str(required=True, validate=Email(
+        error='Not a valid email address'))
+        
+
+class UsernameDuplicationCheckSchema(Schema):
+    username = Str(required=True, validate=Length(min=4, max=64))
+
+
 class LoginSchema(Schema):
     username = Str(required=True)
     password = Str(required=True)

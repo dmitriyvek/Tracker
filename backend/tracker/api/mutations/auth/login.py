@@ -1,11 +1,12 @@
 import graphene
 
 from ..base import BaseMutationPayload
-from tracker.api.schemas.auth import LoginSchema
 from tracker.api.services import validate_input
 from tracker.api.services.auth import (
     check_user_credentials, generate_auth_token
 )
+from tracker.api.scalars.auth import Username, Password
+from tracker.api.schemas.auth import LoginSchema
 from tracker.api.status_codes import StatusEnum
 from tracker.api.types import UserType
 
@@ -29,8 +30,8 @@ class LoginStatus(graphene.Enum):
 
 
 class LoginInput(graphene.InputObjectType):
-    username = graphene.String(required=True)
-    password = graphene.String(required=True)
+    username = Username(required=True)
+    password = Password(required=True)
 
 
 class LoginPayload(graphene.ObjectType):

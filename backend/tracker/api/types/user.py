@@ -2,6 +2,7 @@ import graphene
 from graphene.types import ResolveInfo
 from sqlalchemy import and_
 
+from tracker.api.scalars.auth import Email, Username
 from tracker.api.connections import (
     CustomPageInfo, create_connection_from_record_list,
     validate_connection_params
@@ -19,11 +20,12 @@ class UserType(graphene.ObjectType):
     A user is an individual's account on current api
     that can take part in projects.
     '''
-    username = graphene.String(
+
+    username = Username(
         required=True,
         description='A username of user',
     )
-    email = graphene.String(
+    email = Email(
         required=True,
         description='A email of user',
     )

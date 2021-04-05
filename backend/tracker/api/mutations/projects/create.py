@@ -1,13 +1,14 @@
 import graphene
 
 from ..base import BaseMutationPayload
-from tracker.api.types import ProjectType
-from tracker.api.status_codes import StatusEnum
+from tracker.api.scalars.projects import Description, Title
 from tracker.api.schemas.projects import ProjectCreationSchema
 from tracker.api.services import validate_input
 from tracker.api.services.projects import (
     check_if_project_exists, create_project
 )
+from tracker.api.status_codes import StatusEnum
+from tracker.api.types import ProjectType
 from tracker.api.wrappers import login_required
 
 
@@ -27,8 +28,8 @@ class ProjectCreationStatus(graphene.Enum):
 
 
 class ProjectCreationInput(graphene.InputObjectType):
-    title = graphene.String(required=True)
-    description = graphene.String(required=False)
+    title = Title(required=True)
+    description = Description(required=False)
 
 
 class ProjectCreationPayload(graphene.ObjectType):
