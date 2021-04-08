@@ -1,4 +1,12 @@
-import { useApolloClient, useMutation } from "@apollo/client";
+import {
+  DocumentNode,
+  OperationVariables,
+  QueryHookOptions,
+  QueryResult,
+  useApolloClient,
+  useMutation,
+  useQuery,
+} from "@apollo/client";
 import { useCookies } from "react-cookie";
 
 import { LOGOUT_MUTATION } from "./gqlQueries";
@@ -12,7 +20,8 @@ type setAuthTokenFuncType = (authToken: string) => void;
 const useAuthToken = () => {
   const [cookies, setCookie, removeCookie] = useCookies([TOKEN_NAME]);
 
-  const setAuthToken: setAuthTokenFuncType = (authToken) => setCookie(TOKEN_NAME, authToken);
+  const setAuthToken: setAuthTokenFuncType = (authToken) =>
+    setCookie(TOKEN_NAME, authToken);
 
   const removeAuthToken = () => removeCookie(TOKEN_NAME);
 
@@ -25,7 +34,10 @@ const useLogout = () => {
 
   const [mutation] = useMutation(LOGOUT_MUTATION, {
     onCompleted: async (response: LogoutMutationResponseType) => {
-      if (response.auth.logout.logoutPayload.status === MutatianStatusEnum.Success) {
+      if (
+        response.auth.logout.logoutPayload.status ===
+        MutatianStatusEnum.success
+      ) {
         await apolloClient.clearStore();
         removeAuthToken(); // removes cookie
       } else console.log("Logout failed");
@@ -39,4 +51,27 @@ const useLogout = () => {
   return logout;
 };
 
-export { useAuthToken, useLogout };
+/**
+ * @example
+ * const callQuery = useImperativeQuery(query, options)
+ * const handleClick = async () => {
+ *   const{ data, error } = await callQuery()
+ * }
+ */
+function useImperativeQuery<TData = any, TVariables = OperationVariables>(
+  query: DocumentNode,
+  options: QueryHookOptions<TData, TVariables> = {},
+): QueryResult<TData, TVariables>["refetch"] {
+  const { refetch } = useQuery<TData, TVariables>(query, {
+    ...options,
+    skip: true,
+  });
+
+  const imperativelyCallQuery = (queryVariables: TVariables) => {
+    return refetch(queryVariables);
+  };
+
+  return imperativelyCallQuery;
+}
+
+export { useAuthToken, useLogout, useImperativeQuery };

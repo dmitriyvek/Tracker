@@ -7,8 +7,14 @@ import { useAuthToken } from "../hooks";
 import { LoginForm } from "../components/LoginForm";
 import { RegisterForm } from "../components/RegisterForm";
 
-import type { LoginMutationResponseType, RegisterMutationResponseType } from "../types";
-import type { LoginFormItemsType, LoginRequirementsType } from "../components/LoginForm";
+import type {
+  LoginMutationResponseType,
+  RegisterMutationResponseType,
+} from "../types";
+import type {
+  LoginFormItemsType,
+  LoginRequirementsType,
+} from "../components/LoginForm";
 import type { RegisterFormItemsType } from "../components/RegisterForm";
 
 type LoginFuncType = (input: LoginRequirementsType) => Promise<any>;
@@ -19,24 +25,24 @@ const AuthPage: React.FC = () => {
 
   const [authToken, setAuthToken, removeAuthToken] = useAuthToken();
 
-  const [loginMutation, { error: loginError, loading: loginIsLoading }] = useMutation(
-    LOGIN_MUTATION,
-    {
-      onCompleted: (response: LoginMutationResponseType) => {
-        setAuthToken(response.auth.login.loginPayload.authToken);
-      },
-      onError: (error: ApolloError) => {},
+  const [
+    loginMutation,
+    { error: loginError, loading: loginIsLoading },
+  ] = useMutation(LOGIN_MUTATION, {
+    onCompleted: (response: LoginMutationResponseType) => {
+      setAuthToken(response.auth.login.loginPayload.authToken);
     },
-  );
-  const [registerMutation, { error: registerError, loading: registerIsLoading }] = useMutation(
-    REGISTER_MUTATION,
-    {
-      onCompleted: (response: RegisterMutationResponseType) => {
-        setAuthToken(response.auth.register.registerPayload.authToken);
-      },
-      onError: (error: ApolloError) => {},
+    onError: (error: ApolloError) => {},
+  });
+  const [
+    registerMutation,
+    { error: registerError, loading: registerIsLoading },
+  ] = useMutation(REGISTER_MUTATION, {
+    onCompleted: (response: RegisterMutationResponseType) => {
+      setAuthToken(response.auth.register.registerPayload.authToken);
     },
-  );
+    onError: (error: ApolloError) => {},
+  });
 
   const login: LoginFuncType = (input) => {
     if (authToken) removeAuthToken();
@@ -65,7 +71,7 @@ const AuthPage: React.FC = () => {
   };
 
   const onFormFinishFailed = (errorInfo: any) => {
-    console.log("Form failed:", errorInfo);
+    // console.log("Form failed:", errorInfo);
   };
 
   return (

@@ -22,9 +22,24 @@ type ProjectListResponseType = {
   };
 };
 
+type EmailDuplicationCheckResponse = {
+  auth: {
+    duplicationCheck: {
+      email: boolean;
+    };
+  };
+};
+type UsernameDuplicationCheckResponse = {
+  auth: {
+    duplicationCheck: {
+      username: boolean;
+    };
+  };
+};
+
 enum MutatianStatusEnum {
-  Success = "SUCCESS",
-  Fail = "FAIL",
+  success = "SUCCESS",
+  fail = "FAIL",
 }
 
 type UserType = {
@@ -66,6 +81,8 @@ type LogoutMutationResponseType = {
 export type {
   ProjectNodeType,
   ProjectListResponseType,
+  EmailDuplicationCheckResponse,
+  UsernameDuplicationCheckResponse,
   LoginMutationResponseType,
   LogoutMutationResponseType,
   RegisterMutationResponseType,
