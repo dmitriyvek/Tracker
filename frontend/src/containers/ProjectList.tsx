@@ -73,7 +73,10 @@ const ProjectList: React.FC = () => {
         dataSource={data && data.projects.list.edges}
         renderItem={({ node }: ProjectNodeType) => (
           <List.Item
-            actions={[<a key="list-loadmore-edit">edit</a>, <a key="list-loadmore-more">more</a>]}
+            actions={[
+              <a key="list-loadmore-edit">edit</a>,
+              <a key="list-loadmore-more">more</a>,
+            ]}
           >
             <List.Item.Meta
               avatar={

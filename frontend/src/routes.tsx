@@ -8,7 +8,9 @@ type BaseRouterPropsType = {
   isAuthenticated: boolean;
 };
 
-const BaseRouter: React.FC<BaseRouterPropsType> = ({ isAuthenticated }: BaseRouterPropsType) => {
+const BaseRouter: React.FC<BaseRouterPropsType> = ({
+  isAuthenticated,
+}: BaseRouterPropsType) => {
   return (
     <>
       {isAuthenticated ? (

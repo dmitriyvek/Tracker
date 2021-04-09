@@ -1,3 +1,9 @@
+type AuthTokenPayloadType = {
+  exp: number,
+  iat: number,
+  sub: number
+}
+
 type ProjectListPageInfoType = {
   hasNextPage: boolean;
   endCursor: string;
@@ -90,6 +96,7 @@ type RegistrationMutationRequiredVarsType = {
 };
 
 export type {
+  AuthTokenPayloadType,
   ProjectNodeType,
   ProjectListResponseType,
   EmailDuplicationCheckResponse,
