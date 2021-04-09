@@ -10,30 +10,29 @@ import { RegisterForm } from "../components/RegisterForm";
 import type {
   LoginMutationResponseType,
   RegisterMutationResponseType,
+  LoginMutationRequiredVarsType,
+  RegistrationMutationRequiredVarsType,
 } from "../types";
-import type {
-  LoginFormItemsType,
-  LoginRequirementsType,
-} from "../components/LoginForm";
+import type { LoginFormItemsType, LoginRequirementsType } from "../components/LoginForm";
 import type { RegisterFormItemsType } from "../components/RegisterForm";
 
-type LoginFuncType = (input: LoginRequirementsType) => Promise<any>;
-type RegisterFuncType = (input: RegisterFormItemsType) => Promise<any>;
+type LoginFuncType = (input: LoginMutationRequiredVarsType) => Promise<any>;
+type RegisterFuncType = (input: RegistrationMutationRequiredVarsType) => Promise<any>;
 
 const AuthPage: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
 
   const [authToken, setAuthToken, removeAuthToken] = useAuthToken();
 
-  const [
-    loginMutation,
-    { error: loginError, loading: loginIsLoading },
-  ] = useMutation(LOGIN_MUTATION, {
-    onCompleted: (response: LoginMutationResponseType) => {
-      setAuthToken(response.auth.login.loginPayload.authToken);
+  const [loginMutation, { error: loginError, loading: loginIsLoading }] = useMutation(
+    LOGIN_MUTATION,
+    {
+      onCompleted: (response: LoginMutationResponseType) => {
+        setAuthToken(response.auth.login.loginPayload.authToken);
+      },
+      onError: (error: ApolloError) => {},
     },
-    onError: (error: ApolloError) => {},
-  });
+  );
   const [
     registerMutation,
     { error: registerError, loading: registerIsLoading },
@@ -67,7 +66,12 @@ const AuthPage: React.FC = () => {
   };
 
   const onRegisterFormFinish = (values: RegisterFormItemsType) => {
-    register(values);
+    const input = {
+      username: values.username,
+      email: values.email,
+      password: values.password,
+    };
+    register(input);
   };
 
   const onFormFinishFailed = (errorInfo: any) => {

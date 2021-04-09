@@ -78,6 +78,17 @@ type LogoutMutationResponseType = {
   };
 };
 
+type LoginMutationRequiredVarsType = {
+  username: string;
+  password: string;
+};
+
+type RegistrationMutationRequiredVarsType = {
+  username: string;
+  email: string;
+  password: string;
+};
+
 export type {
   ProjectNodeType,
   ProjectListResponseType,
@@ -86,6 +97,8 @@ export type {
   LoginMutationResponseType,
   LogoutMutationResponseType,
   RegisterMutationResponseType,
+  LoginMutationRequiredVarsType,
+  RegistrationMutationRequiredVarsType,
 };
 
 export { MutatianStatusEnum };

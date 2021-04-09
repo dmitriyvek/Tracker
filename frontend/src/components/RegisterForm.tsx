@@ -1,4 +1,5 @@
-import { ApolloError, useLazyQuery } from "@apollo/client";
+// TODO: think on how to make it a pure component
+import { ApolloError, ApolloQueryResult } from "@apollo/client";
 import React, { useEffect, useState } from "react";
 import { message, Form, Input, Button, Spin } from "antd";
 
@@ -7,6 +8,7 @@ import {
   USERNAME_DUPLICATION_CHECK_QUERY,
 } from "../gqlQueries";
 import { useImperativeQuery } from "../hooks";
+import { validateEmail } from "../utils";
 
 import type {
   EmailDuplicationCheckResponse,
@@ -32,6 +34,7 @@ type RegisterFormItemsType = {
   username: string;
   email: string;
   password: string;
+  confirm: string;
 };
 
 type RegisterFormPropsType = {
@@ -41,13 +44,6 @@ type RegisterFormPropsType = {
   onFormFinishFailed: (errorInfo: any) => void;
   error: ApolloError | undefined;
 };
-
-enum DuplicationCheckStatusEnum {
-  initial = "",
-  success = "success",
-  error = "error",
-  processing = "validating",
-}
 
 const RegisterForm: React.FC<RegisterFormPropsType> = ({
   isLoading,
@@ -65,84 +61,70 @@ const RegisterForm: React.FC<RegisterFormPropsType> = ({
       });
   }, [error]);
 
-  const [form] = Form.useForm();
+  const [usernameIsChanged, setUsernameIsChanged] = useState<boolean>(false);
+  const [usernameIsUnique, setUsernameIsUnique] = useState<boolean>(false);
+  const [usernameCheckTimeoutId, setUsernameCheckTimeoutId] = useState<number>(0);
 
-  const [usernameCheckStatus, setUsernameCheckStatus] = useState<any>(
-    DuplicationCheckStatusEnum.initial,
-  );
-  const [emailCheckStatus, setEmailCheckStatus] = useState<any>(
-    DuplicationCheckStatusEnum.initial,
-  );
-  const [usernameCheckTimeoutId, setUsernameCheckTimeoutId] = useState<number>(
-    0,
-  );
+  const [emailIsChanged, setEmailIsChanged] = useState<boolean>(false);
+  const [emailIsUnique, setEmailIsUnique] = useState<boolean>(false);
   const [emailCheckTimeoutId, setEmailCheckTimeoutId] = useState<number>(0);
 
-  const [emailCheck] = useLazyQuery(EMAIL_DUPLICATION_CHECK_QUERY, {
-    onCompleted: (response: EmailDuplicationCheckResponse) => {
-      response.auth.duplicationCheck.email
-        ? setEmailCheckStatus(DuplicationCheckStatusEnum.error)
-        : setEmailCheckStatus(DuplicationCheckStatusEnum.success);
-    },
-  });
-  const [usernameCheck] = useLazyQuery(USERNAME_DUPLICATION_CHECK_QUERY, {
-    onCompleted: (response: UsernameDuplicationCheckResponse) => {
-      response.auth.duplicationCheck.username
-        ? setUsernameCheckStatus(DuplicationCheckStatusEnum.error)
-        : setUsernameCheckStatus(DuplicationCheckStatusEnum.success);
-    },
-  });
+  const usernameCheck = useImperativeQuery(USERNAME_DUPLICATION_CHECK_QUERY);
+  const emailCheck = useImperativeQuery(EMAIL_DUPLICATION_CHECK_QUERY);
 
-  const usernameCheck2 = useImperativeQuery(USERNAME_DUPLICATION_CHECK_QUERY);
-
-  const onEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (emailCheckTimeoutId) clearTimeout(emailCheckTimeoutId);
-    setEmailCheckStatus(DuplicationCheckStatusEnum.processing);
-    setEmailCheckTimeoutId(
-      window.setTimeout(() => {
-        emailCheck({ variables: { email: event.target.value } });
-      }, 3000),
-    );
-  };
-  const onUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.value.length < 4) return;
-
-    if (usernameCheckTimeoutId) clearTimeout(usernameCheckTimeoutId);
-    setUsernameCheckStatus(DuplicationCheckStatusEnum.processing);
-    setUsernameCheckTimeoutId(
-      window.setTimeout(() => {
-        usernameCheck({ variables: { username: event.target.value } });
-      }, 3000),
-    );
-  };
-  const onUsernameChange2 = (value: string) => {
-    if (usernameCheckTimeoutId) clearTimeout(usernameCheckTimeoutId);
+  const makeUsernameCheck = (value: string) => {
     return new Promise((resolve, reject) => {
       setUsernameCheckTimeoutId(
         window.setTimeout(async () => {
-          await usernameCheck2({
+          usernameCheck({
             username: value,
-          }).then((response) => {
-            if (response.data.auth.duplicationCheck.username) {
-              reject("User with given username is already exists!");
-            } else resolve(true);
-          });
+          })
+            .then((response: ApolloQueryResult<UsernameDuplicationCheckResponse>) => {
+              setUsernameIsChanged(false);
+
+              if (response.data.auth.duplicationCheck.username) {
+                setUsernameIsUnique(false);
+                reject("User with given username is already exists!");
+              } else {
+                setUsernameIsUnique(true);
+                resolve(true);
+              }
+            })
+            .catch((error: any) => {
+              console.log("Error during username duplication check: ", error);
+              resolve(true);
+            });
         }, 3000),
       );
     });
-    // setUsernameCheckTimeoutId(
-    //   window.setTimeout(() => {
-    //     usernameCheck({ variables: { username: value } });
-    //     if (false) return Promise.resolve();
-    //     else
-    //       return Promise.reject(
-    //         new Error("User with given username is already exists!"),
-    //       );
-    //   }, 3000),
-    // );
   };
-  // console.log(usernameCheckStatus);
-  // console.log(emailCheckStatus);
+
+  const makeEmailCheck = (value: string) => {
+    return new Promise((resolve, reject) => {
+      setEmailCheckTimeoutId(
+        window.setTimeout(async () => {
+          emailCheck({
+            email: value,
+          })
+            .then((response: ApolloQueryResult<EmailDuplicationCheckResponse>) => {
+              setEmailIsChanged(false);
+
+              if (response.data.auth.duplicationCheck.email) {
+                setEmailIsUnique(false);
+                reject("User with given username is already exists!");
+              } else {
+                setEmailIsUnique(true);
+                resolve(true);
+              }
+            })
+            .catch((error: any) => {
+              console.log("Error during email duplication check: ", error);
+              resolve(true);
+            });
+        }, 3000),
+      );
+    });
+  };
 
   return (
     <Spin spinning={isLoading} delay={500} size="small">
@@ -156,51 +138,34 @@ const RegisterForm: React.FC<RegisterFormPropsType> = ({
           required={false}
           label="Username"
           name="username"
-          // validateStatus={usernameCheckStatus}
           tooltip="Username used to log into the application"
-          // hasFeedback={
-          //   !(usernameCheckStatus == DuplicationCheckStatusEnum.initial)
-          // }
           hasFeedback
           rules={[
             {
-              required: true,
-              message: "Please input your username!",
-            },
-            { min: 4, message: "Username is too short." },
-            () => ({
-              validator(_, value) {
-                // if (!value.length)
-                //   return Promise.reject(
-                //     new Error("Please input your username!"),
-                //   );
+              min: 4,
+              validator(rule, value) {
+                if (usernameCheckTimeoutId) clearTimeout(usernameCheckTimeoutId);
 
-                // if (value.length < 4)
-                // return Promise.reject(new Error("Username is too short."));
+                if (!value || !value.length)
+                  return Promise.reject("Please input your username!");
 
-                if (value.length >= 4) return onUsernameChange2(value).then();
-                return Promise.resolve();
-
-                // if (a) {
-                //   return Promise.reject(new Error("Pizdec"));
-                // } else return Promise.resolve();
-
-                // if (
-                //   usernameCheckStatus == DuplicationCheckStatusEnum.success
-                // ) {
-                //   return Promise.resolve();
-                // } else if (
-                //   usernameCheckStatus == DuplicationCheckStatusEnum.error
-                // )
-                //   return Promise.reject(
-                //     new Error("User with given username is already exists!"),
-                //   );
+                if (value.length >= rule.min!)
+                  if (usernameIsChanged) return makeUsernameCheck(value).then();
+                  else
+                    return usernameIsUnique
+                      ? Promise.resolve()
+                      : Promise.reject("User with given username is already exists!");
+                return Promise.reject("Username is too short.");
               },
-            }),
+            },
           ]}
         >
-          {/* <Input onChange={onUsernameChange} autoComplete="new-username" /> */}
-          <Input autoComplete="new-username" />
+          <Input
+            onChange={() => {
+              if (!usernameIsChanged) setUsernameIsChanged(true);
+            }}
+            autoComplete="new-username"
+          />
         </Form.Item>
 
         <Form.Item
@@ -208,18 +173,35 @@ const RegisterForm: React.FC<RegisterFormPropsType> = ({
           label="Email"
           name="email"
           tooltip="Email used for account confirmation"
-          hasFeedback={
-            !(emailCheckStatus == DuplicationCheckStatusEnum.initial)
-          }
+          hasFeedback
           rules={[
-            {
-              required: true,
-              message: "Please input your email!",
-            },
-            { type: "email", message: "The input is not valid email!" },
+            () => ({
+              validator(_, value) {
+                if (emailCheckTimeoutId) clearTimeout(emailCheckTimeoutId);
+
+                if (!value || !value.length) {
+                  return Promise.reject("Please input your email!");
+                }
+
+                if (!validateEmail(value)) {
+                  return Promise.reject("The input is not valid email!");
+                }
+
+                if (emailIsChanged) return makeEmailCheck(value).then();
+                else
+                  return emailIsUnique
+                    ? Promise.resolve()
+                    : Promise.reject("User with given email is already exists!");
+              },
+            }),
           ]}
         >
-          <Input onChange={onEmailChange} autoComplete="new-email" />
+          <Input
+            onChange={() => {
+              if (!emailIsChanged) setEmailIsChanged(true);
+            }}
+            autoComplete="new-email"
+          />
         </Form.Item>
 
         <Form.Item
@@ -249,16 +231,13 @@ const RegisterForm: React.FC<RegisterFormPropsType> = ({
               required: true,
               message: "Please confirm your password!",
             },
-            { min: 6, message: "Password is too short." },
             ({ getFieldValue }) => ({
               validator(_, value) {
                 if (!value || getFieldValue("password") === value) {
                   return Promise.resolve();
                 }
                 return Promise.reject(
-                  new Error(
-                    "The two passwords that you entered do not match!",
-                  ),
+                  new Error("The two passwords that you entered do not match!"),
                 );
               },
             }),
@@ -267,16 +246,8 @@ const RegisterForm: React.FC<RegisterFormPropsType> = ({
           <Input.Password />
         </Form.Item>
 
-        <Form.Item shouldUpdate {...tailLayout}>
-          <Button
-            type="primary"
-            htmlType="submit"
-            // disabled={
-            //   !form.isFieldsTouched() ||
-            //   form.getFieldsError().filter(({ errors }) => errors.length)
-            //     .length > 0
-            // }
-          >
+        <Form.Item {...tailLayout} name="submit-button">
+          <Button type="primary" htmlType="submit" disabled={false}>
             Register
           </Button>
         </Form.Item>
