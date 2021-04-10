@@ -4,26 +4,16 @@ import { List, Avatar, Button, Spin } from "antd";
 
 import { PROJECT_LIST_QUERY } from "../gqlQueries";
 import type { ProjectNodeType, ProjectListResponseType } from "../types";
-import { useLogout } from "../hooks";
 
 const recordNumber = 2;
 
 const ProjectList: React.FC = () => {
   const [initLoad, setInitLoad] = useState<boolean>(false);
-  const [skipQuery, setSkipQuery] = useState<boolean>(false);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
 
-  const logout = useLogout();
-  const onLogoutClick = () => {
-    setSkipQuery(true);
-    logout();
-    setInitLoad(false);
-  };
-
-  const { loading, error, data, fetchMore } = useQuery(PROJECT_LIST_QUERY, {
+  const { error, data, fetchMore } = useQuery(PROJECT_LIST_QUERY, {
     variables: { first: recordNumber },
     notifyOnNetworkStatusChange: true,
-    skip: skipQuery,
     onCompleted: (response: ProjectListResponseType) => {
       setInitLoad(true);
     },
@@ -62,9 +52,6 @@ const ProjectList: React.FC = () => {
 
   return (
     <>
-      <Button danger onClick={onLogoutClick}>
-        Log out
-      </Button>
       <List
         className="demo-loadmore-list"
         loading={!initLoad}

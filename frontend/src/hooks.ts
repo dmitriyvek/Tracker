@@ -15,12 +15,11 @@ import { MutatianStatusEnum } from "./types";
 
 import type { LogoutMutationResponseType, AuthTokenPayloadType } from "./types";
 
-const TOKEN_NAME = "authToken";
-
 type setAuthTokenFuncType = (authToken: string) => void;
 type removeAuthTokenFunctionType = () => void;
 
 const useAuthToken = () => {
+  const TOKEN_NAME = "authToken";
   const [cookies, setCookie, removeCookie] = useCookies([TOKEN_NAME]);
 
   const setAuthToken: setAuthTokenFuncType = (authToken) => {
@@ -41,8 +40,8 @@ const useLogout = () => {
   const [mutation] = useMutation(LOGOUT_MUTATION, {
     onCompleted: async (response: LogoutMutationResponseType) => {
       if (response.auth.logout.logoutPayload.status === MutatianStatusEnum.success) {
-        await apolloClient.clearStore();
         removeAuthToken(); // removes cookie
+        await apolloClient.clearStore();
       } else console.log("Logout failed");
     },
   });

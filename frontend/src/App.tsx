@@ -5,7 +5,6 @@ import jwt_decode from "jwt-decode";
 import "antd/dist/antd.css";
 
 import { useAppApolloClient } from "./apolloClient";
-import { MainLayout } from "./containers/Layout";
 import { useAuthToken } from "./hooks";
 import { BaseRouter } from "./routes";
 
@@ -38,8 +37,8 @@ const App: React.FC = () => {
       setLogoutTimeoutId(
         window.setTimeout(async () => {
           console.log("Your time is out");
-          await apolloClient.clearStore();
           removeAuthToken();
+          await apolloClient.clearStore();
         }, expirationTime),
       );
     }
@@ -48,9 +47,7 @@ const App: React.FC = () => {
   return (
     <ApolloProvider client={apolloClient}>
       <Router>
-        <MainLayout>
-          <BaseRouter isAuthenticated={Boolean(authToken)} />
-        </MainLayout>
+        <BaseRouter isAuthenticated={Boolean(authToken)} />
       </Router>
     </ApolloProvider>
   );
