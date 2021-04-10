@@ -144,8 +144,6 @@ const RegisterForm: React.FC<RegisterFormPropsType> = ({
             {
               min: 4,
               validator(rule, value) {
-                if (usernameCheckTimeoutId) clearTimeout(usernameCheckTimeoutId);
-
                 if (!value || !value.length)
                   return Promise.reject("Please input your username!");
 
@@ -163,6 +161,7 @@ const RegisterForm: React.FC<RegisterFormPropsType> = ({
           <Input
             onChange={() => {
               if (!usernameIsChanged) setUsernameIsChanged(true);
+              if (usernameCheckTimeoutId) clearTimeout(usernameCheckTimeoutId);
             }}
             autoComplete="new-username"
           />
@@ -177,8 +176,6 @@ const RegisterForm: React.FC<RegisterFormPropsType> = ({
           rules={[
             () => ({
               validator(_, value) {
-                if (emailCheckTimeoutId) clearTimeout(emailCheckTimeoutId);
-
                 if (!value || !value.length) {
                   return Promise.reject("Please input your email!");
                 }
@@ -199,6 +196,7 @@ const RegisterForm: React.FC<RegisterFormPropsType> = ({
           <Input
             onChange={() => {
               if (!emailIsChanged) setEmailIsChanged(true);
+              if (emailCheckTimeoutId) clearTimeout(emailCheckTimeoutId);
             }}
             autoComplete="new-email"
           />

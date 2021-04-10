@@ -18,7 +18,7 @@ const cache = new InMemoryCache({
       fields: {
         list: {
           keyArgs: false,
-          merge(existing = [], incoming) {
+          merge(existing, incoming) {
             if (!existing) return incoming;
             return { ...existing, ...incoming };
           },
@@ -41,6 +41,34 @@ const cache = new InMemoryCache({
         title: {
           read(title: string = "TITLE") {
             return title;
+          },
+        },
+      },
+    },
+
+    AuthQuery: {
+      fields: {
+        duplicationCheck: {
+          merge(existing, incoming) {
+            if (!existing) return incoming;
+            return { ...existing, ...incoming };
+          },
+        },
+      },
+    },
+
+    DuplicationChecksType: {
+      fields: {
+        email: {
+          keyArgs: false,
+          merge(existing, incoming) {
+            return incoming;
+          },
+        },
+        username: {
+          keyArgs: false,
+          merge(existing, incoming) {
+            return incoming;
           },
         },
       },
