@@ -3,9 +3,9 @@ module.exports = {
     service: {
       name: "Tracker",
       url: "http://localhost:8000/graphql",
-      headers: {
-        authorization: "Bearer auth_token",
-      },
+      // headers: {
+      //   authorization: "Bearer auth_token",
+      // },
     },
     // name: "Tracker",
     // sevice: "Tracker-Graph",

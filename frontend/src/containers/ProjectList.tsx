@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { useQuery } from "@apollo/client";
-import { List, Avatar, Button, Spin } from "antd";
+import { List, Button, Spin } from "antd";
 
 import { PROJECT_LIST_QUERY } from "../gqlQueries";
 import type { ProjectNodeType, ProjectListResponseType } from "../types";
+import { ProjectListItem } from "../components/ProjectListItem";
 
 const recordNumber = 2;
 
@@ -51,32 +52,14 @@ const ProjectList: React.FC = () => {
     ) : null;
 
   return (
-    <>
-      <List
-        className="demo-loadmore-list"
-        loading={!initLoad}
-        itemLayout="horizontal"
-        loadMore={loadMore}
-        dataSource={data && data.projects.list.edges}
-        renderItem={({ node }: ProjectNodeType) => (
-          <List.Item
-            actions={[
-              <a key="list-loadmore-edit">edit</a>,
-              <a key="list-loadmore-more">more</a>,
-            ]}
-          >
-            <List.Item.Meta
-              avatar={
-                <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
-              }
-              title={<a href="https://ant.design">{node.title}</a>}
-              description={node.description}
-            />
-            {/* <div>content</div> */}
-          </List.Item>
-        )}
-      />
-    </>
+    <List
+      className="demo-loadmore-list"
+      loading={!initLoad}
+      itemLayout="horizontal"
+      loadMore={loadMore}
+      dataSource={data && data.projects.list.edges}
+      renderItem={(item: ProjectNodeType) => <ProjectListItem item={item} />}
+    />
   );
 };
 

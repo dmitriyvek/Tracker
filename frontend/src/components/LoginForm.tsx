@@ -93,9 +93,9 @@ const LoginForm: React.FC<LoginFormPropsType> = ({
           <Input.Password autoComplete="on" />
         </Form.Item>
 
-        <Form.Item {...tailLayout} name="remember" valuePropName="checked">
+        {/* <Form.Item {...tailLayout} name="remember" valuePropName="checked">
           <Checkbox>Remember me</Checkbox>
-        </Form.Item>
+        </Form.Item> */}
 
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit">

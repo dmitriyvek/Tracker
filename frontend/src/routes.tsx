@@ -3,7 +3,7 @@ import { Route } from "react-router-dom";
 
 import { AuthPage } from "./containers/AuthPage";
 import { MainLayout } from "./containers/MainLayout";
-import { ProjectList } from "./containers/ProjectList";
+import { ProjectsLayout } from "./containers/ProjectsLayout";
 
 type BaseRouterPropsType = {
   isAuthenticated: boolean;
@@ -16,7 +16,7 @@ const BaseRouter: React.FC<BaseRouterPropsType> = ({
     <>
       {isAuthenticated ? (
         <MainLayout>
-          <Route exact path="/projects" component={ProjectList} />
+          <Route path="/projects" component={ProjectsLayout} />
         </MainLayout>
       ) : (
         <Route path="/" component={AuthPage} />

@@ -4,7 +4,7 @@ import { UserOutlined } from "@ant-design/icons";
 const { SubMenu } = Menu;
 const { Sider } = Layout;
 
-const MainSideBar = () => {
+const ProjectsSideBar = () => {
   return (
     <Sider width={200} className="site-layout-background">
       <Menu
@@ -22,4 +22,4 @@ const MainSideBar = () => {
   );
 };
 
-export { MainSideBar };
+export { ProjectsSideBar };
