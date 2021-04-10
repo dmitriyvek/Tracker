@@ -1,8 +1,8 @@
 type AuthTokenPayloadType = {
-  exp: number,
-  iat: number,
-  sub: number
-}
+  exp: number;
+  iat: number;
+  sub: number;
+};
 
 type ProjectListPageInfoType = {
   hasNextPage: boolean;
@@ -35,11 +35,36 @@ type EmailDuplicationCheckResponse = {
     };
   };
 };
+
 type UsernameDuplicationCheckResponse = {
   auth: {
     duplicationCheck: {
       username: boolean;
     };
+  };
+};
+
+type RoleNodeType = {
+  node: {
+    userId: number;
+    role: string;
+  };
+};
+
+type RoleListType = {
+  edges: RoleNodeType[];
+  pageInfo: {
+    hasNextPage: boolean;
+    endCursor: string;
+  };
+};
+
+type ProjectDetailResponseType = {
+  node: {
+    title: string;
+    description: string;
+    createdAt: string;
+    roleList: RoleListType;
   };
 };
 
@@ -106,6 +131,7 @@ export type {
   RegisterMutationResponseType,
   LoginMutationRequiredVarsType,
   RegistrationMutationRequiredVarsType,
+  ProjectDetailResponseType,
 };
 
 export { MutatianStatusEnum };

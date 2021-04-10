@@ -1,4 +1,5 @@
 import { List, Avatar } from "antd";
+import { Link } from "react-router-dom";
 
 import type { ProjectNodeType } from "../types";
 
@@ -20,10 +21,9 @@ const ProjectListItem: React.FC<ProjectListItemPropsType> = ({
         avatar={
           <Avatar src="https://avatars.githubusercontent.com/u/60567822?s=400&u=dd215e7416a4f20549a1decad084eb54b8a809e4&v=4" />
         }
-        title={<a href="https://ant.design">{item.node.title}</a>}
+        title={<Link to={`/projects/${item.node.id}`}>{item.node.title}</Link>}
         description={item.node.description}
       />
-      {/* <div>content</div> */}
     </List.Item>
   );
 };

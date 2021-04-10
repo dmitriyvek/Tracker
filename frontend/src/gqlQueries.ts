@@ -86,6 +86,30 @@ const PROJECT_LIST_QUERY = gql`
   }
 `;
 
+const PROJECT_DETAIL_QUERY = gql`
+  query projectDetailQuery($projectId: ID!) {
+    node(id: $projectId) {
+      ... on ProjectType {
+        title
+        description
+        createdAt
+        roleList {
+          edges {
+            node {
+              role
+              userId
+            }
+          }
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+        }
+      }
+    }
+  }
+`;
+
 export {
   REGISTER_MUTATION,
   LOGIN_MUTATION,
@@ -93,4 +117,5 @@ export {
   PROJECT_LIST_QUERY,
   USERNAME_DUPLICATION_CHECK_QUERY,
   EMAIL_DUPLICATION_CHECK_QUERY,
+  PROJECT_DETAIL_QUERY,
 };

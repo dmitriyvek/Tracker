@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useQuery } from "@apollo/client";
-import { List, Button, Spin } from "antd";
+import { Layout, List, Button, Spin } from "antd";
 
 import { PROJECT_LIST_QUERY } from "../gqlQueries";
 import type { ProjectNodeType, ProjectListResponseType } from "../types";
@@ -8,13 +8,14 @@ import { ProjectListItem } from "../components/ProjectListItem";
 
 const recordNumber = 2;
 
+const { Content } = Layout;
+
 const ProjectList: React.FC = () => {
   const [initLoad, setInitLoad] = useState<boolean>(false);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
 
   const { error, data, fetchMore } = useQuery(PROJECT_LIST_QUERY, {
     variables: { first: recordNumber },
-    notifyOnNetworkStatusChange: true,
     onCompleted: (response: ProjectListResponseType) => {
       setInitLoad(true);
     },
@@ -52,14 +53,17 @@ const ProjectList: React.FC = () => {
     ) : null;
 
   return (
-    <List
-      className="demo-loadmore-list"
-      loading={!initLoad}
-      itemLayout="horizontal"
-      loadMore={loadMore}
-      dataSource={data && data.projects.list.edges}
-      renderItem={(item: ProjectNodeType) => <ProjectListItem item={item} />}
-    />
+    <Content style={{ padding: "24px 24px 24px" }}>
+      <h1>Projects</h1>
+      <List
+        className="demo-loadmore-list"
+        loading={!initLoad}
+        itemLayout="horizontal"
+        loadMore={loadMore}
+        dataSource={data && data.projects.list.edges}
+        renderItem={(item: ProjectNodeType) => <ProjectListItem item={item} />}
+      />
+    </Content>
   );
 };
 

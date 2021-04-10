@@ -111,7 +111,7 @@ const RegisterForm: React.FC<RegisterFormPropsType> = ({
 
               if (response.data.auth.duplicationCheck.email) {
                 setEmailIsUnique(false);
-                reject("User with given username is already exists!");
+                reject("User with given email is already exists!");
               } else {
                 setEmailIsUnique(true);
                 resolve(true);
