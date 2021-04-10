@@ -1,6 +1,6 @@
 import { ApolloError, useMutation } from "@apollo/client";
 import React, { useState } from "react";
-import { GraphQLError } from "graphql";
+import { useHistory } from "react-router";
 
 import { REGISTER_MUTATION, LOGIN_MUTATION } from "../gqlQueries";
 import { useAuthToken } from "../hooks";
@@ -13,7 +13,7 @@ import type {
   LoginMutationRequiredVarsType,
   RegistrationMutationRequiredVarsType,
 } from "../types";
-import type { LoginFormItemsType, LoginRequirementsType } from "../components/LoginForm";
+import type { LoginFormItemsType } from "../components/LoginForm";
 import type { RegisterFormItemsType } from "../components/RegisterForm";
 
 type LoginFuncType = (input: LoginMutationRequiredVarsType) => Promise<any>;
@@ -21,6 +21,8 @@ type RegisterFuncType = (input: RegistrationMutationRequiredVarsType) => Promise
 
 const AuthPage: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
+
+  const history = useHistory();
 
   const [authToken, setAuthToken, removeAuthToken] = useAuthToken();
 
@@ -62,7 +64,9 @@ const AuthPage: React.FC = () => {
 
   const onLoginFormFinish = (values: LoginFormItemsType) => {
     // TODO: add to local storage on remember = true
-    login({ username: values.username, password: values.password });
+    login({ username: values.username, password: values.password }).then(() =>
+      history.push("/projects"),
+    );
   };
 
   const onRegisterFormFinish = (values: RegisterFormItemsType) => {
@@ -71,11 +75,11 @@ const AuthPage: React.FC = () => {
       email: values.email,
       password: values.password,
     };
-    register(input);
+    register(input).then(() => history.push("/projects"));
   };
 
   const onFormFinishFailed = (errorInfo: any) => {
-    // console.log("Form failed:", errorInfo);
+    console.log("Form failed:", errorInfo);
   };
 
   return (

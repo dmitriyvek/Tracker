@@ -16,7 +16,7 @@ const MainHeader: React.FC<MainHeaderPropsType> = ({ onLogoutBtnClick }) => {
         </Menu.Item>
         <Menu.Item key="logout-btn">
           <Button danger onClick={onLogoutBtnClick}>
-            Log out
+            <Link to="/auth">Log out</Link>
           </Button>
         </Menu.Item>
       </Menu>
