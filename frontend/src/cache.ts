@@ -1,4 +1,4 @@
-import { InMemoryCache, Reference, makeVar } from "@apollo/client";
+import { InMemoryCache } from "@apollo/client";
 
 const cache = new InMemoryCache({
   addTypename: true,

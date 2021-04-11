@@ -7,8 +7,8 @@ from tracker.api.status_codes import StatusEnum
 
 
 class RegistrationSchema(Schema):
-    username = Str(required=True, validate=Length(min=4, max=64))
-    password = Str(required=True, validate=Length(min=6, max=64))
+    username = Str(required=True, validate=Length(min=4, max=32))
+    password = Str(required=True, validate=Length(min=8, max=32))
     email = Str(required=True, validate=Email(
         error='Not a valid email address'))
 
@@ -19,7 +19,7 @@ class EmailDuplicationCheckSchema(Schema):
         
 
 class UsernameDuplicationCheckSchema(Schema):
-    username = Str(required=True, validate=Length(min=4, max=64))
+    username = Str(required=True, validate=Length(min=4, max=32))
 
 
 class LoginSchema(Schema):
@@ -28,12 +28,12 @@ class LoginSchema(Schema):
 
     @validates('username')
     def validate_username(self, value: str):
-        if not 4 <= len(value) <= 64:
+        if not 4 <= len(value) <= 32:
             raise APIException('No user with given credentials.',
                                status=StatusEnum.UNAUTHORIZED.name)
 
     @validates('password')
     def validate_password(self, value: str):
-        if not 6 <= len(value) <= 64:
+        if not 8 <= len(value) <= 32:
             raise APIException('No user with given credentials.',
                                status=StatusEnum.UNAUTHORIZED.name)

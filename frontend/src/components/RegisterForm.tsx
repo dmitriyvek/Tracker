@@ -17,16 +17,17 @@ import type {
 
 const layout = {
   labelCol: {
-    span: 8,
+    span: 3,
+    offset: 6,
   },
   wrapperCol: {
-    span: 16,
+    span: 6,
   },
 };
 const tailLayout = {
   wrapperCol: {
-    offset: 8,
-    span: 16,
+    offset: 9,
+    span: 4,
   },
 };
 
@@ -143,17 +144,22 @@ const RegisterForm: React.FC<RegisterFormPropsType> = ({
           rules={[
             {
               min: 4,
+              max: 32,
               validator(rule, value) {
                 if (!value || !value.length)
                   return Promise.reject("Please input your username!");
 
-                if (value.length >= rule.min!)
-                  if (usernameIsChanged) return makeUsernameCheck(value).then();
-                  else
-                    return usernameIsUnique
-                      ? Promise.resolve()
-                      : Promise.reject("User with given username is already exists!");
-                return Promise.reject("Username is too short.");
+                if (value.length < rule.min!)
+                  return Promise.reject("Username is too short.");
+
+                if (value.length > rule.max!)
+                  return Promise.reject("Username is too long.");
+
+                if (usernameIsChanged) return makeUsernameCheck(value).then();
+                else
+                  return usernameIsUnique
+                    ? Promise.resolve()
+                    : Promise.reject("User with given username is already exists!");
               },
             },
           ]}
@@ -213,6 +219,7 @@ const RegisterForm: React.FC<RegisterFormPropsType> = ({
               message: "Please input your password!",
             },
             { min: 6, message: "Password is too short." },
+            { max: 32, message: "Password is too long." },
           ]}
         >
           <Input.Password autoComplete="new-password" />
@@ -252,7 +259,7 @@ const RegisterForm: React.FC<RegisterFormPropsType> = ({
 
         <Form.Item {...tailLayout}>
           <Button type="primary" ghost onClick={onChangeFormTypeClick}>
-            Login form
+            Login page
           </Button>
         </Form.Item>
       </Form>

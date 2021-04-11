@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useQuery } from "@apollo/client";
-import { Layout, List, Button, Spin } from "antd";
+import { Layout, List, Button, Spin, Col } from "antd";
 
 import { PROJECT_LIST_QUERY } from "../gqlQueries";
 import type { ProjectNodeType, ProjectListResponseType } from "../types";
@@ -9,6 +9,11 @@ import { ProjectListItem } from "../components/ProjectListItem";
 const recordNumber = 2;
 
 const { Content } = Layout;
+
+const layout = {
+  span: 16,
+  offset: 4,
+};
 
 const ProjectList: React.FC = () => {
   const [initLoad, setInitLoad] = useState<boolean>(false);
@@ -54,15 +59,17 @@ const ProjectList: React.FC = () => {
 
   return (
     <Content style={{ padding: "24px 24px 24px" }}>
-      <h1>Projects</h1>
-      <List
-        className="demo-loadmore-list"
-        loading={!initLoad}
-        itemLayout="horizontal"
-        loadMore={loadMore}
-        dataSource={data && data.projects.list.edges}
-        renderItem={(item: ProjectNodeType) => <ProjectListItem item={item} />}
-      />
+      <Col {...layout}>
+        <h1>Projects</h1>
+        <List
+          className="demo-loadmore-list"
+          loading={!initLoad}
+          itemLayout="horizontal"
+          loadMore={loadMore}
+          dataSource={data && data.projects.list.edges}
+          renderItem={(item: ProjectNodeType) => <ProjectListItem item={item} />}
+        />
+      </Col>
     </Content>
   );
 };

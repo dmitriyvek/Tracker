@@ -4,16 +4,17 @@ import { message, Form, Input, Button, Checkbox, Spin } from "antd";
 
 const layout = {
   labelCol: {
-    span: 8,
+    span: 3,
+    offset: 6,
   },
   wrapperCol: {
-    span: 16,
+    span: 6,
   },
 };
 const tailLayout = {
   wrapperCol: {
-    offset: 8,
-    span: 16,
+    offset: 9,
+    span: 4,
   },
 };
 
@@ -73,6 +74,7 @@ const LoginForm: React.FC<LoginFormPropsType> = ({
               message: "Please input your username!",
             },
             { min: 4, message: "Username is too short." },
+            { max: 32, message: "Username is too long." },
           ]}
         >
           <Input autoComplete="on" />
@@ -87,7 +89,8 @@ const LoginForm: React.FC<LoginFormPropsType> = ({
               required: true,
               message: "Please input your password!",
             },
-            { min: 6, message: "Password is too short." },
+            { min: 8, message: "Password is too short." },
+            { max: 32, message: "Password is too long." },
           ]}
         >
           <Input.Password autoComplete="on" />
@@ -105,7 +108,7 @@ const LoginForm: React.FC<LoginFormPropsType> = ({
 
         <Form.Item {...tailLayout}>
           <Button type="primary" ghost onClick={onChangeFormTypeClick}>
-            Register form
+            Register page
           </Button>
         </Form.Item>
       </Form>

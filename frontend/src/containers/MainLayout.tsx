@@ -13,7 +13,7 @@ const MainLayout: React.FC<MainLayoutPropsType> = ({ children }: MainLayoutProps
 
   return (
     <Layout>
-      <MainHeader onLogoutBtnClick={logout} />
+      <MainHeader logout={logout} />
       {children}
     </Layout>
   );

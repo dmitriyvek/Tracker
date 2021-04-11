@@ -85,21 +85,27 @@ const AuthPage: React.FC = () => {
   return (
     <>
       {isLogin ? (
-        <LoginForm
-          onChangeFormTypeClick={() => setIsLogin(false)}
-          isLoading={loginIsLoading}
-          onFormFinish={onLoginFormFinish}
-          onFormFinishFailed={onFormFinishFailed}
-          error={loginError}
-        />
+        <>
+          <h1 style={{ textAlign: "center" }}>Login page</h1>
+          <LoginForm
+            onChangeFormTypeClick={() => setIsLogin(false)}
+            isLoading={loginIsLoading}
+            onFormFinish={onLoginFormFinish}
+            onFormFinishFailed={onFormFinishFailed}
+            error={loginError}
+          />
+        </>
       ) : (
-        <RegisterForm
-          onChangeFormTypeClick={() => setIsLogin(true)}
-          isLoading={registerIsLoading}
-          onFormFinish={onRegisterFormFinish}
-          onFormFinishFailed={onFormFinishFailed}
-          error={registerError}
-        />
+        <>
+          <h1 style={{ textAlign: "center" }}>Registration page</h1>
+          <RegisterForm
+            onChangeFormTypeClick={() => setIsLogin(true)}
+            isLoading={registerIsLoading}
+            onFormFinish={onRegisterFormFinish}
+            onFormFinishFailed={onFormFinishFailed}
+            error={registerError}
+          />
+        </>
       )}
     </>
   );
