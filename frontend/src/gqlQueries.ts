@@ -87,13 +87,38 @@ const PROJECT_LIST_QUERY = gql`
 `;
 
 const PROJECT_DETAIL_QUERY = gql`
-  query projectDetailQuery($projectId: ID!) {
+  query projectDetailQuery($projectId: ID!, $roleNumber: Int) {
     node(id: $projectId) {
       ... on ProjectType {
         title
         description
         createdAt
-        roleList {
+        roleList(first: $roleNumber) {
+          edges {
+            node {
+              role
+              userId
+            }
+          }
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+        }
+      }
+    }
+  }
+`;
+
+const PROJECT_DETAIL_ROLE_LIST_FETCH_MORE = gql`
+  query projectDetailRoleListFetchMoreQuery(
+    $first: Int
+    $projectId: ID!
+    $after: String
+  ) {
+    node(id: $projectId) {
+      ... on ProjectType {
+        roleList(first: $first, after: $after) {
           edges {
             node {
               role
@@ -118,4 +143,5 @@ export {
   USERNAME_DUPLICATION_CHECK_QUERY,
   EMAIL_DUPLICATION_CHECK_QUERY,
   PROJECT_DETAIL_QUERY,
+  PROJECT_DETAIL_ROLE_LIST_FETCH_MORE,
 };

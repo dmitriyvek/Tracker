@@ -11,6 +11,8 @@ import { BaseRouter } from "./routes";
 import type { AuthTokenPayloadType } from "./types";
 import type { removeAuthTokenFunctionType } from "./hooks";
 
+const recordNumber = 2;
+
 const App: React.FC = () => {
   const [logoutTimeoutId, setLogoutTimeoutId] = useState<number>(0);
 
@@ -54,3 +56,4 @@ const App: React.FC = () => {
 };
 
 export default App;
+export { recordNumber };

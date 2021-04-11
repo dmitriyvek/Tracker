@@ -68,6 +68,12 @@ type ProjectDetailResponseType = {
   };
 };
 
+type ProjectDetailRoleListFetchMoreResponseType = {
+  node: {
+    roleList: RoleListType;
+  };
+};
+
 enum MutatianStatusEnum {
   success = "SUCCESS",
   fail = "FAIL",
@@ -132,6 +138,7 @@ export type {
   LoginMutationRequiredVarsType,
   RegistrationMutationRequiredVarsType,
   ProjectDetailResponseType,
+  ProjectDetailRoleListFetchMoreResponseType,
 };
 
 export { MutatianStatusEnum };

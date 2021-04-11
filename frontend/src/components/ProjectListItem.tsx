@@ -12,6 +12,7 @@ const ProjectListItem: React.FC<ProjectListItemPropsType> = ({
 }: ProjectListItemPropsType) => {
   return (
     <List.Item
+      style={{ borderBottom: "1px solid silver" }}
       actions={[
         <a key="list-loadmore-edit">edit</a>,
         <a key="list-loadmore-more">more</a>,

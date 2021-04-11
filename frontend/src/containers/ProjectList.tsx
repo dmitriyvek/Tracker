@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import { useQuery } from "@apollo/client";
 import { Layout, List, Button, Spin, Col } from "antd";
 
+import { recordNumber } from "../App";
 import { PROJECT_LIST_QUERY } from "../gqlQueries";
-import type { ProjectNodeType, ProjectListResponseType } from "../types";
 import { ProjectListItem } from "../components/ProjectListItem";
 
-const recordNumber = 2;
+import type { ProjectNodeType, ProjectListResponseType } from "../types";
 
 const { Content } = Layout;
 

@@ -36,11 +36,26 @@ const cache = new InMemoryCache({
       },
     },
 
+    RoleConnection: {
+      fields: {
+        edges: {
+          merge(existing = [], incoming) {
+            console.log(existing, "2222", incoming);
+            return [...existing, ...incoming];
+          },
+        },
+      },
+    },
+
     ProjectType: {
       fields: {
-        title: {
-          read(title: string = "TITLE") {
-            return title;
+        roleList: {
+          keyArgs: false,
+          merge(existing, incoming) {
+            console.log(existing, "1111", incoming);
+
+            if (!existing) return incoming;
+            return { ...existing, ...incoming };
           },
         },
       },
