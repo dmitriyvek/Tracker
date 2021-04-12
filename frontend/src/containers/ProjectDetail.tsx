@@ -9,6 +9,7 @@ import { ProjectsSideBar } from "../components/ProjectsSideBar";
 import { ProjectRoleList } from "../components/ProjectRoleList";
 
 import type { ProjectDetailResponseType } from "../types";
+
 type TParam = {
   projectId: string;
 };
@@ -22,9 +23,12 @@ const ProjectDetail: React.FC<ProjectDetailPropsType> = ({
 }: ProjectDetailPropsType) => {
   const projectId: string = match.params.projectId;
 
-  const { error, data } = useQuery<ProjectDetailResponseType>(PROJECT_DETAIL_QUERY, {
-    variables: { projectId, roleNumber: recordNumber },
-  });
+  const { error, data, fetchMore } = useQuery<ProjectDetailResponseType>(
+    PROJECT_DETAIL_QUERY,
+    {
+      variables: { projectId, roleNumber: recordNumber },
+    },
+  );
 
   if (error) console.log("Error in project detail: ", error);
 
@@ -46,7 +50,7 @@ const ProjectDetail: React.FC<ProjectDetailPropsType> = ({
             <h1>{data.node.title}</h1>
             <p>{data.node.description}</p>
             <p>{data.node.createdAt}</p>
-            <ProjectRoleList data={data} projectId={projectId} />
+            <ProjectRoleList fetchMore={fetchMore} data={data} />
           </Content>
         </Layout>
       )) || <Spin style={{ margin: "auto" }} />}

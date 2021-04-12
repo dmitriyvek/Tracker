@@ -18,10 +18,6 @@ const cache = new InMemoryCache({
       fields: {
         list: {
           keyArgs: false,
-          merge(existing, incoming) {
-            if (!existing) return incoming;
-            return { ...existing, ...incoming };
-          },
         },
       },
     },
@@ -44,6 +40,13 @@ const cache = new InMemoryCache({
             return [...existing, ...incoming];
           },
         },
+        pageInfo: {
+          merge(existing, incoming) {
+            console.log(incoming);
+
+            return incoming;
+          },
+        },
       },
     },
 
@@ -51,11 +54,23 @@ const cache = new InMemoryCache({
       fields: {
         roleList: {
           keyArgs: false,
+        },
+        title: {
           merge(existing, incoming) {
-            console.log(existing, "1111", incoming);
-
             if (!existing) return incoming;
-            return { ...existing, ...incoming };
+            return existing;
+          },
+        },
+        description: {
+          merge(existing, incoming) {
+            if (!existing) return incoming;
+            return existing;
+          },
+        },
+        createdAt: {
+          merge(existing, incoming) {
+            if (!existing) return incoming;
+            return existing;
           },
         },
       },

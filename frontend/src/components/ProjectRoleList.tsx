@@ -1,63 +1,37 @@
-import { useLazyQuery } from "@apollo/client";
-import { List, Avatar, Spin, Button } from "antd";
+import { List, Avatar, Spin } from "antd";
+import { useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 
-import { recordNumber } from "../App";
-import { PROJECT_DETAIL_ROLE_LIST_FETCH_MORE } from "../gqlQueries";
-
-import type {
-  ProjectDetailResponseType,
-  ProjectDetailRoleListFetchMoreResponseType,
-} from "../types";
+import type { ProjectDetailResponseType } from "../types";
 
 type ProjectRoleListPropsType = {
-  projectId: string;
   data: ProjectDetailResponseType;
+  fetchMore: (params: any) => Promise<any>;
 };
 
 const ProjectRoleList: React.FC<ProjectRoleListPropsType> = ({
   data,
-  projectId,
+  fetchMore,
 }: ProjectRoleListPropsType) => {
-  const [
-    fetchMore,
-    { error, loading },
-  ] = useLazyQuery<ProjectDetailRoleListFetchMoreResponseType>(
-    PROJECT_DETAIL_ROLE_LIST_FETCH_MORE,
-    {
-      variables: {
-        projectId,
-        first: recordNumber,
-      },
-    },
-  );
+  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
 
-  const onFetchMore = () =>
-    fetchMore({
+  const onFetchMore = async () => {
+    setIsLoadingMore(true);
+    await fetchMore({
       variables: {
-        projectId: projectId,
-
         after: data.node.roleList.pageInfo.endCursor,
       },
     });
-
-  if (error) console.log("Error in project detail role list", error);
-  console.log(projectId);
+    setIsLoadingMore(false);
+  };
 
   return (
     <div style={{ height: "100px", overflow: "auto" }}>
       <InfiniteScroll
         initialLoad={false}
         pageStart={0}
-        loadMore={() =>
-          fetchMore({
-            variables: {
-              first: recordNumber,
-              after: data.node.roleList.pageInfo.endCursor,
-            },
-          })
-        }
-        hasMore={!loading && data.node.roleList.pageInfo.hasNextPage}
+        loadMore={onFetchMore}
+        hasMore={!isLoadingMore && data.node.roleList.pageInfo.hasNextPage}
         useWindow={false}
       >
         <List
@@ -71,14 +45,11 @@ const ProjectRoleList: React.FC<ProjectRoleListPropsType> = ({
                 title={<a href="https://ant.design">{item.node.userId}</a>}
                 description={item.node.role}
               />
-              <div>Content</div>
             </List.Item>
           )}
-        >
-          {loading && <Spin />}
-        </List>
+        ></List>
       </InfiniteScroll>
-      <Button onClick={() => onFetchMore()}>Fetch more</Button>
+      {isLoadingMore && <Spin />}
     </div>
   );
 };
