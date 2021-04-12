@@ -36,14 +36,11 @@ const cache = new InMemoryCache({
       fields: {
         edges: {
           merge(existing = [], incoming) {
-            console.log(existing, "2222", incoming);
             return [...existing, ...incoming];
           },
         },
         pageInfo: {
           merge(existing, incoming) {
-            console.log(incoming);
-
             return incoming;
           },
         },

@@ -7,10 +7,9 @@ from tracker.api.connections import (
     CustomPageInfo, create_connection_from_record_list,
     validate_connection_params
 )
-from tracker.api.connections.projects import ProjectConnection
 from tracker.api.services.users import get_user_by_id
 from tracker.api.services.projects import get_user_project_list
-from tracker.api.types.project import ProjectType
+from tracker.api.types.project import ProjectType, ProjectConnection
 from tracker.api.wrappers import login_required
 from tracker.db.schema import users_table
 

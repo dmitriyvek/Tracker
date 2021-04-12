@@ -7,14 +7,13 @@ from tracker.api.connections import (
     CustomPageInfo, create_connection_from_record_list,
     validate_connection_params
 )
-from tracker.api.connections.roles import RoleConnection
 from tracker.api.dataloaders import get_generic_loader
 from tracker.api.scalars.projects import Description, Title
-from tracker.api.services.projects import get_project_node
+from tracker.api.services.projects import get_project_node, get_total_count_of_user_projects
 from tracker.api.services.roles import (
     ROLES_REQUIRED_FIELDS, get_projects_role_list
 )
-from tracker.api.types.role import RoleType
+from tracker.api.types.role import RoleType, RoleConnection
 from tracker.api.wrappers import login_required
 from tracker.db.schema import roles_table
 
@@ -84,7 +83,7 @@ class ProjectType(graphene.ObjectType):
         # if called from connection
         else:
             # initialize data loader
-            if not info.context.get('loader'):
+            if not info.context.get('role_list_loader'):
                 db = info.context['request'].app['db']
                 max_fetch_number = info.context['request'].app.\
                     get('config', {}).\
@@ -97,15 +96,16 @@ class ProjectType(graphene.ObjectType):
                     nested_connection=True
                 )
 
-                info.context['loader'] = get_generic_loader(
-                    db,
-                    roles_table,
-                    'project_id',
-                    connection_params,
-                    [roles_table.c.id, *ROLES_REQUIRED_FIELDS]
+                info.context['role_list_loader'] = get_generic_loader(
+                    db=db,
+                    table=roles_table,
+                    attr='project_id',
+                    connection_params=connection_params,
+                    nested_connection=True,
+                    required_fields=[roles_table.c.id, *ROLES_REQUIRED_FIELDS]
                 )()
 
-            record_list = await info.context['loader'].load(parent['id'])
+            record_list = await info.context['role_list_loader'].load(parent['id'])
 
         return create_connection_from_record_list(
             record_list,
@@ -114,3 +114,21 @@ class ProjectType(graphene.ObjectType):
             RoleType,
             CustomPageInfo
         )
+
+
+class ProjectConnection(graphene.relay.Connection):
+    total_count = graphene.Int(
+        required=True,
+        description='Total number of user\'s projects'
+    )
+
+    class Meta:
+        node = ProjectType
+
+    @staticmethod
+    def resolve_total_count(parent, info: ResolveInfo):
+        db = info.context['request'].app['db']
+        user_id = info.context['request']['user_id']
+
+        total_count = get_total_count_of_user_projects(db, user_id)
+        return total_count
