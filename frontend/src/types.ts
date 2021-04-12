@@ -32,6 +32,7 @@ type EmailDuplicationCheckResponse = {
   auth: {
     duplicationCheck: {
       email: boolean;
+      __typename: string;
     };
   };
 };
@@ -40,6 +41,7 @@ type UsernameDuplicationCheckResponse = {
   auth: {
     duplicationCheck: {
       username: boolean;
+      __typename: string;
     };
   };
 };
@@ -120,6 +122,30 @@ type RegistrationMutationRequiredVarsType = {
   password: string;
 };
 
+type ProjectCreationMutationResponseType = {
+  project: {
+    projectCreation: {
+      projectCreationPayload: {
+        status: MutatianStatusEnum;
+        record: {
+          id: string;
+          title: string;
+          description: string;
+        };
+      };
+    };
+  };
+};
+
+type ProjectTitleDuplicationCheckResponseType = {
+  projects: {
+    duplicationCheck: {
+      title: boolean;
+      __typename: string;
+    };
+  };
+};
+
 export type {
   AuthTokenPayloadType,
   ProjectNodeType,
@@ -132,6 +158,8 @@ export type {
   LoginMutationRequiredVarsType,
   RegistrationMutationRequiredVarsType,
   ProjectDetailResponseType,
+  ProjectCreationMutationResponseType,
+  ProjectTitleDuplicationCheckResponseType,
 };
 
 export { MutatianStatusEnum };

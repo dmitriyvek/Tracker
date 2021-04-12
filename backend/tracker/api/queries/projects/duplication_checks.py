@@ -1,13 +1,13 @@
 import graphene
 from graphql import ResolveInfo
 
-from tracker.api.types import UserDuplicationChecksType
+from tracker.api.types import ProjectDuplicationChecksType
 
 
 class DuplicationCheckQuery(graphene.ObjectType):
     duplication_check = graphene.Field(
-        UserDuplicationChecksType,
-        description='Check user\'s credentials duplication',
+        ProjectDuplicationChecksType,
+        description='Check if user already have a project with given title',
         required=True
     )
 

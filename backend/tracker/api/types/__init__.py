@@ -1,14 +1,18 @@
-from .auth import DuplicationChecksType
-from .project import ProjectType, ProjectConnection
+from .auth import UserDuplicationChecksType
+from .project import (
+    ProjectType, ProjectConnection, 
+    ProjectDuplicationChecksType
+)
 from .role import RoleType, RoleConnection
 from .user import UserType
 
 
 __all__ = [
-    'DuplicationChecksType',
+    'ProjectDuplicationChecksType',
     'ProjectType',
     'ProjectConnection',
     'RoleType',
     'RoleConnection',
+    'UserDuplicationChecksType',
     'UserType',
 ]

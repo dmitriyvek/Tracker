@@ -7,6 +7,10 @@ from tracker.api.status_codes import StatusEnum
 from tracker.db.schema import UserRole, projects_table, roles_table
 
 
+async def check_title_duplication(db: PG, title: str) -> bool:
+    return True
+
+
 async def check_if_project_exists(db: PG, data: dict) -> None:
     '''
     Checks if project with given title is already exist 

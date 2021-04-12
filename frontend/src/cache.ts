@@ -19,6 +19,12 @@ const cache = new InMemoryCache({
         list: {
           keyArgs: false,
         },
+        duplicationCheck: {
+          merge(existing, incoming) {
+            if (!existing) return incoming;
+            return { ...existing, ...incoming };
+          },
+        },
       },
     },
 
@@ -84,7 +90,7 @@ const cache = new InMemoryCache({
       },
     },
 
-    DuplicationChecksType: {
+    UserDuplicationChecksType: {
       fields: {
         email: {
           keyArgs: false,
@@ -93,6 +99,17 @@ const cache = new InMemoryCache({
           },
         },
         username: {
+          keyArgs: false,
+          merge(existing, incoming) {
+            return incoming;
+          },
+        },
+      },
+    },
+
+    ProjectDuplicationChecksType: {
+      fields: {
+        title: {
           keyArgs: false,
           merge(existing, incoming) {
             return incoming;

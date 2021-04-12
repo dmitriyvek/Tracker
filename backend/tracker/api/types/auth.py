@@ -9,7 +9,7 @@ from tracker.api.schemas.auth import (
 )
 
 
-class DuplicationChecksType(graphene.ObjectType):
+class UserDuplicationChecksType(graphene.ObjectType):
     username = graphene.Boolean(
         required=True,
         description='Does user with given username exists',

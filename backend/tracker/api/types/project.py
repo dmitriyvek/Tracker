@@ -9,7 +9,13 @@ from tracker.api.connections import (
 )
 from tracker.api.dataloaders import get_generic_loader
 from tracker.api.scalars.projects import Description, Title
-from tracker.api.services.projects import get_project_node, get_total_count_of_user_projects
+from tracker.api.schemas.projects import TitleDuplicationCheckSchema
+from tracker.api.services import validate_input
+from tracker.api.services.projects import (
+    check_title_duplication,
+    get_project_node,
+    get_total_count_of_user_projects,
+)
 from tracker.api.services.roles import (
     ROLES_REQUIRED_FIELDS, get_projects_role_list
 )
@@ -132,3 +138,19 @@ class ProjectConnection(graphene.relay.Connection):
 
         total_count = get_total_count_of_user_projects(db, user_id)
         return total_count
+
+
+class ProjectDuplicationChecksType(graphene.ObjectType):
+    title = graphene.Boolean(
+        required=True,
+        description='Does user already have a project with given title',
+        title=Title(required=True)
+    )
+
+    async def resolve_title(parent, info: ResolveInfo, title):
+        db = info.context['request'].app['db']
+        data = {'title': title}
+        validate_input(data, TitleDuplicationCheckSchema)
+
+        is_existed = await check_title_duplication(db, title=title)
+        return is_existed

@@ -33,6 +33,7 @@ const ProjectRoleList: React.FC<ProjectRoleListPropsType> = ({
         loadMore={onFetchMore}
         hasMore={!isLoadingMore && data.node.roleList.pageInfo.hasNextPage}
         useWindow={false}
+        threshold={50}
       >
         <List
           dataSource={data.node.roleList.edges}

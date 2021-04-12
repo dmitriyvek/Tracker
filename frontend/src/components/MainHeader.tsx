@@ -1,4 +1,4 @@
-import { Menu, Layout, Button, Modal, Row, Col } from "antd";
+import { Menu, Layout, Button, Modal, Row, Col, Dropdown } from "antd";
 import { useState } from "react";
 import { Link, useHistory } from "react-router-dom";
 
@@ -44,13 +44,33 @@ const MainHeader: React.FC<MainHeaderPropsType> = ({ logout }) => {
     setLogoutModalVisible(false);
   };
 
+  const projectListMenu = (
+    <Menu>
+      <Menu.Item key="project-list">
+        <Link to="/projects">Project list</Link>
+      </Menu.Item>
+      <Menu.Divider />
+      <Menu.Item key="project-create">
+        <Link to="/projects/create">Create new project</Link>
+      </Menu.Item>
+    </Menu>
+  );
+
   return (
     <Header className="header">
       <Row>
         <Col {...menuLayout}>
           <Menu theme="dark" mode="horizontal" defaultSelectedKeys={["projects-link"]}>
             <Menu.Item key="projects-link">
-              <Link to="/projects">Projects</Link>
+              <Dropdown
+                overlay={projectListMenu}
+                placement="bottomRight"
+                trigger={["click"]}
+              >
+                <a className="ant-dropdown-link" onClick={(e) => e.preventDefault()}>
+                  Projects
+                </a>
+              </Dropdown>
             </Menu.Item>
           </Menu>
         </Col>

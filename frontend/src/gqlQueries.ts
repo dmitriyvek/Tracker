@@ -110,6 +110,33 @@ const PROJECT_DETAIL_QUERY = gql`
   }
 `;
 
+const PROJECT_CREATION_MUTATION = gql`
+  mutation projectCreationMutation($input: ProjectCreationInput!) {
+    project {
+      projectCreation(input: $input) {
+        projectCreationPayload {
+          record {
+            id
+            title
+            description
+          }
+          status
+        }
+      }
+    }
+  }
+`;
+
+const PROJECT_TITLE_DUPLICATION_CHECK_QUERY = gql`
+  query ProjectTitleDuplicationCheckQuery($title: Title!) {
+    projects {
+      duplicationCheck {
+        title(title: $title)
+      }
+    }
+  }
+`;
+
 export {
   REGISTER_MUTATION,
   LOGIN_MUTATION,
@@ -118,4 +145,6 @@ export {
   USERNAME_DUPLICATION_CHECK_QUERY,
   EMAIL_DUPLICATION_CHECK_QUERY,
   PROJECT_DETAIL_QUERY,
+  PROJECT_CREATION_MUTATION,
+  PROJECT_TITLE_DUPLICATION_CHECK_QUERY,
 };
