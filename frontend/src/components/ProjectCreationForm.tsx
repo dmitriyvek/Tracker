@@ -53,26 +53,23 @@ const ProjectCreationForm: React.FC<ProjectCreationFormPropsType> = ({
     return new Promise((resolve, reject) => {
       setTitleCheckTimeoutId(
         window.setTimeout(async () => {
-          usernameCheck({
-            title: value,
-          })
-            .then(
-              (response: ApolloQueryResult<ProjectTitleDuplicationCheckResponseType>) => {
-                setTitleIsChanged(false);
-
-                if (response.data.projects.duplicationCheck.title) {
-                  setTitleIsUnique(false);
-                  reject("You already have a project with given title!");
-                } else {
-                  setTitleIsUnique(true);
-                  resolve(true);
-                }
-              },
-            )
-            .catch((error: any) => {
-              console.log("Error during project title duplication check: ", error);
-              resolve(true);
+          try {
+            const response = await usernameCheck({
+              title: value,
             });
+            setTitleIsChanged(false);
+
+            if (response.data.projects.duplicationCheck.title) {
+              setTitleIsUnique(false);
+              reject("You already have a project with given title!");
+            } else {
+              setTitleIsUnique(true);
+              resolve(true);
+            }
+          } catch (error: any) {
+            console.log("Error during project title duplication check: ", error);
+            resolve(true);
+          }
         }, 3000),
       );
     });
@@ -96,7 +93,7 @@ const ProjectCreationForm: React.FC<ProjectCreationFormPropsType> = ({
             {
               min: 4,
               max: 32,
-              validator(rule, value) {
+              async validator(rule, value) {
                 if (!value || !value.length) return Promise.reject("Please input title!");
 
                 if (value.length < rule.min!)
@@ -104,7 +101,7 @@ const ProjectCreationForm: React.FC<ProjectCreationFormPropsType> = ({
 
                 if (value.length > rule.max!) return Promise.reject("Title is too long.");
 
-                if (titleIsChanged) return makeTitleCheck(value).then();
+                if (titleIsChanged) return await makeTitleCheck(value);
                 else
                   return titleIsUnique
                     ? Promise.resolve()

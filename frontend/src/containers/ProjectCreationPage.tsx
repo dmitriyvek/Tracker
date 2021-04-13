@@ -19,16 +19,15 @@ const ProjectCreationPage = () => {
     },
   });
 
-  const createProject = (input: ProjectCreationFormValuesType) => {
-    return projectCreationMutation({
+  const createProject = async (input: ProjectCreationFormValuesType) => {
+    const response = await projectCreationMutation({
       variables: {
         input,
       },
-    }).then((response: FetchResult<ProjectCreationMutationResponseType>) => {
-      const projectId =
-        response.data?.project.projectCreation.projectCreationPayload.record.id;
-      history.push(`/projects/${projectId}`);
     });
+    const projectId =
+      response.data?.project.projectCreation.projectCreationPayload.record.id;
+    history.push(`/projects/${projectId}`);
   };
 
   return (

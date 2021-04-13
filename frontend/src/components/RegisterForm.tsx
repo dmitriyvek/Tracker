@@ -68,8 +68,12 @@ const RegisterForm: React.FC<RegisterFormPropsType> = ({
   const [emailIsUnique, setEmailIsUnique] = useState<boolean>(false);
   const [emailCheckTimeoutId, setEmailCheckTimeoutId] = useState<number>(0);
 
-  const usernameCheck = useImperativeQuery(USERNAME_DUPLICATION_CHECK_QUERY);
-  const emailCheck = useImperativeQuery(EMAIL_DUPLICATION_CHECK_QUERY);
+  const usernameCheck = useImperativeQuery<UsernameDuplicationCheckResponse>(
+    USERNAME_DUPLICATION_CHECK_QUERY,
+  );
+  const emailCheck = useImperativeQuery<EmailDuplicationCheckResponse>(
+    EMAIL_DUPLICATION_CHECK_QUERY,
+  );
 
   const onFormFinishFailed = (errorInfo: any) => {
     console.log("Form failed:", errorInfo);
@@ -79,24 +83,23 @@ const RegisterForm: React.FC<RegisterFormPropsType> = ({
     return new Promise((resolve, reject) => {
       setUsernameCheckTimeoutId(
         window.setTimeout(async () => {
-          usernameCheck({
-            username: value,
-          })
-            .then((response: ApolloQueryResult<UsernameDuplicationCheckResponse>) => {
-              setUsernameIsChanged(false);
-
-              if (response.data.auth.duplicationCheck.username) {
-                setUsernameIsUnique(false);
-                reject("User with given username is already exists!");
-              } else {
-                setUsernameIsUnique(true);
-                resolve(true);
-              }
-            })
-            .catch((error: any) => {
-              console.log("Error during username duplication check: ", error);
-              resolve(true);
+          try {
+            const response = await usernameCheck({
+              username: value,
             });
+            setUsernameIsChanged(false);
+
+            if (response.data.auth.duplicationCheck.username) {
+              setUsernameIsUnique(false);
+              reject("User with given username is already exists!");
+            } else {
+              setUsernameIsUnique(true);
+              resolve(true);
+            }
+          } catch (error: any) {
+            console.log("Error during username duplication check: ", error);
+            resolve(true);
+          }
         }, 3000),
       );
     });
@@ -106,24 +109,23 @@ const RegisterForm: React.FC<RegisterFormPropsType> = ({
     return new Promise((resolve, reject) => {
       setEmailCheckTimeoutId(
         window.setTimeout(async () => {
-          emailCheck({
-            email: value,
-          })
-            .then((response: ApolloQueryResult<EmailDuplicationCheckResponse>) => {
-              setEmailIsChanged(false);
-
-              if (response.data.auth.duplicationCheck.email) {
-                setEmailIsUnique(false);
-                reject("User with given email is already exists!");
-              } else {
-                setEmailIsUnique(true);
-                resolve(true);
-              }
-            })
-            .catch((error: any) => {
-              console.log("Error during email duplication check: ", error);
-              resolve(true);
+          try {
+            const response = await emailCheck({
+              email: value,
             });
+            setEmailIsChanged(false);
+
+            if (response.data.auth.duplicationCheck.email) {
+              setEmailIsUnique(false);
+              reject("User with given email is already exists!");
+            } else {
+              setEmailIsUnique(true);
+              resolve(true);
+            }
+          } catch (error: any) {
+            console.log("Error during email duplication check: ", error);
+            resolve(true);
+          }
         }, 3000),
       );
     });
@@ -147,7 +149,7 @@ const RegisterForm: React.FC<RegisterFormPropsType> = ({
             {
               min: 4,
               max: 32,
-              validator(rule, value) {
+              async validator(rule, value) {
                 if (!value || !value.length)
                   return Promise.reject("Please input your username!");
 
@@ -157,7 +159,7 @@ const RegisterForm: React.FC<RegisterFormPropsType> = ({
                 if (value.length > rule.max!)
                   return Promise.reject("Username is too long.");
 
-                if (usernameIsChanged) return makeUsernameCheck(value).then();
+                if (usernameIsChanged) return await makeUsernameCheck(value);
                 else
                   return usernameIsUnique
                     ? Promise.resolve()
@@ -183,7 +185,7 @@ const RegisterForm: React.FC<RegisterFormPropsType> = ({
           hasFeedback
           rules={[
             () => ({
-              validator(_, value) {
+              async validator(_, value) {
                 if (!value || !value.length) {
                   return Promise.reject("Please input your email!");
                 }
@@ -192,7 +194,7 @@ const RegisterForm: React.FC<RegisterFormPropsType> = ({
                   return Promise.reject("The input is not valid email!");
                 }
 
-                if (emailIsChanged) return makeEmailCheck(value).then();
+                if (emailIsChanged) return await makeEmailCheck(value);
                 else
                   return emailIsUnique
                     ? Promise.resolve()

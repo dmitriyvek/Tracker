@@ -62,20 +62,20 @@ const AuthPage: React.FC = () => {
     });
   };
 
-  const onLoginFormFinish = (values: LoginFormItemsType) => {
+  const onLoginFormFinish = async (values: LoginFormItemsType) => {
     // TODO: add to local storage on remember = true
-    login({ username: values.username, password: values.password }).then(() =>
-      history.push("/projects"),
-    );
+    await login({ username: values.username, password: values.password });
+    history.push("/projects");
   };
 
-  const onRegisterFormFinish = (values: RegisterFormItemsType) => {
+  const onRegisterFormFinish = async (values: RegisterFormItemsType) => {
     const input = {
       username: values.username,
       email: values.email,
       password: values.password,
     };
-    register(input).then(() => history.push("/projects"));
+    await register(input);
+    history.push("/projects");
   };
 
   return (

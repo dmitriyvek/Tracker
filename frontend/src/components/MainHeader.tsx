@@ -30,14 +30,14 @@ const MainHeader: React.FC<MainHeaderPropsType> = ({ logout }) => {
     setLogoutModalVisible(true);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setLogoutModalText("Loging you out...");
     setLogoutConfirmLoading(true);
-    logout().then(() => {
-      // setLogoutModalVisible(false);
-      // setLogoutConfirmLoading(false);
-      history.push("/auth");
-    });
+    await logout();
+
+    // setLogoutModalVisible(false);
+    // setLogoutConfirmLoading(false);
+    history.push("/auth");
   };
 
   const handleLogoutCancel = () => {
