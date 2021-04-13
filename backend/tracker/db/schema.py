@@ -66,12 +66,11 @@ users_table = sa.Table(
     comment='Representation of user'
 )
 
-# TODO: index on title
 projects_table = sa.Table(
     'projects',
     metadata,
     sa.Column('id', sa.Integer, primary_key=True),
-    sa.Column('title', sa.String, unique=True, nullable=False),
+    sa.Column('title', sa.String, nullable=False),
     sa.Column('description', sa.String, nullable=True),
     sa.Column('created_at', sa.DateTime, default=sa.func.current_timestamp(
     ), nullable=False),
@@ -80,6 +79,8 @@ projects_table = sa.Table(
     sa.Column('created_by', sa.Integer, sa.ForeignKey(
         'users.id', ondelete='CASCADE'
     ), nullable=False),
+
+    sa.Index('ix__projects__created_by__title', 'created_by', 'title', unique=True), 
 
     comment='Representation of project (collection of tickets and user roles)'
 )

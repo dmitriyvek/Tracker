@@ -1,4 +1,5 @@
 from asyncpgsa import PG
+from sqlalchemy import and_, exists, select
 
 from .base import PROJECTS_REQUIRED_FIELDS
 from tracker.api.errors import APIException
@@ -7,21 +8,39 @@ from tracker.api.status_codes import StatusEnum
 from tracker.db.schema import UserRole, projects_table, roles_table
 
 
-async def check_title_duplication(db: PG, title: str) -> bool:
-    return True
+async def check_title_duplication(db: PG, user_id: int, title: str) -> bool:
+    '''
+    Checks if project with given title is already created by given user
+    return True if it does 
+    '''
+    query = projects_table.\
+        select().\
+        with_only_columns([projects_table.c.id]).\
+        where(and_(
+            projects_table.c.title ==title,
+            projects_table.c.created_by == user_id
+        ))
+    query = select([exists(query)])
+
+    result = await db.fetchval(query)
+    return result
 
 
 async def check_if_project_exists(db: PG, data: dict) -> None:
     '''
-    Checks if project with given title is already exist 
+    Checks if project with given title is already created by given user 
     if yes raises 400 error
     '''
     query = projects_table.\
         select().\
         with_only_columns([projects_table.c.id]).\
-        where(projects_table.c.title == data['title'])
+        where(and_(
+            projects_table.c.title == data['title'],
+            projects_table.c.created_by == data['created_by']
+        ))
+    query = select([exists(query)])
 
-    result = await db.fetchrow(query)
+    result = await db.fetchval(query)
     if result:
         raise APIException(
             'Project with given title is already exist.',

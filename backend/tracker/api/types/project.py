@@ -147,10 +147,15 @@ class ProjectDuplicationChecksType(graphene.ObjectType):
         title=Title(required=True)
     )
 
+    @staticmethod
+    @login_required
     async def resolve_title(parent, info: ResolveInfo, title):
         db = info.context['request'].app['db']
+        user_id = info.context['request']['user_id']
         data = {'title': title}
         validate_input(data, TitleDuplicationCheckSchema)
 
-        is_existed = await check_title_duplication(db, title=title)
+        is_existed = await check_title_duplication(
+            db, user_id=user_id, title=title
+        )
         return is_existed

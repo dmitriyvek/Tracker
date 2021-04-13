@@ -1,21 +1,20 @@
-import { ApolloError, ApolloQueryResult, useMutation } from "@apollo/client";
+import { ApolloQueryResult } from "@apollo/client";
 import { Form, Input, Button, Spin } from "antd";
 import { useState } from "react";
 
 import { useImperativeQuery } from "../hooks";
-import {
-  PROJECT_CREATION_MUTATION,
-  PROJECT_TITLE_DUPLICATION_CHECK_QUERY,
-} from "../gqlQueries";
+import { PROJECT_TITLE_DUPLICATION_CHECK_QUERY } from "../gqlQueries";
 
-import type {
-  ProjectCreationMutationResponseType,
-  ProjectTitleDuplicationCheckResponseType,
-} from "../types";
+import type { ProjectTitleDuplicationCheckResponseType } from "../types";
 
-type projectCreationFormValuesType = {
+type ProjectCreationFormValuesType = {
   title: string;
   description?: string;
+};
+
+type ProjectCreationFormPropsType = {
+  isLoading: boolean;
+  createProject: (input: ProjectCreationFormValuesType) => void;
 };
 
 const layout = {
@@ -28,7 +27,10 @@ const tailLayout = {
 
 const { TextArea } = Input;
 
-const ProjectCreationForm = () => {
+const ProjectCreationForm: React.FC<ProjectCreationFormPropsType> = ({
+  isLoading,
+  createProject,
+}: ProjectCreationFormPropsType) => {
   const [titleIsUnique, setTitleIsUnique] = useState<boolean>(false);
   const [titleIsChanged, setTitleIsChanged] = useState<boolean>(false);
   const [titleCheckTimeoutId, setTitleCheckTimeoutId] = useState<number>(0);
@@ -41,23 +43,6 @@ const ProjectCreationForm = () => {
 
   const onFormFinishFailed = (errorInfo: any) => {
     console.log("Form failed:", errorInfo);
-  };
-
-  const [
-    projectCreationMutation,
-    { loading },
-  ] = useMutation<ProjectCreationMutationResponseType>(PROJECT_CREATION_MUTATION, {
-    onError: (error: ApolloError) => {
-      console.log("Error during project creation mutation: ", error);
-    },
-  });
-
-  const createProject = (input: projectCreationFormValuesType) => {
-    return projectCreationMutation({
-      variables: {
-        input,
-      },
-    });
   };
 
   const usernameCheck = useImperativeQuery<ProjectTitleDuplicationCheckResponseType>(
@@ -94,7 +79,7 @@ const ProjectCreationForm = () => {
   };
 
   return (
-    <Spin spinning={loading} delay={500} size="small">
+    <Spin spinning={isLoading} delay={500} size="small">
       <Form
         {...layout}
         form={form}
@@ -166,3 +151,4 @@ const ProjectCreationForm = () => {
 };
 
 export { ProjectCreationForm };
+export type { ProjectCreationFormValuesType };

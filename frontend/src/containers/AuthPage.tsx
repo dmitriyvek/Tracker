@@ -78,10 +78,6 @@ const AuthPage: React.FC = () => {
     register(input).then(() => history.push("/projects"));
   };
 
-  const onFormFinishFailed = (errorInfo: any) => {
-    console.log("Form failed:", errorInfo);
-  };
-
   return (
     <>
       {isLogin ? (
@@ -91,7 +87,6 @@ const AuthPage: React.FC = () => {
             onChangeFormTypeClick={() => setIsLogin(false)}
             isLoading={loginIsLoading}
             onFormFinish={onLoginFormFinish}
-            onFormFinishFailed={onFormFinishFailed}
             error={loginError}
           />
         </>
@@ -102,7 +97,6 @@ const AuthPage: React.FC = () => {
             onChangeFormTypeClick={() => setIsLogin(true)}
             isLoading={registerIsLoading}
             onFormFinish={onRegisterFormFinish}
-            onFormFinishFailed={onFormFinishFailed}
             error={registerError}
           />
         </>

@@ -33,14 +33,12 @@ type LoginFormPropsType = {
   isLoading: boolean;
   onChangeFormTypeClick: () => void;
   onFormFinish: (values: LoginFormItemsType) => void;
-  onFormFinishFailed: (errorInfo: any) => void;
   error: ApolloError | undefined;
 };
 
 const LoginForm: React.FC<LoginFormPropsType> = ({
   isLoading,
   onFormFinish,
-  onFormFinishFailed,
   onChangeFormTypeClick,
   error,
 }: LoginFormPropsType) => {
@@ -52,6 +50,10 @@ const LoginForm: React.FC<LoginFormPropsType> = ({
         key: "loginErrorMessage",
       });
   }, [error]);
+
+  const onFormFinishFailed = (errorInfo: any) => {
+    console.log("Form failed:", errorInfo);
+  };
 
   return (
     <Spin spinning={isLoading} delay={500} size="small">

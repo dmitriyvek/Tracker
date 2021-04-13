@@ -42,14 +42,12 @@ type RegisterFormPropsType = {
   isLoading: boolean;
   onChangeFormTypeClick: () => void;
   onFormFinish: (values: RegisterFormItemsType) => void;
-  onFormFinishFailed: (errorInfo: any) => void;
   error: ApolloError | undefined;
 };
 
 const RegisterForm: React.FC<RegisterFormPropsType> = ({
   isLoading,
   onFormFinish,
-  onFormFinishFailed,
   onChangeFormTypeClick,
   error,
 }: RegisterFormPropsType) => {
@@ -72,6 +70,10 @@ const RegisterForm: React.FC<RegisterFormPropsType> = ({
 
   const usernameCheck = useImperativeQuery(USERNAME_DUPLICATION_CHECK_QUERY);
   const emailCheck = useImperativeQuery(EMAIL_DUPLICATION_CHECK_QUERY);
+
+  const onFormFinishFailed = (errorInfo: any) => {
+    console.log("Form failed:", errorInfo);
+  };
 
   const makeUsernameCheck = (value: string) => {
     return new Promise((resolve, reject) => {

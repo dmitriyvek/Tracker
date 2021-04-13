@@ -51,8 +51,8 @@ class ProjectCreation(BaseMutationPayload, graphene.Mutation):
     async def mutate(parent, info, input):
         app = info.context['request'].app
         data = validate_input(input, ProjectCreationSchema)
-        await check_if_project_exists(app['db'], data)
         data['created_by'] = info.context['request']['user_id']
+        await check_if_project_exists(app['db'], data)
 
         project = await create_project(app['db'], data)
 
