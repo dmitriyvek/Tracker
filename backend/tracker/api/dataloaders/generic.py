@@ -6,7 +6,7 @@ from asyncpgsa import PG
 from sqlalchemy.sql.schema import Table, Column
 
 from tracker.api.connections import (
-    modify_query_by_nested_connection_params, 
+    modify_query_by_nested_connection_params,
     modify_query_by_connection_params
 )
 from tracker.db.schema import roles_table
@@ -18,7 +18,8 @@ def get_generic_loader(
     attr: str,
     connection_params: Optional[Dict[str, str]] = None,
     nested_connection: bool = False,
-    required_fields: Optional[List[Column]] = None
+    required_fields: Optional[List[Column]] = None,
+    many: bool = False
 ) -> DataLoader:
     '''
     If not required fields get all columns from table.
@@ -28,7 +29,6 @@ def get_generic_loader(
     class GenericLoader(DataLoader):
 
         async def batch_load_fn(self, key_list: list) -> List[List[Dict]]:
-            records_by_attr = defaultdict(list)
 
             lookup = getattr(table.c, attr).in_(key_list)
             query = table.select().where(lookup)
@@ -46,15 +46,22 @@ def get_generic_loader(
                     )
                 else:
                     query = modify_query_by_connection_params(
-                       query,
-                       roles_table,
-                       connection_params, 
+                        query,
+                        roles_table,
+                        connection_params,
                     )
 
             record_list = await db.fetch(query)
 
-            for record in record_list:
-                records_by_attr[record[attr]].append(dict(record))
+            if many:
+                records_by_attr = defaultdict(list)
+                for record in record_list:
+                    records_by_attr[record[attr]].append(dict(record))
+
+            else:
+                records_by_attr = {}
+                for record in record_list:
+                    records_by_attr[record[attr]] = dict(record)
 
             result = [records_by_attr.get(key, []) for key in key_list]
             return result

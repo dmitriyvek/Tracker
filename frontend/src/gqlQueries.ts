@@ -98,6 +98,10 @@ const PROJECT_DETAIL_QUERY = gql`
             node {
               role
               userId
+              user {
+                username
+                email
+              }
             }
           }
           pageInfo {

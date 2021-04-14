@@ -4,6 +4,15 @@ from sqlalchemy import and_
 from tracker.db.schema import users_table
 
 
+# fields of tracker.api.types.user.UserType
+USERS_REQUIRED_FIELDS = [
+    users_table.c.id,
+    users_table.c.username,
+    users_table.c.email,
+    users_table.c.registered_at,
+]
+
+
 async def get_user_by_id(db: PG, user_id: int) -> dict:
     '''Get user with given id'''
     query = users_table.\

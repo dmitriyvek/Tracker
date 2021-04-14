@@ -33,6 +33,11 @@ async def test_user_detail_query(
                                 assignAt
                                 assignBy
                                 role
+                                user {{
+                                    id
+                                    username
+                                    email
+                                }}
                             }}
                         }}
                         pageInfo {{
@@ -62,3 +67,4 @@ async def test_user_detail_query(
         role_list = data['roleList']
 
         assert len(role_list['edges']) == 5
+        assert role_list['edges'][0]['node']['user']['username']

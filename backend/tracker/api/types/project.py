@@ -108,7 +108,8 @@ class ProjectType(graphene.ObjectType):
                     attr='project_id',
                     connection_params=connection_params,
                     nested_connection=True,
-                    required_fields=[roles_table.c.id, *ROLES_REQUIRED_FIELDS]
+                    required_fields=[roles_table.c.id, *ROLES_REQUIRED_FIELDS],
+                    many=True
                 )()
 
             record_list = await info.context['role_list_loader'].load(parent['id'])

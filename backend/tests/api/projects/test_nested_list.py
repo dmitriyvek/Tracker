@@ -24,6 +24,11 @@ base_query = '''
                                 node {{
                                     userId
                                     role
+                                    user {{
+                                        id
+                                        username
+                                        email
+                                    }}
                                 }}
                             }}
                             pageInfo {{
@@ -69,10 +74,12 @@ async def test_project_list_with_nested_connections_first_only(
 
         data = await response.json()
         data = data['data']['projects']['list']['edges']
-        first_role = data[0]['node']['roleList']
-        pageinfo = first_role['pageInfo']
+        first_role_list = data[0]['node']['roleList']
+        pageinfo = first_role_list['pageInfo']
 
-        assert len(first_role['edges']) == 3
+        assert first_role_list['edges'][0]['node']['user']['username']
+
+        assert len(first_role_list['edges']) == 3
         assert pageinfo['hasNextPage']
         assert not pageinfo['hasPreviousPage']
 
@@ -104,10 +111,12 @@ async def test_project_list_with_nested_connections_last_only(
 
         data = await response.json()
         data = data['data']['projects']['list']['edges']
-        first_role = data[0]['node']['roleList']
-        pageinfo = first_role['pageInfo']
+        first_role_list = data[0]['node']['roleList']
+        pageinfo = first_role_list['pageInfo']
 
-        assert len(first_role['edges']) == 5
+        assert first_role_list['edges'][0]['node']['user']['username']
+
+        assert len(first_role_list['edges']) == 5
         assert not pageinfo['hasNextPage']
         assert pageinfo['hasPreviousPage']
 
@@ -141,10 +150,12 @@ async def test_project_list_with_nested_connections_first_and_last(
 
         data = await response.json()
         data = data['data']['projects']['list']['edges']
-        first_role = data[0]['node']['roleList']
-        pageinfo = first_role['pageInfo']
+        first_role_list = data[0]['node']['roleList']
+        pageinfo = first_role_list['pageInfo']
 
-        assert len(first_role['edges']) == 4
+        assert first_role_list['edges'][0]['node']['user']['username']
+
+        assert len(first_role_list['edges']) == 4
         assert not pageinfo['hasNextPage']
         assert pageinfo['hasPreviousPage']
 

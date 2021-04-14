@@ -50,6 +50,10 @@ type RoleNodeType = {
   node: {
     userId: number;
     role: string;
+    user: {
+      username: string;
+      email: string;
+    };
   };
 };
 

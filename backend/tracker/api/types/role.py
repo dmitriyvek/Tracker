@@ -1,7 +1,10 @@
 import graphene
 from graphql import ResolveInfo
 
+from tracker.api.dataloaders import get_generic_loader
+from tracker.api.services.users import USERS_REQUIRED_FIELDS
 from tracker.api.services.roles import get_total_count_of_roles_in_project
+from tracker.db.schema import users_table
 
 
 class RoleType(graphene.ObjectType):
@@ -31,6 +34,23 @@ class RoleType(graphene.ObjectType):
         required=True,
         description='User linked with this role'
     )
+
+    @staticmethod
+    async def resolve_user(parent, info: ResolveInfo):
+        if not info.context.get('user_loader'):
+            db = info.context['request'].app['db']
+
+            info.context['user_loader'] = get_generic_loader(
+                db=db,
+                table=users_table,
+                attr='id',
+                connection_params=None,
+                nested_connection=False,
+                required_fields=USERS_REQUIRED_FIELDS,
+            )()
+
+        record = await info.context['user_loader'].load(parent['user_id'])
+        return record
 
 
 class RoleConnection(graphene.relay.Connection):
