@@ -1,6 +1,7 @@
-import React, { useState } from "react";
 import { useQuery } from "@apollo/client";
-import { Layout, List, Button, Spin, Col } from "antd";
+import { Layout, List, Button, Spin, Col, Empty } from "antd";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 import { recordNumber } from "../App";
 import { PROJECT_LIST_QUERY } from "../gqlQueries";
@@ -18,6 +19,20 @@ const layout = {
 const ProjectList: React.FC = () => {
   const [initLoad, setInitLoad] = useState<boolean>(false);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
+
+  const emptyList = (
+    <Empty
+      image={Empty.PRESENTED_IMAGE_SIMPLE}
+      imageStyle={{
+        height: 60,
+      }}
+      description={<span>You are not involved in any project yet</span>}
+    >
+      <Button type="primary">
+        <Link to="/projects/create">Create new project</Link>
+      </Button>
+    </Empty>
+  );
 
   const { error, data, fetchMore } = useQuery(PROJECT_LIST_QUERY, {
     variables: { first: recordNumber },
@@ -66,6 +81,7 @@ const ProjectList: React.FC = () => {
           loading={!initLoad}
           itemLayout="horizontal"
           loadMore={loadMore}
+          locale={{ emptyText: emptyList }}
           dataSource={data && data.projects.list.edges}
           renderItem={(item: ProjectNodeType) => <ProjectListItem item={item} />}
         />
