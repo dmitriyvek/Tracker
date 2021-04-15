@@ -5,7 +5,7 @@ import { useLogout } from "../hooks";
 import { MainHeader } from "../components/MainHeader";
 
 type MainLayoutPropsType = {
-  children: ReactElement | null;
+  children: ReactElement[] | null;
 };
 
 const MainLayout: React.FC<MainLayoutPropsType> = ({ children }: MainLayoutPropsType) => {

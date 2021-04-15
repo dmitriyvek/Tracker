@@ -48,9 +48,9 @@ type UsernameDuplicationCheckResponse = {
 
 type RoleNodeType = {
   node: {
-    userId: number;
     role: string;
     user: {
+      id: string;
       username: string;
       email: string;
     };
@@ -150,6 +150,25 @@ type ProjectTitleDuplicationCheckResponseType = {
   };
 };
 
+type UserRecord = {
+  id: string;
+  username: string;
+  email: string;
+  registeredAt: string;
+};
+
+type UserDetailHomeResponseType = {
+  users: {
+    detail: {
+      record: UserRecord;
+    };
+  };
+};
+
+type UserDetailResponseType = {
+  node: UserRecord;
+};
+
 export type {
   AuthTokenPayloadType,
   ProjectNodeType,
@@ -164,6 +183,8 @@ export type {
   ProjectDetailResponseType,
   ProjectCreationMutationResponseType,
   ProjectTitleDuplicationCheckResponseType,
+  UserDetailHomeResponseType,
+  UserDetailResponseType,
 };
 
 export { MutatianStatusEnum };

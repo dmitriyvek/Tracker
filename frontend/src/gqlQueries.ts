@@ -97,8 +97,8 @@ const PROJECT_DETAIL_QUERY = gql`
           edges {
             node {
               role
-              userId
               user {
+                id
                 username
                 email
               }
@@ -141,6 +141,34 @@ const PROJECT_TITLE_DUPLICATION_CHECK_QUERY = gql`
   }
 `;
 
+const USER_DETAIL_HOME_QUERY = gql`
+  query UserDetailHomeQuery {
+    users {
+      detail {
+        record {
+          id
+          username
+          email
+          registeredAt
+        }
+      }
+    }
+  }
+`;
+
+const USER_DETAIL_QUERY = gql`
+  query UserDetailQuery($userId: ID!) {
+    node(id: $userId) {
+      ... on UserType {
+        id
+        email
+        username
+        registeredAt
+      }
+    }
+  }
+`;
+
 export {
   REGISTER_MUTATION,
   LOGIN_MUTATION,
@@ -151,4 +179,6 @@ export {
   PROJECT_DETAIL_QUERY,
   PROJECT_CREATION_MUTATION,
   PROJECT_TITLE_DUPLICATION_CHECK_QUERY,
+  USER_DETAIL_HOME_QUERY,
+  USER_DETAIL_QUERY,
 };

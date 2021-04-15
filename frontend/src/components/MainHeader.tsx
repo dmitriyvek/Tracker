@@ -1,6 +1,6 @@
 import { Menu, Layout, Button, Modal, Row, Col, Dropdown } from "antd";
 import { useState } from "react";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useHistory, useLocation } from "react-router-dom";
 
 const { Header } = Layout;
 
@@ -25,6 +25,7 @@ const MainHeader: React.FC<MainHeaderPropsType> = ({ logout }) => {
   );
 
   const history = useHistory();
+  const location = useLocation();
 
   const showLogoutModal = () => {
     setLogoutModalVisible(true);
@@ -44,6 +45,11 @@ const MainHeader: React.FC<MainHeaderPropsType> = ({ logout }) => {
     setLogoutModalVisible(false);
   };
 
+  const getSelectedKeys = () => {
+    if (location.pathname.startsWith("/projects")) return ["projects-link"];
+    if (location.pathname.startsWith("/users")) return ["users-link"];
+  };
+
   const projectListMenu = (
     <Menu>
       <Menu.Item key="project-list">
@@ -56,11 +62,19 @@ const MainHeader: React.FC<MainHeaderPropsType> = ({ logout }) => {
     </Menu>
   );
 
+  const userMenu = (
+    <Menu>
+      <Menu.Item key="user-detail">
+        <Link to="/users/home">My profile</Link>
+      </Menu.Item>
+    </Menu>
+  );
+
   return (
     <Header className="header">
       <Row>
         <Col {...menuLayout}>
-          <Menu theme="dark" mode="horizontal" defaultSelectedKeys={["projects-link"]}>
+          <Menu theme="dark" mode="horizontal" defaultSelectedKeys={getSelectedKeys()}>
             <Menu.Item key="projects-link">
               <Dropdown
                 overlay={projectListMenu}
@@ -69,6 +83,13 @@ const MainHeader: React.FC<MainHeaderPropsType> = ({ logout }) => {
               >
                 <a className="ant-dropdown-link" onClick={(e) => e.preventDefault()}>
                   Projects
+                </a>
+              </Dropdown>
+            </Menu.Item>
+            <Menu.Item key="users-link">
+              <Dropdown overlay={userMenu} placement="bottomLeft" trigger={["click"]}>
+                <a className="ant-dropdown-link" onClick={(e) => e.preventDefault()}>
+                  Users
                 </a>
               </Dropdown>
             </Menu.Item>

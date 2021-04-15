@@ -30,7 +30,10 @@ const ProjectDetail: React.FC<ProjectDetailPropsType> = ({
     },
   );
 
-  if (error) console.log("Error in project detail: ", error);
+  if (error) {
+    console.log("Error in project detail: ", error);
+    return <p>Some thing goes wrong. Sorry...</p>;
+  }
 
   return (
     <>

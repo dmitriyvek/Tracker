@@ -1,6 +1,7 @@
 import { List, Avatar, Spin } from "antd";
 import { useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
+import { Link } from "react-router-dom";
 
 import type { ProjectDetailResponseType } from "../types";
 
@@ -38,12 +39,16 @@ const ProjectRoleList: React.FC<ProjectRoleListPropsType> = ({
         <List
           dataSource={data.node.roleList.edges}
           renderItem={(item) => (
-            <List.Item key={`${item.node.userId}:${item.node.role}`}>
+            <List.Item key={item.node.user.id}>
               <List.Item.Meta
                 avatar={
                   <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
                 }
-                title={<a href="https://ant.design">{item.node.user.username}</a>}
+                title={
+                  <Link to={`/users/${item.node.user.id}`}>
+                    {item.node.user.username}
+                  </Link>
+                }
                 description={item.node.role}
               />
             </List.Item>
