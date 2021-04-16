@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 
+from asyncpg.exceptions import ForeignKeyViolationError
 from asyncpgsa import PG
 from sqlalchemy import and_, exists, select
 
@@ -101,6 +102,13 @@ async def create_role(db: PG, data: RoleData) -> RoleResponseData:
     query = roles_table.insert().\
         returning(roles_table.c.id, *ROLES_REQUIRED_FIELDS).\
         values(data)
-    role = dict(await db.fetchrow(query))
+
+    try:
+        role = dict(await db.fetchrow(query))
+    except ForeignKeyViolationError:
+        raise APIException(
+            'Invalid project id or user id.',
+            status=StatusEnum.BAD_REQUEST.name
+        )
 
     return role

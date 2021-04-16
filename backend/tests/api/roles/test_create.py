@@ -109,3 +109,32 @@ async def test_create_role_mutation(
 
     data = await response.json()
     assert data['errors'][0]['status'] == StatusEnum.BAD_REQUEST._name_
+
+    # with invalid user id
+    variables = {
+        'input': {
+            "projectId": to_global_id('ProjectType', 1),
+            "role": "team_member",
+            "userId": to_global_id('UserType', 30000000)
+        }
+    }
+
+    response = await client.post(
+        '/graphql',
+        data=json.dumps({
+            'query': query,
+            'variables': json.dumps(variables),
+        }),
+        headers={
+            'content-type': 'application/json',
+            'Authorization': f'Bearer {pm_auth_token}'
+        },
+    )
+
+    # if something will go wrong there will be response body output
+    print(await response.text())
+
+    assert response.status == 200
+
+    data = await response.json()
+    assert data['errors'][0]['status'] == StatusEnum.BAD_REQUEST._name_
