@@ -147,7 +147,8 @@ def create_projects_in_db(
         projects_id_list.append(project['id'])
 
     # create roles
-    role_pool = [key.name for key in UserRoleEnum]
+    # role_pool = [key.name for key in UserRoleEnum]
+    role_pool = ['team_member', 'viewer']
     role_pool_len = len(role_pool)
 
     role_list = []
@@ -159,12 +160,13 @@ def create_projects_in_db(
             'project_id': project_id
         })
         for i in range(role_number - 1):
-            role_list.append({
-                'role': role_pool[randint(0, role_pool_len - 1)],
-                'user_id': users_id_list[i],
-                'assign_by': user_id,
-                'project_id': project_id
-            })
+            if users_id_list[i] != 3:
+                role_list.append({
+                    'role': role_pool[randint(0, role_pool_len - 1)],
+                    'user_id': users_id_list[i],
+                    'assign_by': user_id,
+                    'project_id': project_id
+                })
 
     query = roles_table.insert().values(
         role_list).returning(roles_table.c.id)

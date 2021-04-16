@@ -1,6 +1,6 @@
 from base64 import b64decode, b64encode
 
-from .conftest import NUMBER_OF_PROJECTS
+from tests.conftest import NUMBER_OF_PROJECTS
 from tests.utils import make_request_coroutines
 
 
