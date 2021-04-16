@@ -135,8 +135,11 @@ def create_projects_in_db(
     # create projects
     project_list = [
         generate_project_data(created_by=user_id)
-        for _ in range(project_number)
+        for _ in range(project_number - 1)
     ]
+    project_list.append(
+        generate_project_data(created_by=user_id, title='test_title')
+    )
 
     query = projects_table.insert().values(
         project_list).returning(projects_table.c.id)

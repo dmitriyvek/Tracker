@@ -8,7 +8,7 @@ from tracker.api.services.auth import (
 from tracker.api.status_codes import StatusEnum
 
 
-async def test_create_role_mutation(
+async def test_role_duplication_query(
     client,
     setup_project_list_test_retrun_auth_token
 ):
