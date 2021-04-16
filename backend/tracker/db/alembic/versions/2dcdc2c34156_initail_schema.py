@@ -8,7 +8,7 @@ Create Date: 2021-03-09 11:44:31.205823
 from alembic import op
 import sqlalchemy as sa
 
-from tracker.db.schema import UserRole, TicketPriority, TicketStatus, TicketType
+from tracker.db.schema import UserRoleEnum, TicketPriorityEnum, TicketStatusEnum, TicketTypeEnum
 
 
 # revision identifiers, used by Alembic.
@@ -18,10 +18,10 @@ branch_labels = None
 depends_on = None
 
 
-UserRoleEnum = sa.Enum(UserRole, name='role')
-TicketPriorityEnum = sa.Enum(TicketPriority, name='priority')
-TicketStatusEnum = sa.Enum(TicketStatus, name='status')
-TicketTypeEnum = sa.Enum(TicketType, name='type')
+UserRoleEnumEnum = sa.Enum(UserRoleEnum, name='role')
+TicketPriorityEnumEnum = sa.Enum(TicketPriorityEnum, name='priority')
+TicketStatusEnumEnum = sa.Enum(TicketStatusEnum, name='status')
+TicketTypeEnumEnum = sa.Enum(TicketTypeEnum, name='type')
 
 
 def upgrade():
@@ -137,7 +137,7 @@ def downgrade():
     op.drop_table('blacklist_tokens')
     # ### end Alembic commands ###
 
-    UserRoleEnum.drop(op.get_bind())
-    TicketPriorityEnum.drop(op.get_bind())
-    TicketTypeEnum.drop(op.get_bind())
-    TicketStatusEnum.drop(op.get_bind())
+    UserRoleEnumEnum.drop(op.get_bind())
+    TicketPriorityEnumEnum.drop(op.get_bind())
+    TicketTypeEnumEnum.drop(op.get_bind())
+    TicketStatusEnumEnum.drop(op.get_bind())

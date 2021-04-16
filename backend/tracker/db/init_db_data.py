@@ -7,8 +7,8 @@ from tracker.utils.db import get_db_url
 from tracker.api.services import generate_password_hash
 from tracker.db.schema import (
     users_table, projects_table, roles_table, tickets_table, comments_table,
-    UserRole as URole, TicketStatus as TS,
-    TicketPriority as TP, TicketType as TT
+    UserRoleEnum as URole, TicketStatusEnum as TS,
+    TicketPriorityEnum as TP, TicketTypeEnum as TT
 )
 
 

@@ -9,7 +9,7 @@ from faker import Faker
 from sqlalchemy.engine import Connection
 
 from tracker.db.schema import (
-    UserRole, projects_table, roles_table, users_table
+    UserRoleEnum, projects_table, roles_table, users_table
 )
 
 
@@ -147,13 +147,13 @@ def create_projects_in_db(
         projects_id_list.append(project['id'])
 
     # create roles
-    role_pool = [key.name for key in UserRole]
+    role_pool = [key.name for key in UserRoleEnum]
     role_pool_len = len(role_pool)
 
     role_list = []
     for project_id in projects_id_list:
         role_list.append({
-            'role': UserRole.project_manager,
+            'role': UserRoleEnum.project_manager,
             'user_id': user_id,
             'assign_by': user_id,
             'project_id': project_id

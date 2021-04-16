@@ -18,37 +18,40 @@ metadata = sa.MetaData(naming_convention=convention)
 
 
 @unique
-class UserRole(Enum):
-    '''Variants of roles that users can have in a project'''
-    project_manager = 1
-    team_member = 2
-    viewer = 3
+class UserRoleEnum(Enum):
+    '''
+    Variants of roles that users can have in a project.
+    One project - one role.
+    '''
+    project_manager = 'project_manager'
+    team_member = 'team_member'
+    viewer = 'viewer'
 
 
 @unique
-class TicketStatus(Enum):
+class TicketStatusEnum(Enum):
     '''Variants of ticket complition status'''
-    open = 1
-    in_progress = 2
-    done = 3
+    open = 'open'
+    in_progress = 'in_progress'
+    done = 'done'
 
 
 @unique
-class TicketPriority(Enum):
+class TicketPriorityEnum(Enum):
     '''Variants of ticket complition priority'''
-    none = 1
-    low = 2
-    medium = 3
-    hight = 4
+    none = 'none'
+    low = 'low'
+    medium = 'medium'
+    hight = 'hight'
 
 
 @unique
-class TicketType(Enum):
+class TicketTypeEnum(Enum):
     '''Variants of ticket type'''
-    bug_or_error = 1
-    feature_request = 2
-    document_request = 3
-    other = 4
+    bug_or_error = 'bug_or_error'
+    feature_request = 'feature_request'
+    document_request = 'document_request'
+    other = 'other'
 
 
 users_table = sa.Table(
@@ -80,7 +83,8 @@ projects_table = sa.Table(
         'users.id', ondelete='CASCADE'
     ), nullable=False),
 
-    sa.Index('ix__projects__created_by__title', 'created_by', 'title', unique=True), 
+    sa.Index('ix__projects__created_by__title',
+             'created_by', 'title', unique=True),
 
     comment='Representation of project (collection of tickets and user roles)'
 )
@@ -89,7 +93,7 @@ roles_table = sa.Table(
     'roles',
     metadata,
     sa.Column('id', sa.Integer, primary_key=True),
-    sa.Column('role', sa.Enum(UserRole, name='role'), nullable=False),
+    sa.Column('role', sa.Enum(UserRoleEnum, name='role'), nullable=False),
     sa.Column('assign_at', sa.DateTime,
               default=sa.func.current_timestamp(), nullable=False),
     sa.Column('is_deleted', sa.Boolean, nullable=False, default=False),
@@ -106,6 +110,8 @@ roles_table = sa.Table(
         'users.id', ondelete='CASCADE'
     ), nullable=False),
 
+    sa.UniqueConstraint('user_id', 'project_id'),
+
     comment='Description of what role the user has in which project'
 )
 
@@ -119,11 +125,11 @@ tickets_table = sa.Table(
     ), nullable=False),
     sa.Column('updated_at', sa.DateTime,
               onupdate=sa.func.current_timestamp(), nullable=True),
-    sa.Column('status', sa.Enum(TicketStatus, name='status'),
-              nullable=False, default=TicketStatus.open),
-    sa.Column('priority', sa.Enum(TicketPriority, name='priority'),
-              nullable=False, default=TicketPriority.none),
-    sa.Column('type', sa.Enum(TicketType, name='type'), nullable=False),
+    sa.Column('status', sa.Enum(TicketStatusEnum, name='status'),
+              nullable=False, default=TicketStatusEnum.open),
+    sa.Column('priority', sa.Enum(TicketPriorityEnum, name='priority'),
+              nullable=False, default=TicketPriorityEnum.none),
+    sa.Column('type', sa.Enum(TicketTypeEnum, name='type'), nullable=False),
     sa.Column('is_deleted', sa.Boolean, nullable=False, default=False),
 
     sa.Column('created_by', sa.Integer, sa.ForeignKey(

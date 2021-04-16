@@ -7,7 +7,7 @@ from tracker.api.services.auth import (
 )
 from tests.utils import generate_user_data
 from tracker.db.schema import (
-    UserRole, projects_table, roles_table, users_table
+    UserRoleEnum, projects_table, roles_table, users_table
 )
 
 
@@ -81,7 +81,7 @@ async def test_project_creation_mutation(migrated_db_connection, client):
     role = record['myRole']
     assert role['projectId'] == data['recordId']
     assert role['userId'] == user_id
-    assert role['role'] == UserRole.project_manager.name
+    assert role['role'] == UserRoleEnum.project_manager.name
 
     db_query = projects_table.\
         join(
