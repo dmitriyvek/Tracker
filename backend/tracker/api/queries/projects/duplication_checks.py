@@ -4,7 +4,7 @@ from graphql import ResolveInfo
 from tracker.api.types import ProjectDuplicationChecksType
 
 
-class DuplicationCheckQuery(graphene.ObjectType):
+class ProjectDuplicationCheckQuery(graphene.ObjectType):
     duplication_check = graphene.Field(
         ProjectDuplicationChecksType,
         description='Check if user already have a project with given title',

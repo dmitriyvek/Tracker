@@ -21,6 +21,7 @@ class UserDuplicationChecksType(graphene.ObjectType):
         email=Email(required=True)
     )
 
+    @staticmethod
     async def resolve_username(parent, info: ResolveInfo, username):
         db = info.context['request'].app['db']
         data = {'username': username}
@@ -29,6 +30,7 @@ class UserDuplicationChecksType(graphene.ObjectType):
         is_existed = await check_credentials_duplication(db, username=username)
         return is_existed
 
+    @staticmethod
     async def resolve_email(parent, info: ResolveInfo, email):
         db = info.context['request'].app['db']
         data = {'email': email}

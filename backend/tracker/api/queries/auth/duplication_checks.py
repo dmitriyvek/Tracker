@@ -4,7 +4,7 @@ from graphql import ResolveInfo
 from tracker.api.types import UserDuplicationChecksType
 
 
-class DuplicationCheckQuery(graphene.ObjectType):
+class AuthDuplicationCheckQuery(graphene.ObjectType):
     duplication_check = graphene.Field(
         UserDuplicationChecksType,
         description='Check user\'s credentials duplication',

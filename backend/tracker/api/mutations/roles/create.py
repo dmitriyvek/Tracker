@@ -59,13 +59,13 @@ class RoleCreation(BaseMutationPayload, graphene.Mutation):
         data = validate_input(input, RoleCreationSchema)
 
         data['assign_by'] = info.context['request']['user_id']
-        data['user_id'] = int(from_global_id(data['user_id'])[1])
         data['project_id'] = int(from_global_id(data['project_id'])[1])
         await check_if_user_is_project_manager(
             db=app['db'],
             user_id=data['assign_by'],
             project_id=data['project_id']
         )
+        data['user_id'] = int(from_global_id(data['user_id'])[1])
 
         await check_if_role_exists(app['db'], data)
 

@@ -121,9 +121,10 @@ async def test_project_list_with_nested_connections_last_only(
         assert pageinfo['hasPreviousPage']
 
         decoded_cursor = b64decode(pageinfo['startCursor']).decode()
-        assert decoded_cursor == f'RoleType:{NUMBER_OF_ROLES - 4}'
+        # -1 becouse of skiping 3rd role
+        assert decoded_cursor == f'RoleType:{NUMBER_OF_ROLES - 4 - 1}'
         decoded_cursor = b64decode(pageinfo['endCursor']).decode()
-        assert decoded_cursor == f'RoleType:{NUMBER_OF_ROLES}'
+        assert decoded_cursor == f'RoleType:{NUMBER_OF_ROLES - 1}'
 
 
 async def test_project_list_with_nested_connections_first_and_last(

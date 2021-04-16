@@ -1,11 +1,11 @@
 import graphene
 
 from .list import ProjectListQuery
-from .duplication_checks import DuplicationCheckQuery
+from .duplication_checks import ProjectDuplicationCheckQuery
 
 
 class ProjectsQuery(
-    DuplicationCheckQuery,
-    ProjectListQuery, 
+    ProjectDuplicationCheckQuery,
+    ProjectListQuery,
 ):
     pass

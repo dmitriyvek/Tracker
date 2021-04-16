@@ -1,29 +1,11 @@
 from asyncpgsa import PG
-from sqlalchemy import and_, exists, select
+from sqlalchemy import and_, exists, select, literal_column
 
 from .base import PROJECTS_REQUIRED_FIELDS
 from tracker.api.errors import APIException
 from tracker.api.services.roles import ROLES_REQUIRED_FIELDS
 from tracker.api.status_codes import StatusEnum
 from tracker.db.schema import UserRoleEnum, projects_table, roles_table
-
-
-async def check_title_duplication(db: PG, user_id: int, title: str) -> bool:
-    '''
-    Checks if project with given title is already created by given user
-    return True if it does 
-    '''
-    query = projects_table.\
-        select().\
-        with_only_columns([projects_table.c.id]).\
-        where(and_(
-            projects_table.c.title == title,
-            projects_table.c.created_by == user_id
-        ))
-    query = select([exists(query)])
-
-    result = await db.fetchval(query)
-    return result
 
 
 async def check_if_project_exists(db: PG, data: dict) -> None:
@@ -33,7 +15,7 @@ async def check_if_project_exists(db: PG, data: dict) -> None:
     '''
     query = projects_table.\
         select().\
-        with_only_columns([projects_table.c.id]).\
+        with_only_columns([literal_column('1')]).\
         where(and_(
             projects_table.c.title == data['title'],
             projects_table.c.created_by == data['created_by'],

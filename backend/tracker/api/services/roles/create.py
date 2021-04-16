@@ -3,12 +3,12 @@ from datetime import datetime
 
 from asyncpg.exceptions import ForeignKeyViolationError
 from asyncpgsa import PG
-from sqlalchemy import and_, exists, select
+from sqlalchemy import and_, exists, select, literal_column
 
-from .base import ROLES_REQUIRED_FIELDS
 from tracker.api.errors import APIException
 from tracker.api.status_codes import StatusEnum
 from tracker.db.schema import UserRoleEnum, roles_table
+from .base import ROLES_REQUIRED_FIELDS
 
 
 @dataclass
@@ -34,7 +34,7 @@ async def check_if_user_is_project_manager(
     '''
     query = roles_table.\
         select().\
-        with_only_columns([roles_table.c.id]).\
+        with_only_columns([literal_column('1')]).\
         where(and_(
             roles_table.c.role == UserRoleEnum.__members__[
                 'project_manager'].value,
@@ -47,30 +47,9 @@ async def check_if_user_is_project_manager(
     result = await db.fetchval(query)
     if not result:
         raise APIException(
-            'You must be a project manager to add new users in a project.',
+            'You must be a project manager for this operation.',
             status=StatusEnum.FORBIDDEN.name
         )
-
-
-async def check_user_role_duplication(
-    db: PG, user_id: int, project_id: int
-) -> bool:
-    '''
-    Checks if user already has a role in given project
-    return True if it does 
-    '''
-    query = roles_table.\
-        select().\
-        with_only_columns([roles_table.c.id]).\
-        where(and_(
-            roles_table.c.user_id == user_id,
-            roles_table.c.project_id == project_id,
-            roles_table.c.is_deleted.is_(False)
-        ))
-    query = select([exists(query)])
-
-    result = await db.fetchval(query)
-    return result
 
 
 async def check_if_role_exists(db: PG, data: RoleData) -> None:
@@ -80,7 +59,7 @@ async def check_if_role_exists(db: PG, data: RoleData) -> None:
     '''
     query = roles_table.\
         select().\
-        with_only_columns([roles_table.c.id]).\
+        with_only_columns([literal_column('1')]).\
         where(and_(
             roles_table.c.user_id == data['user_id'],
             roles_table.c.project_id == data['project_id'],

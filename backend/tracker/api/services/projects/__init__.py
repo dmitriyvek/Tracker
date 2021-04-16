@@ -1,9 +1,9 @@
 from .base import PROJECTS_REQUIRED_FIELDS
 from .create import (
     check_if_project_exists,
-    check_title_duplication,
     create_project,
 )
+from .duplication_checks import check_title_duplication
 from .list import get_user_project_list, get_total_count_of_user_projects
 from .node import get_project_node
 

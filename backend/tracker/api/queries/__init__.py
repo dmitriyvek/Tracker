@@ -3,6 +3,7 @@ from graphene.relay import Node
 
 from .auth import AuthQuery
 from .projects import ProjectsQuery
+from .roles import RolesQuery
 from .users import UsersQuery
 
 
@@ -12,6 +13,7 @@ class Query(graphene.ObjectType):
     '''
     auth = graphene.Field(AuthQuery)
     projects = graphene.Field(ProjectsQuery)
+    roles = graphene.Field(RolesQuery)
     users = graphene.Field(UsersQuery)
     node = Node.Field()
 
@@ -19,6 +21,9 @@ class Query(graphene.ObjectType):
         return {}
 
     def resolve_projects(self, info):
+        return {}
+
+    def resolve_roles(self, info):
         return {}
 
     def resolve_auth(self, info):

@@ -1,5 +1,5 @@
-from .duplication_checks import DuplicationCheckQuery
+from .duplication_checks import AuthDuplicationCheckQuery
 
 
-class AuthQuery(DuplicationCheckQuery):
+class AuthQuery(AuthDuplicationCheckQuery):
     pass
