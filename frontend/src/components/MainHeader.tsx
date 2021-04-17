@@ -74,7 +74,8 @@ const MainHeader: React.FC<MainHeaderPropsType> = ({ logout }) => {
     <Header className="header">
       <Row>
         <Col {...menuLayout}>
-          <Menu theme="dark" mode="horizontal" defaultSelectedKeys={getSelectedKeys()}>
+          {/* <Menu theme="dark" mode="horizontal" defaultSelectedKeys={getSelectedKeys()}> */}
+          <Menu theme="dark" mode="horizontal" selectable={false}>
             <Menu.Item key="projects-link">
               <Dropdown
                 overlay={projectListMenu}

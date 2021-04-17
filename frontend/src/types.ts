@@ -17,6 +17,10 @@ type ProjectNodeType = {
     myRole: {
       role: string;
     };
+    createdBy: {
+      id: string;
+      username: string;
+    };
   };
 };
 

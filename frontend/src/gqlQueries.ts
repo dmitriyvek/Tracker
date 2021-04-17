@@ -78,6 +78,10 @@ const PROJECT_LIST_QUERY = gql`
             myRole {
               role
             }
+            createdBy {
+              id
+              username
+            }
           }
         }
         pageInfo {

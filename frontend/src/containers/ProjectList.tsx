@@ -76,13 +76,13 @@ const ProjectList: React.FC = () => {
   const columns: ColumnsType<ProjectNodeType> = [
     {
       title: "Title",
-      dataIndex: ["node", "title"],
+      // dataIndex: ["node", "title"],
       key: "title",
-      render: (title: string, record: ProjectNodeType) => (
+      render: (_, record: ProjectNodeType) => (
         <Link to={`/projects/${record.node.id}`}>
           <Space size="small" direction="horizontal">
             <Avatar src="https://avatars.githubusercontent.com/u/60567822?s=400&u=dd215e7416a4f20549a1decad084eb54b8a809e4&v=4" />
-            {title}
+            {record.node.title}
           </Space>
         </Link>
       ),
@@ -92,6 +92,18 @@ const ProjectList: React.FC = () => {
       dataIndex: ["node", "myRole", "role"],
       key: "myRole",
       render: (role: string) => role.replaceAll("_", " "),
+    },
+    {
+      title: "Lead",
+      key: "lead",
+      render: (_, record: ProjectNodeType) => (
+        <Link to={`/users/${record.node.createdBy.id}`}>
+          <Space size="small" direction="horizontal">
+            <Avatar src="https://avatars.githubusercontent.com/u/60567822?s=400&u=dd215e7416a4f20549a1decad084eb54b8a809e4&v=4" />
+            {record.node.createdBy.username}
+          </Space>
+        </Link>
+      ),
     },
   ];
 
