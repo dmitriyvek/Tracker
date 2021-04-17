@@ -11,6 +11,7 @@ PROJECTS_REQUIRED_FIELDS = [
     projects_table.c.title,
     projects_table.c.description,
     projects_table.c.created_at,
+    projects_table.c.created_by,
 ]
 
 
@@ -21,6 +22,7 @@ def format_project_type(record: Union[Record, Dict]) -> dict:
         'title': record['title'],
         'description': record['description'],
         'created_at': record['created_at'],
+        'created_by': record['created_by'],
         'my_role': {
             'user_id': record['user_id'],
             'role': record['role'],

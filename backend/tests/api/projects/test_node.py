@@ -23,6 +23,11 @@ async def test_user_detail_query(
                     myRole {{
                         role
                     }}
+                    createdBy {{
+                        id
+                        username
+                        email
+                    }}
                     roleList(first: 5) {{
                         totalCount
                         edges {{
@@ -68,3 +73,6 @@ async def test_user_detail_query(
 
         assert len(role_list['edges']) == 5
         assert role_list['edges'][0]['node']['user']['username']
+
+        assert data['myRole']['role']
+        assert data['createdBy']['username']

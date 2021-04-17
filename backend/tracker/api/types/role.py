@@ -55,6 +55,7 @@ class RoleType(graphene.ObjectType):
                 connection_params=None,
                 nested_connection=False,
                 required_fields=USERS_REQUIRED_FIELDS,
+                many=False,
             )()
 
         record = await info.context['user_loader'].load(parent['user_id'])

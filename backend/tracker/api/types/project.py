@@ -19,9 +19,10 @@ from tracker.api.services.projects import (
 from tracker.api.services.roles import (
     ROLES_REQUIRED_FIELDS, get_projects_role_list
 )
+from tracker.api.services.users import USERS_REQUIRED_FIELDS
 from tracker.api.types.role import RoleType, RoleConnection
 from tracker.api.wrappers import login_required
-from tracker.db.schema import roles_table
+from tracker.db.schema import roles_table, users_table
 
 
 class ProjectType(graphene.ObjectType):
@@ -47,6 +48,11 @@ class ProjectType(graphene.ObjectType):
         required=True,
         description='Role of the current user in given project'
     )
+    created_by = graphene.Field(
+        'tracker.api.types.user.UserType',
+        required=True,
+        description='User who created this project'
+    )
 
     class Meta:
         interfaces = (graphene.relay.Node, )
@@ -67,11 +73,32 @@ class ProjectType(graphene.ObjectType):
         return record
 
     @staticmethod
+    async def resolve_created_by(parent, info: ResolveInfo):
+        if not info.context.get('created_by_loader'):
+            db = info.context['request'].app['db']
+
+            info.context['created_by_loader'] = get_generic_loader(
+                db=db,
+                table=users_table,
+                attr='id',
+                connection_params=None,
+                nested_connection=False,
+                required_fields=USERS_REQUIRED_FIELDS,
+                many=False,
+            )()
+
+        # parent is ProjectType in node; parent is dict in connection (list)
+        parent_id = parent.created_by if isinstance(
+            parent, ProjectType) else parent['created_by']
+
+        record = await info.context['created_by_loader'].load(parent_id)
+        return record
+
+    @staticmethod
     async def resolve_role_list(
         parent, info: ResolveInfo, **connection_params
     ):
-        # if called from node
-        if project_id := info.context['request'].get('project_id'):
+        if not info.context.get('role_list_loader'):
             db = info.context['request'].app['db']
             max_fetch_number = info.context['request'].app.\
                 get('config', {}).\
@@ -80,39 +107,25 @@ class ProjectType(graphene.ObjectType):
             connection_params = validate_connection_params(
                 connection_params,
                 RoleType,
-                max_fetch_number
+                max_fetch_number,
+                nested_connection=False if isinstance(
+                    parent, ProjectType) else True
             )
-            record_list = await get_projects_role_list(
-                db, info, project_id, connection_params
-            )
 
-        # if called from connection
-        else:
-            # initialize data loader
-            if not info.context.get('role_list_loader'):
-                db = info.context['request'].app['db']
-                max_fetch_number = info.context['request'].app.\
-                    get('config', {}).\
-                    get('max_fetch_number')
+            info.context['role_list_loader'] = get_generic_loader(
+                db=db,
+                table=roles_table,
+                attr='project_id',
+                connection_params=connection_params,
+                nested_connection=True,
+                required_fields=[roles_table.c.id, *ROLES_REQUIRED_FIELDS],
+                many=True
+            )()
 
-                connection_params = validate_connection_params(
-                    connection_params,
-                    RoleType,
-                    max_fetch_number,
-                    nested_connection=True
-                )
-
-                info.context['role_list_loader'] = get_generic_loader(
-                    db=db,
-                    table=roles_table,
-                    attr='project_id',
-                    connection_params=connection_params,
-                    nested_connection=True,
-                    required_fields=[roles_table.c.id, *ROLES_REQUIRED_FIELDS],
-                    many=True
-                )()
-
-            record_list = await info.context['role_list_loader'].load(parent['id'])
+        # parent is ProjectType in node; parent is dict in connection (list)
+        parent_id = parent.id if isinstance(
+            parent, ProjectType) else parent['id']
+        record_list = await info.context['role_list_loader'].load(parent_id)
 
         return create_connection_from_record_list(
             record_list,

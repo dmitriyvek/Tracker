@@ -19,6 +19,10 @@ base_query = '''
                         myRole {{
                             role
                         }}
+                        createdBy {{
+                            id
+                            username
+                        }}
                         roleList{params} {{
                             edges {{
                                 node {{
@@ -77,6 +81,9 @@ async def test_project_list_with_nested_connections_first_only(
         first_role_list = data[0]['node']['roleList']
         pageinfo = first_role_list['pageInfo']
 
+        assert data[0]['node']['myRole']['role']
+        assert data[0]['node']['createdBy']['username']
+
         assert first_role_list['edges'][0]['node']['user']['username']
 
         assert len(first_role_list['edges']) == 3
@@ -113,6 +120,9 @@ async def test_project_list_with_nested_connections_last_only(
         data = data['data']['projects']['list']['edges']
         first_role_list = data[0]['node']['roleList']
         pageinfo = first_role_list['pageInfo']
+
+        assert data[0]['node']['myRole']['role']
+        assert data[0]['node']['createdBy']['username']
 
         assert first_role_list['edges'][0]['node']['user']['username']
 
@@ -153,6 +163,9 @@ async def test_project_list_with_nested_connections_first_and_last(
         data = data['data']['projects']['list']['edges']
         first_role_list = data[0]['node']['roleList']
         pageinfo = first_role_list['pageInfo']
+
+        assert data[0]['node']['myRole']['role']
+        assert data[0]['node']['createdBy']['username']
 
         assert first_role_list['edges'][0]['node']['user']['username']
 

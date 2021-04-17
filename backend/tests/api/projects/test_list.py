@@ -13,6 +13,12 @@ base_query = '''
                     node {{
                         id
                         title
+                        myRole {{
+                            role
+                        }}
+                        createdBy {{
+                            username
+                        }}
                     }}
                 }}
                 pageInfo {{
@@ -51,6 +57,9 @@ async def test_projects_list_query_with_no_params(
         data = data['data']['projects']['list']
         pageinfo = data['pageInfo']
 
+        assert data['edges'][0]['node']['myRole']['role']
+        assert data['edges'][0]['node']['createdBy']['username']
+
         assert len(data['edges']) == max_fetch_number
         assert pageinfo['hasNextPage']
         assert not pageinfo['hasPreviousPage']
@@ -83,6 +92,9 @@ async def test_projects_list_query_with_first_only(
         data = data['data']['projects']['list']
         pageinfo = data['pageInfo']
 
+        assert data['edges'][0]['node']['myRole']['role']
+        assert data['edges'][0]['node']['createdBy']['username']
+
         assert len(data['edges']) == 5
         assert pageinfo['hasNextPage']
         assert not pageinfo['hasPreviousPage']
@@ -110,6 +122,9 @@ async def test_projects_list_query_with_first_only(
         data = await response.json()
         data = data['data']['projects']['list']
         pageinfo = data['pageInfo']
+
+        assert data['edges'][0]['node']['myRole']['role']
+        assert data['edges'][0]['node']['createdBy']['username']
 
         assert len(data['edges']) == max_fetch_number
         assert pageinfo['hasNextPage']
@@ -143,6 +158,9 @@ async def test_projects_list_query_with_first_and_last(
         data = data['data']['projects']['list']
         pageinfo = data['pageInfo']
 
+        assert data['edges'][0]['node']['myRole']['role']
+        assert data['edges'][0]['node']['createdBy']['username']
+
         assert len(data['edges']) == 5
         assert not pageinfo['hasNextPage']
         assert pageinfo['hasPreviousPage']
@@ -175,6 +193,9 @@ async def test_projects_list_query_with_last_only(
         data = data['data']['projects']['list']
         pageinfo = data['pageInfo']
 
+        assert data['edges'][0]['node']['myRole']['role']
+        assert data['edges'][0]['node']['createdBy']['username']
+
         assert len(data['edges']) == 5
         assert not pageinfo['hasNextPage']
         assert pageinfo['hasPreviousPage']
@@ -202,6 +223,9 @@ async def test_projects_list_query_with_last_only(
         data = await response.json()
         data = data['data']['projects']['list']
         pageinfo = data['pageInfo']
+
+        assert data['edges'][0]['node']['myRole']['role']
+        assert data['edges'][0]['node']['createdBy']['username']
 
         assert len(data['edges']) == max_fetch_number
         assert not pageinfo['hasNextPage']
@@ -240,6 +264,9 @@ async def test_projects_list_query_with_after_only(
         data = data['data']['projects']['list']
         pageinfo = data['pageInfo']
 
+        assert data['edges'][0]['node']['myRole']['role']
+        assert data['edges'][0]['node']['createdBy']['username']
+
         assert len(data['edges']) == max_fetch_number
         assert pageinfo['hasNextPage']
         assert pageinfo['hasPreviousPage']
@@ -274,6 +301,9 @@ async def test_projects_list_query_with_before_only(
         data = await response.json()
         data = data['data']['projects']['list']
         pageinfo = data['pageInfo']
+
+        assert data['edges'][0]['node']['myRole']['role']
+        assert data['edges'][0]['node']['createdBy']['username']
 
         assert len(data['edges']) == 4
         assert pageinfo['hasNextPage']
