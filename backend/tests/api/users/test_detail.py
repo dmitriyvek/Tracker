@@ -18,7 +18,7 @@ async def test_user_detail_query(migrated_db_connection, client):
     db_query = users_table.insert().values(user).returning(users_table.c.id)
     user_id = migrated_db_connection.execute(db_query).fetchone()[0]
 
-    auth_token = generate_auth_token(app['config'], user_id)
+    auth_token = generate_auth_token(app['config'], user_id=user_id)
 
     create_projects_in_db(
         migrated_db_connection, user_id, project_number=5

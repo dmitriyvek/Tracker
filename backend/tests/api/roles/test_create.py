@@ -15,7 +15,7 @@ async def test_create_role_mutation(
     pm_auth_token = setup_project_list_test_retrun_auth_token
 
     app = client.server.app
-    auth_token = generate_auth_token(app['config'], 2)
+    auth_token = generate_auth_token(app['config'], user_id=2)
 
     query = '''
         mutation RoleCreationMutation($input: RoleCreationInput!) {

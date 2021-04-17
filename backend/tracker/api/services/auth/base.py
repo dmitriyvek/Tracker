@@ -8,19 +8,31 @@ from sqlalchemy.sql import select
 from tracker.db.schema import blacklist_tokens_table
 
 
-def generate_auth_token(config: dict, user_id: int, email: str = '') -> bytes:
+def generate_auth_token(
+    config: dict,
+    user_id: int = None,
+    email: str = None
+) -> bytes:
     '''
     Generates the Auth Token with the given user_id.
-    If the email was also given then adds it to the payload
-    (the token will be used for account confirmation).
+    Generates the Account Confirmation Token with the given email.
+    You can pass only user_id or email.
     '''
+    if user_id and email:
+        raise ValueError('You can pass only user_id or email.')
+    if not (user_id or email):
+        raise ValueError('You must pass user_id or email.')
+
     payload = {
         'exp': datetime.utcnow() + config.get('token_expiration_time'),
         'iat': datetime.utcnow(),
-        'sub': user_id,
     }
-    if email:
+
+    if user_id:
+        payload['sub'] = user_id
+    else:
         payload['email'] = email
+
     return jwt.encode(
         payload,
         config['secret_key'],

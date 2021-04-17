@@ -66,6 +66,8 @@ users_table = sa.Table(
     sa.Column('is_admin', sa.Boolean, nullable=False, default=False,
               comment='If user has admin priviliges in app'),
     sa.Column('is_deleted', sa.Boolean, nullable=False, default=False),
+    sa.Column('is_confirmed', sa.Boolean, nullable=False, default=False,
+              comment='Is account is confirmed by email'),
     comment='Representation of user'
 )
 
@@ -83,7 +85,7 @@ projects_table = sa.Table(
         'users.id', ondelete='CASCADE'
     ), nullable=False),
 
-    sa.Index('ix__projects__created_by__title',
+    sa.Index('ix__projects__created_by_title',
              'created_by', 'title', unique=True),
 
     comment='Representation of project (collection of tickets and user roles)'

@@ -28,13 +28,19 @@ async def check_user_credentials(db: PG, data: dict) -> dict:
         users_table.c.id,
         users_table.c.username,
         users_table.c.email,
-        users_table.c.password
+        users_table.c.password,
+        users_table.c.is_confirmed
     ]).\
         where(and_(
             users_table.c.username == data.get('username'),
             users_table.c.is_deleted.is_(False)
         ))
     user = await db.fetchrow(query)
+
+    if not user['is_confirmed']:
+        raise APIException('Your account is not confirmed yet. '
+                           'Please, check verification letter on your email.',
+                           status=StatusEnum.UNAUTHORIZED.name)
 
     if not (user and check_password_hash(
         user['password'], data.get('password')

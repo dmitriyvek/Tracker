@@ -3,7 +3,8 @@ import graphene
 from ..base import BaseMutationPayload
 from tracker.api.services import validate_input
 from tracker.api.services.auth import (
-    check_if_user_exists, create_user, generate_auth_token
+    check_if_user_exists, create_user,
+    generate_auth_token, send_confirmation_email
 )
 from tracker.api.scalars.auth import Email, Password, Username
 from tracker.api.schemas.auth import RegistrationSchema
@@ -33,7 +34,6 @@ class RegisterInput(graphene.InputObjectType):
 
 
 class RegisterPayload(graphene.ObjectType):
-    auth_token = graphene.String(required=True)
     record = graphene.Field(UserType, required=True)
     record_id = graphene.Int(required=True)
     status = graphene.Field(RegisterStatus, required=True)
@@ -52,14 +52,14 @@ class Registration(BaseMutationPayload, graphene.Mutation):
         data = validate_input(input, RegistrationSchema)
         await check_if_user_exists(app['db'], data)
 
+        await send_confirmation_email(app=app, data=data)
+
         user = await create_user(app['db'], data)
-        auth_token = generate_auth_token(app['config'], user['id'])
 
         return Registration(
             register_payload=RegisterPayload(
                 record=user,
                 record_id=user['id'],
-                auth_token=auth_token,
                 status=RegisterStatus.SUCCESS,
             )
         )

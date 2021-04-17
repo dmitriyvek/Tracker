@@ -1,7 +1,10 @@
+import os
 from functools import partial
 
 import aiohttp_cors
 from aiohttp import web
+from jinja2 import Environment, PackageLoader, select_autoescape
+
 
 from tracker.utils import get_config, setup_db, setup_logger, close_logger
 from tracker.api.views import gqil_view, gql_view
@@ -43,6 +46,12 @@ def create_app() -> web.Application:
         app['config']['request_info_log_file_path'],
         app['config']['debug']
     )
+
+    env = Environment(
+        loader=PackageLoader('tracker', 'api/templates'),
+        autoescape=select_autoescape(['html', 'xml'])
+    )
+    app['jinja_env'] = env
 
     cors = aiohttp_cors.setup(app)
 

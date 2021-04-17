@@ -31,6 +31,13 @@ DEFAULT_CONFIG = {
     'censored_sign': '***',
     'token_expiration_time': timedelta(days=1),
     'max_fetch_number': 10,
+
+    # must be in .env file
+    'mail_server': None,
+    'mail_port': None,
+    'mail_username': None,
+    'mail_password': None,
+    'mail_use_ssl': True,
 }
 
 
@@ -42,6 +49,17 @@ def get_config() -> dict:
     env_options = parse_env_file(ENV_PATH)
     params = merge_env_with_default(env_options, DEFAULT_CONFIG)
     config = DEFAULT_CONFIG.copy()
+
+    if not all([
+        params.get('mail_server'), params.get('mail_port'),
+        params.get('mail_username'), params.get('mail_password'),
+        params.get('mail_use_ssl')
+    ]):
+        raise KeyError(
+            'There must be: "mail_server", '
+            '"mail_port", "mail_username", "mail_password", "mail_use_ssl"'
+            ' parameters in your .env file'
+        )
 
     # if app started with aiohttp-devtools runserver
     # then we does not need arg parser

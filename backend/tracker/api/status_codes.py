@@ -7,3 +7,4 @@ class StatusEnum(Enum):
     UNAUTHORIZED = 401
     FORBIDDEN = 403
     ENPROCESSABLE_ENTITY = 422
+    BAD_GATEWAY = 502

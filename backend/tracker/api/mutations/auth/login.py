@@ -54,7 +54,7 @@ class Login(BaseMutationPayload, graphene.Mutation):
         data = validate_input(input, LoginSchema)
 
         user = await check_user_credentials(app['db'], data)
-        auth_token = generate_auth_token(app['config'], user['id'])
+        auth_token = generate_auth_token(app['config'], user_id=user['id'])
 
         return Login(
             login_payload=LoginPayload(

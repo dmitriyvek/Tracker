@@ -5,7 +5,8 @@ from .register import (
     check_if_user_exists,
     check_credentials_duplication,
     create_user,
-    generate_password_hash
+    generate_password_hash,
+    send_confirmation_email,
 )
 
 
@@ -19,4 +20,5 @@ __all__ = [
     'create_user',
     'generate_auth_token',
     'generate_password_hash',
+    'send_confirmation_email',
 ]
