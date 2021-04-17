@@ -75,6 +75,9 @@ const PROJECT_LIST_QUERY = gql`
             id
             title
             description
+            myRole {
+              role
+            }
           }
         }
         pageInfo {

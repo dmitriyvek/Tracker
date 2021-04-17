@@ -14,6 +14,9 @@ type ProjectNodeType = {
     id: string;
     title: string;
     description: string;
+    myRole: {
+      role: string;
+    };
   };
 };
 

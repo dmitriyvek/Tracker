@@ -25,6 +25,7 @@ const ProjectListItem: React.FC<ProjectListItemPropsType> = ({
         title={<Link to={`/projects/${item.node.id}`}>{item.node.title}</Link>}
         description={item.node.description}
       />
+      My role: {item.node.myRole.role}
     </List.Item>
   );
 };
