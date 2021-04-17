@@ -1,6 +1,7 @@
 import { useQuery } from "@apollo/client";
 import { Layout, Spin } from "antd";
 import { RouteComponentProps } from "react-router";
+import { Link } from "react-router-dom";
 
 import { recordNumber } from "../App";
 import { PROJECT_DETAIL_QUERY } from "../gqlQueries";
@@ -37,7 +38,7 @@ const ProjectDetail: React.FC<ProjectDetailPropsType> = ({
 
   return (
     <>
-      <ProjectsSideBar />
+      {/* <ProjectsSideBar /> */}
       {(data && (
         <Layout style={{ padding: "0 24px 24px" }}>
           <ProjectsBreadCrumb currentProjectTitle={data.node.title} />
@@ -53,6 +54,13 @@ const ProjectDetail: React.FC<ProjectDetailPropsType> = ({
             <h1>{data.node.title}</h1>
             <p>{data.node.description}</p>
             <p>{data.node.createdAt}</p>
+            <p>My role: {data.node.myRole.role}</p>
+            <p>
+              Lead:{" "}
+              <Link to={`/users/${data.node.createdBy.id}`}>
+                {data.node.createdBy.username}
+              </Link>
+            </p>
             <ProjectRoleList fetchMore={fetchMore} data={data} />
           </Content>
         </Layout>

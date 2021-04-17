@@ -98,6 +98,9 @@ class ProjectType(graphene.ObjectType):
     async def resolve_role_list(
         parent, info: ResolveInfo, **connection_params
     ):
+        # parent is ProjectType in node; parent is dict in connection (list)
+        is_list = not isinstance(parent, ProjectType)
+
         if not info.context.get('role_list_loader'):
             db = info.context['request'].app['db']
             max_fetch_number = info.context['request'].app.\
@@ -108,8 +111,7 @@ class ProjectType(graphene.ObjectType):
                 connection_params,
                 RoleType,
                 max_fetch_number,
-                nested_connection=False if isinstance(
-                    parent, ProjectType) else True
+                nested_connection=is_list
             )
 
             info.context['role_list_loader'] = get_generic_loader(
@@ -117,14 +119,12 @@ class ProjectType(graphene.ObjectType):
                 table=roles_table,
                 attr='project_id',
                 connection_params=connection_params,
-                nested_connection=True,
+                nested_connection=is_list,
                 required_fields=[roles_table.c.id, *ROLES_REQUIRED_FIELDS],
                 many=True
             )()
 
-        # parent is ProjectType in node; parent is dict in connection (list)
-        parent_id = parent.id if isinstance(
-            parent, ProjectType) else parent['id']
+        parent_id = parent['id'] if is_list else parent.id
         record_list = await info.context['role_list_loader'].load(parent_id)
 
         return create_connection_from_record_list(

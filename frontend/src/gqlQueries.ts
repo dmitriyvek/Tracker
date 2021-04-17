@@ -100,6 +100,13 @@ const PROJECT_DETAIL_QUERY = gql`
         title
         description
         createdAt
+        myRole {
+          role
+        }
+        createdBy {
+          id
+          username
+        }
         roleList(first: $roleNumber, after: $after) {
           edges {
             node {

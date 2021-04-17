@@ -1,3 +1,9 @@
+enum RoleEnum {
+  project_manager,
+  team_member,
+  viewer,
+}
+
 type AuthTokenPayloadType = {
   exp: number;
   iat: number;
@@ -15,7 +21,7 @@ type ProjectNodeType = {
     title: string;
     description: string;
     myRole: {
-      role: string;
+      role: RoleEnum;
     };
     createdBy: {
       id: string;
@@ -55,7 +61,7 @@ type UsernameDuplicationCheckResponse = {
 
 type RoleNodeType = {
   node: {
-    role: string;
+    role: RoleEnum;
     user: {
       id: string;
       username: string;
@@ -78,6 +84,13 @@ type ProjectDetailResponseType = {
     description: string;
     createdAt: string;
     roleList: RoleListType;
+    createdBy: {
+      id: string;
+      username: string;
+    };
+    myRole: {
+      role: RoleEnum;
+    };
   };
 };
 
