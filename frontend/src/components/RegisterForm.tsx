@@ -1,5 +1,5 @@
 // TODO: think on how to make it a pure component
-import { ApolloError, ApolloQueryResult } from "@apollo/client";
+import { ApolloError } from "@apollo/client";
 import React, { useEffect, useState } from "react";
 import { message, Form, Input, Button, Spin } from "antd";
 
@@ -222,7 +222,7 @@ const RegisterForm: React.FC<RegisterFormPropsType> = ({
               required: true,
               message: "Please input your password!",
             },
-            { min: 6, message: "Password is too short." },
+            { min: 8, message: "Password is too short." },
             { max: 32, message: "Password is too long." },
           ]}
         >

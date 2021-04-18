@@ -18,7 +18,7 @@ const UserDetailPage = () => {
 
   if (error) {
     console.log("Error in user detail: ", error);
-    return <p>Some thing goes wrong. Sorry...</p>;
+    return <p>Something went wrong. Sorry...</p>;
   }
 
   if (!loading && data)

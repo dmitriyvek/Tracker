@@ -34,8 +34,6 @@ class RegisterInput(graphene.InputObjectType):
 
 
 class RegisterPayload(graphene.ObjectType):
-    record = graphene.Field(UserType, required=True)
-    record_id = graphene.Int(required=True)
     status = graphene.Field(RegisterStatus, required=True)
 
 
@@ -55,12 +53,10 @@ class Registration(BaseMutationPayload, graphene.Mutation):
 
         await send_confirmation_email(app=app, data=data)
 
-        user = await create_user(app['db'], data)
+        await create_user(app['db'], data)
 
         return Registration(
             register_payload=RegisterPayload(
-                record=user,
-                record_id=user['id'],
                 status=RegisterStatus.SUCCESS,
             )
         )

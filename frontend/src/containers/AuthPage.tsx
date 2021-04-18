@@ -21,6 +21,7 @@ type RegisterFuncType = (input: RegistrationMutationRequiredVarsType) => Promise
 
 const AuthPage: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [isRegisterComplition, setIsRegisterComplition] = useState(false);
 
   const history = useHistory();
 
@@ -40,7 +41,7 @@ const AuthPage: React.FC = () => {
     { error: registerError, loading: registerIsLoading },
   ] = useMutation(REGISTER_MUTATION, {
     onCompleted: (response: RegisterMutationResponseType) => {
-      setAuthToken(response.auth.register.registerPayload.authToken);
+      setIsRegisterComplition(true);
     },
     onError: (error: ApolloError) => {},
   });
@@ -75,11 +76,19 @@ const AuthPage: React.FC = () => {
       password: values.password,
     };
     await register(input);
-    history.push("/projects");
+    history.push("/auth");
   };
 
+  if (isRegisterComplition)
+    return (
+      <>
+        <h1 style={{ textAlign: "center" }}>You successfully registered.</h1>
+        <p style={{ textAlign: "center" }}>Check your email for confirmation letter.</p>
+      </>
+    );
+
   return (
-    <>
+    <p>
       {isLogin ? (
         <>
           <h1 style={{ textAlign: "center" }}>Login page</h1>
@@ -101,7 +110,7 @@ const AuthPage: React.FC = () => {
           />
         </>
       )}
-    </>
+    </p>
   );
 };
 

@@ -43,11 +43,6 @@ const REGISTER_MUTATION = gql`
       register(input: $input) {
         registerPayload {
           status
-          authToken
-          recordId
-          record {
-            username
-          }
         }
       }
     }
@@ -128,6 +123,20 @@ const PROJECT_DETAIL_QUERY = gql`
   }
 `;
 
+const EMAIL_CONFIRMATION_MUTATION = gql`
+  mutation($input: EmailConfirmationInput!) {
+    auth {
+      emailConfirmation(input: $input) {
+        emailConfirmationPayload {
+          recordId
+          authToken
+          status
+        }
+      }
+    }
+  }
+`;
+
 const PROJECT_CREATION_MUTATION = gql`
   mutation projectCreationMutation($input: ProjectCreationInput!) {
     project {
@@ -184,6 +193,7 @@ const USER_DETAIL_QUERY = gql`
 `;
 
 export {
+  EMAIL_CONFIRMATION_MUTATION,
   REGISTER_MUTATION,
   LOGIN_MUTATION,
   LOGOUT_MUTATION,

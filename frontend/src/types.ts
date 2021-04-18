@@ -103,7 +103,7 @@ type UserType = {
   username: string;
 };
 
-type LoginAndRegisterPayloadType = {
+type LoginPayloadType = {
   authToken: string;
   recordId: number;
   status: MutatianStatusEnum;
@@ -113,14 +113,16 @@ type LoginAndRegisterPayloadType = {
 type LoginMutationResponseType = {
   auth: {
     login: {
-      loginPayload: LoginAndRegisterPayloadType;
+      loginPayload: LoginPayloadType;
     };
   };
 };
 type RegisterMutationResponseType = {
   auth: {
     register: {
-      registerPayload: LoginAndRegisterPayloadType;
+      registerPayload: {
+        status: MutatianStatusEnum;
+      };
     };
   };
 };
@@ -189,8 +191,21 @@ type UserDetailResponseType = {
   node: UserRecord;
 };
 
+type EmailConfirmationResponseType = {
+  auth: {
+    emailConfirmation: {
+      emailConfirmationPayload: {
+        recordId: number;
+        authToken: string;
+        status: MutatianStatusEnum;
+      };
+    };
+  };
+};
+
 export type {
   AuthTokenPayloadType,
+  EmailConfirmationResponseType,
   ProjectNodeType,
   ProjectListResponseType,
   EmailDuplicationCheckResponse,

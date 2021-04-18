@@ -80,17 +80,17 @@ async def send_confirmation_email(
     message['To'] = data['email']
     message['Subject'] = 'Tracker registration confirmation'
 
-    confirmation_token = generate_email_confirmation_token(
+    token = generate_email_confirmation_token(
         config=config, email=data['email']
     )
-    print(confirmation_token)
+    confirmation_url = f'http://localhost:3000/auth/confirmation/{token}'
 
     template = app['jinja_env'].get_template(
         'email/account_confirmation.html'
     )
     content = template.render(
         username=data['username'],
-        confirmation_url=confirmation_token
+        confirmation_url=confirmation_url
     )
     message.attach(MIMEText(content, 'html', 'utf-8'))
 
@@ -114,6 +114,13 @@ async def send_confirmation_email(
                 'please try registering with a new one.',
                 status=StatusEnum.BAD_GATEWAY.name
             )
+
+    except aiosmtplib.SMTPRecipientsRefused:
+        raise APIException(
+            'Can not send a confirmation email. '
+            ' Smtp server can not send email on give domain.',
+            status=StatusEnum.BAD_GATEWAY.name
+        )
 
     except aiosmtplib.SMTPException as err:
         raise APIException(

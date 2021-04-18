@@ -12,6 +12,7 @@ const ProjectsLayout: React.FC = () => {
         <Route exact path="/projects/create" component={ProjectCreationPage} />
         <Route exact path="/projects/:projectId" component={ProjectDetail} />
         <Route exact path="/projects" component={ProjectList} />
+        <Route path="/" component={ProjectList} />
       </Switch>
     </Layout>
   );
