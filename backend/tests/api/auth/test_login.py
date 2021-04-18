@@ -15,6 +15,7 @@ async def test_login_mutation(migrated_db_connection, client):
     user = generate_user_data()
     raw_password = user['password']
     user['password'] = generate_password_hash(raw_password)
+    user['is_confirmed'] = True
     db_query = users_table.insert().values(user).returning(users_table.c.id)
     user_id = migrated_db_connection.execute(db_query).fetchone()[0]
 

@@ -27,6 +27,7 @@ class Logout(BaseMutationPayload, graphene.Mutation):
 
     logout_payload = graphene.Field(LogoutPayload, required=True)
 
+    @staticmethod
     @login_required
     async def mutate(parent, info):
         db = info.context['request'].app['db']

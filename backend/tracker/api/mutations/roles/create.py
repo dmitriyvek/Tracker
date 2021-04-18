@@ -53,6 +53,7 @@ class RoleCreation(BaseMutationPayload, graphene.Mutation):
     role_creation_payload = graphene.Field(
         RoleCreationPayload, required=True)
 
+    @staticmethod
     @login_required
     async def mutate(parent, info, input):
         app = info.context['request'].app

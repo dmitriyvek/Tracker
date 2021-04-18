@@ -29,7 +29,7 @@ DEFAULT_CONFIG = {
     'info_log_file_path': BASE_DIR.parent / Path('log/app/info.log'),
     'request_info_log_file_path': BASE_DIR.parent / Path('log/app/request.log'),
     'censored_sign': '***',
-    'token_expiration_time': timedelta(days=1),
+    'auth_token_expiration_time': timedelta(days=1),
     'max_fetch_number': 10,
 
     # must be in .env file
@@ -38,6 +38,7 @@ DEFAULT_CONFIG = {
     'mail_username': None,
     'mail_password': None,
     'mail_use_ssl': True,
+    'mail_timeout': 10,  # in seconds
 }
 
 

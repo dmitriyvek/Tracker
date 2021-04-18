@@ -49,6 +49,7 @@ class Login(BaseMutationPayload, graphene.Mutation):
 
     login_payload = graphene.Field(LoginPayload, required=True)
 
+    @staticmethod
     async def mutate(parent, info, input):
         app = info.context['request'].app
         data = validate_input(input, LoginSchema)

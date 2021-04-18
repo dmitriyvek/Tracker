@@ -1,15 +1,10 @@
 import base64
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 
 import bcrypt
-import aiosmtplib
-from aiohttp.web import Application
 from asyncpgsa import PG
 from sqlalchemy import select, and_, or_, exists, literal_column
 
 from tracker.api.errors import APIException
-from tracker.api.services.auth.base import generate_auth_token
 from tracker.api.status_codes import StatusEnum
 from tracker.db.schema import users_table
 
@@ -88,55 +83,3 @@ async def create_user(db: PG, data: dict) -> dict:
     user = dict(await db.fetchrow(query))
 
     return user
-
-
-async def send_confirmation_email(
-    app: Application,
-    data: dict
-) -> None:
-    config = app['config']
-
-    message = MIMEMultipart()
-    message["From"] = config['mail_username']
-    message["To"] = data['email']
-    message["Subject"] = "Tracker registration confirmation"
-
-    confirmation_token = generate_auth_token(
-        config=config, email=data['email']
-    )
-
-    template = app['jinja_env'].get_template(
-        'email/account_confirmation.html'
-    )
-    content = template.render(
-        username=data['username'],
-        confirmation_url='confirmation_url'
-    )
-    message.attach(MIMEText(content, "html", "utf-8"))
-
-    try:
-        await aiosmtplib.send(
-            message,
-            hostname=config['mail_server'],
-            port=config['mail_port'],
-            username=config['mail_username'],
-            password=config['mail_password'],
-            use_tls=config['mail_use_ssl'],
-            timeout=10,
-        )
-
-    except aiosmtplib.SMTPDataError as err:
-        if err.code == 550:
-            raise APIException(
-                'Can not send a confirmation email. A letter on given '
-                'email was rejected by smpt server - server consider it spam.'
-                ' If you use temp email try register with new one.',
-                status=StatusEnum.BAD_GATEWAY.name
-            )
-
-    except aiosmtplib.SMTPException as err:
-        raise APIException(
-            'Can not send a confirmation email. Registration not completed.'
-            ' Please, try again.',
-            status=StatusEnum.BAD_GATEWAY.name
-        )

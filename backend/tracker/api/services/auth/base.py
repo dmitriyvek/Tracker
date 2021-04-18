@@ -10,28 +10,16 @@ from tracker.db.schema import blacklist_tokens_table
 
 def generate_auth_token(
     config: dict,
-    user_id: int = None,
-    email: str = None
+    user_id: int,
 ) -> bytes:
     '''
     Generates the Auth Token with the given user_id.
-    Generates the Account Confirmation Token with the given email.
-    You can pass only user_id or email.
     '''
-    if user_id and email:
-        raise ValueError('You can pass only user_id or email.')
-    if not (user_id or email):
-        raise ValueError('You must pass user_id or email.')
-
     payload = {
-        'exp': datetime.utcnow() + config.get('token_expiration_time'),
+        'exp': datetime.utcnow() + config.get('auth_token_expiration_time'),
         'iat': datetime.utcnow(),
+        'sub': user_id
     }
-
-    if user_id:
-        payload['sub'] = user_id
-    else:
-        payload['email'] = email
 
     return jwt.encode(
         payload,
@@ -45,37 +33,40 @@ async def check_if_token_is_blacklisted(db: PG, token: str) -> None:
     query = select([blacklist_tokens_table.c.id]).where(
         blacklist_tokens_table.c.token == token)
     result = await db.fetchrow(query)
+
     if result:
         raise jwt.ExpiredSignatureError('Signature is expired.')
         # raise APIException('Token is expired.',
         #                    status=StatusEnum.UNAUTHORIZED.name)
 
 
-async def decode_token(
+async def decode_auth_token(
     db: PG,
     config: dict,
     token: str,
-    is_auth: bool = True
 ) -> Union[dict, None]:
     '''
     Decodes given token and return payload or None if token is invalid.
     '''
-
     try:
-        payload = jwt.decode(token, config.get(
-            'secret_key'), algorithms=['HS256'])
-        await check_if_token_is_blacklisted(db, token)
+        payload = jwt.decode(
+            token,
+            config.get('secret_key'),
+            algorithms=['HS256'],
+            options={
+                'require_exp': True,
+                'require_iat': True,
+                'verify_exp': True,
+                'verify_iat': True,
+                'verify_signature': True,
+            }
+        )
+        if not payload.get('sub'):
+            raise jwt.InvalidTokenError('Invalid auth token.')
 
-        # if acoount confirmation token is used
-        if (is_auth and payload.get('email')) or \
-                (not is_auth and not payload.get('email')):
-            raise jwt.InvalidTokenError('Email confirmation token is used')
-            # raise APIException('Invalid auth token is used.',
-            #                    status=StatusEnum.UNAUTHORIZED.name)
+        await check_if_token_is_blacklisted(db, token)
 
         return payload
 
     except (jwt.ExpiredSignatureError, jwt.InvalidTokenError) as error:
         return None
-        #     message = 'Signature expired.' if error is jwt.ExpiredSignatureError else 'Invalid token.'
-        #     raise APIException(message, status=StatusEnum.UNAUTHORIZED.name)

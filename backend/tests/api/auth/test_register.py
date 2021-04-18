@@ -15,7 +15,6 @@ async def test_register_mutation(migrated_db_connection, client):
                 register(input: $input) {
                     registerPayload {
                         status
-                        authToken
                         recordId
                         record {
                             id
@@ -52,15 +51,11 @@ async def test_register_mutation(migrated_db_connection, client):
     app = client.server.app
 
     assert all([key in data for key in (
-        'status', 'recordId', 'record', 'authToken')])
+        'status', 'recordId', 'record')])
     assert data['status'] == 'SUCCESS'
 
     record = data['record']
     assert record['username'] == user['username']
-
-    payload = jwt.decode(data['authToken'], app['config'].get(
-        'secret_key'), algorithms=['HS256'])
-    assert payload['sub'] == data['recordId']
 
     db_query = users_table.select().where(users_table.c.id == data['recordId'])
     db_record = migrated_db_connection.execute(db_query).fetchone()

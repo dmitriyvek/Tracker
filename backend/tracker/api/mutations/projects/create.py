@@ -47,6 +47,7 @@ class ProjectCreation(BaseMutationPayload, graphene.Mutation):
     project_creation_payload = graphene.Field(
         ProjectCreationPayload, required=True)
 
+    @staticmethod
     @login_required
     async def mutate(parent, info, input):
         app = info.context['request'].app

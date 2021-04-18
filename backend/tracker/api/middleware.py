@@ -3,7 +3,7 @@ from functools import partial
 from aiohttp import web
 
 from tracker.api.errors import APIException
-from tracker.api.services.auth import decode_token
+from tracker.api.services.auth import decode_auth_token
 
 
 class GraphQLErrorMiddleware:
@@ -40,7 +40,7 @@ async def auth_middleware(request, handler):
             auth_token = auth_credentials[1]
 
     if auth_token:
-        payload = await decode_token(
+        payload = await decode_auth_token(
             request.app['db'],
             request.app['config'],
             auth_token

@@ -47,6 +47,7 @@ class Registration(BaseMutationPayload, graphene.Mutation):
 
     register_payload = graphene.Field(RegisterPayload, required=True)
 
+    @staticmethod
     async def mutate(parent, info, input):
         app = info.context['request'].app
         data = validate_input(input, RegistrationSchema)
