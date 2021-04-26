@@ -13,7 +13,8 @@ const gqlHost = process.env.REACT_APP_GRAPHQL_HOST;
 const gqlPort = process.env.REACT_APP_GRAPHQL_PORT;
 if (!(gqlHost && gqlPort))
   throw new ReferenceError("Some of .env variables are not specified!");
-const httpLink = new HttpLink({ uri: `http://${gqlHost}:${gqlPort}/graphql` });
+const protocol = gqlHost === "localhost" || gqlHost === "127.0.0.1" ? "http" : "https";
+const httpLink = new HttpLink({ uri: `${protocol}://${gqlHost}:${gqlPort}/graphql` });
 
 const authMiddleware = (authToken: string) =>
   new ApolloLink((operation, forward) => {

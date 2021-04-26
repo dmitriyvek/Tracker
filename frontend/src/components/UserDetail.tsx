@@ -16,9 +16,9 @@ const UserDetail: React.FC<UserDetailPropsType> = ({
     <>
       <h1>{username}`s profile</h1>
       <Avatar size={128} icon={<UserOutlined />} style={{ margin: "auto" }} />
-      <span>{username}</span>
-      <span>{email}</span>
-      <span>{registeredAt}</span>
+      <p>{username}</p>
+      <p>{email}</p>
+      <p>{registeredAt}</p>
     </>
   );
 };

@@ -24,6 +24,7 @@ DEFAULT_CONFIG = {
     'pg_pool_max_size': 10,
     'pg_pool_min_size': 10,
     'api_host': '0.0.0.0',
+    'domain_name': 'localhost',
     'api_port': 8000,
     'log_level': LogLevelEnum.debug.value.name.lower(),
     'error_log_file_path': BASE_DIR.parent / Path('log/app/error.log'),

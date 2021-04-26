@@ -82,9 +82,7 @@ const AuthPage: React.FC = () => {
     return (
       <>
         <h1 style={{ textAlign: "center" }}>You successfully registered.</h1>
-        <span style={{ textAlign: "center" }}>
-          Check your email for confirmation letter.
-        </span>
+        <p style={{ textAlign: "center" }}>Check your email for confirmation letter.</p>
       </>
     );
 

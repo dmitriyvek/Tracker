@@ -15,11 +15,6 @@ from tracker.api.status_codes import StatusEnum
 from tracker.db.schema import users_table
 
 
-domain = 'http://localhost:3000' if os.getenv(
-    'debug') else f'https://{os.getenv("api_host")}'
-confirmation_url = domain + '/auth/confirmation/{token}'
-
-
 def generate_email_confirmation_token(
     config: dict,
     email: str,
@@ -89,7 +84,12 @@ async def send_confirmation_email(
     token = generate_email_confirmation_token(
         config=config, email=data['email']
     )
-    confirmation_url = confirmation_url.format(token=token)
+
+    host = os.getenv('domain_name')
+    domain = 'http://localhost:3000' \
+        if host == 'localhost' or host == '127.0.0.1' else \
+        f'https://{host}'
+    confirmation_url = f'{domain}/auth/confirmation/{token}'
 
     template = app['jinja_env'].get_template(
         'email/account_confirmation.html'
@@ -129,6 +129,7 @@ async def send_confirmation_email(
         )
 
     except aiosmtplib.SMTPException as err:
+        app['logger'].error(err)
         raise APIException(
             'Can not send a confirmation email. Registration not completed.'
             ' Please, try again.',
