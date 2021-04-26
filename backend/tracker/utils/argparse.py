@@ -47,9 +47,9 @@ def get_arg_parser(params: dict) -> argparse.ArgumentParser:
 
     group = parser.add_argument_group('API options')
     group.add_argument(
-        '--api-address',
+        '--api-host',
         required=False,
-        default=params['api_address'],
+        default=params['api_host'],
         help='IPv4/IPv6 address API server would listen on'
     )
     group.add_argument(

@@ -131,7 +131,7 @@ const ProjectList: React.FC = () => {
           columns={columns}
           expandable={{
             expandedRowRender: (record) => (
-              <p style={{ margin: 0 }}>{record.node.description}</p>
+              <span style={{ margin: 0 }}>{record.node.description}</span>
             ),
             rowExpandable: (record) => Boolean(record.node.description),
           }}

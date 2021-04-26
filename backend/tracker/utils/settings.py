@@ -1,3 +1,4 @@
+import os
 import sys
 from datetime import timedelta
 from pathlib import Path
@@ -22,7 +23,7 @@ DEFAULT_CONFIG = {
     ),
     'pg_pool_max_size': 10,
     'pg_pool_min_size': 10,
-    'api_address': '0.0.0.0',
+    'api_host': '0.0.0.0',
     'api_port': 8000,
     'log_level': LogLevelEnum.debug.value.name.lower(),
     'error_log_file_path': BASE_DIR.parent / Path('log/app/error.log'),
@@ -62,9 +63,13 @@ def get_config() -> dict:
             ' parameters in your .env file'
         )
 
+    # if app started with gunicorn
+    # then we does not need arg parser
+    if os.getenv('gunicorn'):
+        config.update(params)
     # if app started with aiohttp-devtools runserver
     # then we does not need arg parser
-    if 'runserver' in sys.argv:
+    elif 'runserver' in sys.argv:
         config.update(params)
     else:
         parser = get_arg_parser(params)

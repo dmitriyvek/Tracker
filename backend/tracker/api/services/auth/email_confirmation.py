@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -12,6 +13,11 @@ from tracker.api.services.auth import check_if_token_is_blacklisted
 from tracker.api.services.users import USERS_REQUIRED_FIELDS
 from tracker.api.status_codes import StatusEnum
 from tracker.db.schema import users_table
+
+
+domain = 'http://localhost:3000' if os.getenv(
+    'debug') else f'https://{os.getenv("api_host")}'
+confirmation_url = domain + '/auth/confirmation/{token}'
 
 
 def generate_email_confirmation_token(
@@ -83,7 +89,7 @@ async def send_confirmation_email(
     token = generate_email_confirmation_token(
         config=config, email=data['email']
     )
-    confirmation_url = f'http://localhost:3000/auth/confirmation/{token}'
+    confirmation_url = confirmation_url.format(token=token)
 
     template = app['jinja_env'].get_template(
         'email/account_confirmation.html'

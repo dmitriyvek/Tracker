@@ -63,3 +63,7 @@ def create_app() -> web.Application:
     init_routes(app, cors)
 
     return app
+
+
+async def wsgi():
+    return create_app()

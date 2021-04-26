@@ -13,7 +13,7 @@ const UserHomePage = () => {
 
   if (error) {
     console.log("Error in user home detail: ", error);
-    return <p>Something went wrong. Sorry...</p>;
+    return <span>Something went wrong. Sorry...</span>;
   }
 
   if (!loading && data)

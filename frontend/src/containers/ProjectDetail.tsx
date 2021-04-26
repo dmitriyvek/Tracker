@@ -33,7 +33,7 @@ const ProjectDetail: React.FC<ProjectDetailPropsType> = ({
 
   if (error) {
     console.log("Error in project detail: ", error);
-    return <p>Something went wrong. Sorry...</p>;
+    return <span>Something went wrong. Sorry...</span>;
   }
 
   return (
@@ -52,15 +52,15 @@ const ProjectDetail: React.FC<ProjectDetailPropsType> = ({
             }}
           >
             <h1>{data.node.title}</h1>
-            <p>{data.node.description}</p>
-            <p>{data.node.createdAt}</p>
-            <p>My role: {data.node.myRole.role}</p>
-            <p>
+            <span>{data.node.description}</span>
+            <span>{data.node.createdAt}</span>
+            <span>My role: {data.node.myRole.role}</span>
+            <span>
               Lead:{" "}
               <Link to={`/users/${data.node.createdBy.id}`}>
                 {data.node.createdBy.username}
               </Link>
-            </p>
+            </span>
             <ProjectRoleList fetchMore={fetchMore} data={data} />
           </Content>
         </Layout>

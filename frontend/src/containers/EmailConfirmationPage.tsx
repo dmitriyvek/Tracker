@@ -63,11 +63,11 @@ const EmailConfirmationPage: React.FC = () => {
   if (error) {
     if (
       error.graphQLErrors.length === 1 &&
-      // @ts-ignore: don's know how extend ApolloError type
+      // @ts-ignore: don's know how to extend ApolloError type
       error.graphQLErrors[0].status === "BAD_REQUEST"
     )
-      return <p>You are using invalid confirmation token!</p>;
-    return <p>Something went wrong. Sorry...</p>;
+      return <span>You are using invalid confirmation token!</span>;
+    return <span>Something went wrong. Sorry...</span>;
   }
 
   return (
@@ -80,10 +80,10 @@ const EmailConfirmationPage: React.FC = () => {
       ) : (
         <div style={{ textAlign: "center" }}>
           <h1>Your email confirmation was successed.</h1>
-          <p>
+          <span>
             You will be redirected to the main page after few seconds or you can click on
             this.
-          </p>
+          </span>
           <Button onClick={onGoToMainPageClick}>Go to main page</Button>
         </div>
       )}

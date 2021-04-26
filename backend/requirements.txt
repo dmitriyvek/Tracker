@@ -9,9 +9,11 @@ asyncpgsa==0.26.3
 bcrypt==3.2.0
 cchardet==2.1.7
 graphene==2.1.8
+gunicorn==20.1.0
 jinja2==2.11.3
 loguru==0.5.3
 marshmallow==3.10.0
 psycopg2-binary==2.8.6
+python-dotenv==0.17.0
 PyJWT==2.0.1
 yarl==1.6.3

@@ -115,7 +115,7 @@ const MainHeader: React.FC<MainHeaderPropsType> = ({ logout }) => {
             cancelText="Cancel"
             confirmLoading={logoutConfirmLoading}
           >
-            <p
+            <span
               style={{
                 textAlign: "center",
                 fontSize: "18px",
@@ -124,7 +124,7 @@ const MainHeader: React.FC<MainHeaderPropsType> = ({ logout }) => {
               }}
             >
               {logoutModalText}
-            </p>
+            </span>
           </Modal>
         </Col>
       </Row>

@@ -73,7 +73,7 @@ def app_args(aiohttp_unused_port, migrated_db):
         '--api-port', str(port),
         '--log-level', 'debug',
         '--db-url', migrated_db,
-        '--api-address', '127.0.0.1'
+        '--api-host', '127.0.0.1'
     ]
 
 

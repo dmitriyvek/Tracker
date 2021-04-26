@@ -64,7 +64,6 @@ const AuthPage: React.FC = () => {
   };
 
   const onLoginFormFinish = async (values: LoginFormItemsType) => {
-    // TODO: add to local storage on remember = true
     await login({ username: values.username, password: values.password });
     history.push("/projects");
   };
@@ -83,35 +82,36 @@ const AuthPage: React.FC = () => {
     return (
       <>
         <h1 style={{ textAlign: "center" }}>You successfully registered.</h1>
-        <p style={{ textAlign: "center" }}>Check your email for confirmation letter.</p>
+        <span style={{ textAlign: "center" }}>
+          Check your email for confirmation letter.
+        </span>
       </>
     );
 
-  return (
-    <p>
-      {isLogin ? (
-        <>
-          <h1 style={{ textAlign: "center" }}>Login page</h1>
-          <LoginForm
-            onChangeFormTypeClick={() => setIsLogin(false)}
-            isLoading={loginIsLoading}
-            onFormFinish={onLoginFormFinish}
-            error={loginError}
-          />
-        </>
-      ) : (
-        <>
-          <h1 style={{ textAlign: "center" }}>Registration page</h1>
-          <RegisterForm
-            onChangeFormTypeClick={() => setIsLogin(true)}
-            isLoading={registerIsLoading}
-            onFormFinish={onRegisterFormFinish}
-            error={registerError}
-          />
-        </>
-      )}
-    </p>
-  );
+  if (isLogin)
+    return (
+      <>
+        <h1 style={{ textAlign: "center" }}>Login page</h1>
+        <LoginForm
+          onChangeFormTypeClick={() => setIsLogin(false)}
+          isLoading={loginIsLoading}
+          onFormFinish={onLoginFormFinish}
+          error={loginError}
+        />
+      </>
+    );
+  else
+    return (
+      <>
+        <h1 style={{ textAlign: "center" }}>Registration page</h1>
+        <RegisterForm
+          onChangeFormTypeClick={() => setIsLogin(true)}
+          isLoading={registerIsLoading}
+          onFormFinish={onRegisterFormFinish}
+          error={registerError}
+        />
+      </>
+    );
 };
 
 export { AuthPage };
