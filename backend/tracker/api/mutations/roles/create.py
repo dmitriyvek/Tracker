@@ -2,11 +2,15 @@ import graphene
 from graphql_relay import from_global_id
 
 from ..base import BaseMutationPayload
+from tracker.api.scalars.auth import Email
+from tracker.api.scalars.roles import EmailList
 from tracker.api.schemas.roles import RoleCreationSchema
-from tracker.api.services import validate_input
+from tracker.api.services import send_email_factory, validate_input
 from tracker.api.services.roles import (
-    RoleData, RoleResponseData,
-    check_if_role_exists, create_role, check_if_user_is_project_manager
+    RolesData,
+    check_if_accounts_exist, check_if_user_is_project_manager,
+    get_emails_of_duplicated_roles, get_rid_of_duplications,
+    send_role_confirmation_email,
 )
 from tracker.api.status_codes import StatusEnum
 from tracker.api.types import RoleType
@@ -34,18 +38,32 @@ class RoleCreationInput(graphene.InputObjectType):
         graphene.Enum.from_enum(UserRoleEnum),
         required=True
     )
-    user_id = graphene.ID(required=False)
+    email_list = EmailList(
+        graphene.NonNull(Email),
+        required=True
+    )
     project_id = graphene.ID(required=False)
 
 
 class RoleCreationPayload(graphene.ObjectType):
-    record = graphene.Field(RoleType, required=True)
-    record_id = graphene.Int(required=True)
+    duplicated_email_list = EmailList(
+        Email,
+        description='A list contains emails of duplicated roles.',
+        required=True,
+    )
     status = graphene.Field(RoleCreationStatus, required=True)
+    error_list = graphene.List(
+        graphene.String,
+        description='A list of errors that occurred when sending emails.',
+        required=True
+    )
 
 
-class RoleCreation(BaseMutationPayload, graphene.Mutation):
-    '''Entity for creation new role on a project'''
+class RoleListCreation(BaseMutationPayload, graphene.Mutation):
+    '''
+    Entity for creation new roles for users 
+    with given emails on a project.
+    '''
 
     class Arguments:
         input = RoleCreationInput(required=True)
@@ -61,21 +79,27 @@ class RoleCreation(BaseMutationPayload, graphene.Mutation):
 
         data['assign_by'] = info.context['request']['user_id']
         data['project_id'] = int(from_global_id(data['project_id'])[1])
-        await check_if_user_is_project_manager(
+        data['title'] = await check_if_user_is_project_manager(
             db=app['db'],
             user_id=data['assign_by'],
             project_id=data['project_id']
         )
-        data['user_id'] = int(from_global_id(data['user_id'])[1])
+        data = RolesData(**data)
 
-        await check_if_role_exists(app['db'], data)
+        duplicated_email_list = await get_emails_of_duplicated_roles(
+            app['db'], data
+        )
+        data = get_rid_of_duplications(data, duplicated_email_list)
+        # data = await check_if_accounts_exist(app['db'], data)
+        send_conf_email = send_email_factory(app=app)(
+            send_role_confirmation_email
+        )
+        error_list = await send_conf_email(app=app, data=data)
 
-        role = await create_role(app['db'], data)
-
-        return RoleCreation(
+        return RoleListCreation(
             role_creation_payload=RoleCreationPayload(
-                record=role,
-                record_id=role['id'],
+                error_list=error_list,
+                duplicated_email_list=duplicated_email_list,
                 status=RoleCreationStatus.SUCCESS,
             )
         )

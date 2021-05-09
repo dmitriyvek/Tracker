@@ -9,12 +9,19 @@ import { useMemo } from "react";
 import { cache } from "./cache";
 import { useAuthToken } from "./hooks";
 
-const gqlHost = process.env.REACT_APP_GRAPHQL_HOST;
-const gqlPort = process.env.REACT_APP_GRAPHQL_PORT;
-if (!(gqlHost && gqlPort))
-  throw new ReferenceError("Some of .env variables are not specified!");
-const protocol = gqlHost === "localhost" || gqlHost === "127.0.0.1" ? "http" : "https";
-const httpLink = new HttpLink({ uri: `${protocol}://${gqlHost}:${gqlPort}/graphql` });
+let gqlHost = process.env.REACT_APP_GRAPHQL_HOST;
+let gqlPort = process.env.REACT_APP_GRAPHQL_PORT;
+let gqlUrlSchema = process.env.REACT_APP_GRAPHQL_SCHEMA;
+if (!(gqlHost && gqlPort && gqlUrlSchema))
+  console.warn(
+    "Some of required .env variables are not specified. Using default values.",
+  );
+gqlHost = gqlHost || "localhost";
+gqlPort = gqlPort || "8000";
+gqlUrlSchema = gqlUrlSchema || "http";
+const httpLink = new HttpLink({
+  uri: `${gqlUrlSchema}://${gqlHost}:${gqlPort}/graphql/`,
+});
 
 const authMiddleware = (authToken: string) =>
   new ApolloLink((operation, forward) => {

@@ -16,7 +16,7 @@ def validate_input(data: dict, schema) -> dict:
     try:
         validate_data = schema().load(data)
     except ValidationError as err:
-        # print(err)
+        print(err)
         raise APIException('Request validation has failed',
                            status=StatusEnum.ENPROCESSABLE_ENTITY.name)
 

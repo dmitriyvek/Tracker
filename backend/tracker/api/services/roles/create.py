@@ -1,28 +1,26 @@
 from dataclasses import dataclass
 from datetime import datetime
+from typing import List, Dict, Union
 
 from asyncpg.exceptions import ForeignKeyViolationError
 from asyncpgsa import PG
-from sqlalchemy import and_, exists, select, literal_column
+from sqlalchemy import and_
 
 from tracker.api.errors import APIException
 from tracker.api.status_codes import StatusEnum
-from tracker.db.schema import UserRoleEnum, roles_table
+from tracker.db.schema import (
+    UserRoleEnum, projects_table, roles_table, users_table
+)
 from .base import ROLES_REQUIRED_FIELDS
 
 
 @dataclass
-class RoleData:
+class RolesData:
     role: UserRoleEnum
-    user_id: int
+    email_list: List[str]
     project_id: int
     assign_by: int
-
-
-@dataclass
-class RoleResponseData(RoleData):
-    id: int
-    assign_at: datetime
+    title: str
 
 
 async def check_if_user_is_project_manager(
@@ -30,11 +28,15 @@ async def check_if_user_is_project_manager(
 ):
     '''
     Checks if user has project manager role in given project
-    if not raise 403
+    if not raise 403, if yes returns project title.
     '''
     query = roles_table.\
+        join(
+            projects_table,
+            roles_table.c.project_id == projects_table.c.id
+        ).\
         select().\
-        with_only_columns([literal_column('1')]).\
+        with_only_columns([projects_table.c.title]).\
         where(and_(
             roles_table.c.role == UserRoleEnum.__members__[
                 'project_manager'].value,
@@ -42,52 +44,98 @@ async def check_if_user_is_project_manager(
             roles_table.c.project_id == project_id,
             roles_table.c.is_deleted.is_(False)
         ))
-    query = select([exists(query)])
 
-    result = await db.fetchval(query)
-    if not result:
+    title = await db.fetchval(query)
+    if not title:
         raise APIException(
             'You must be a project manager for this operation.',
             status=StatusEnum.FORBIDDEN.name
         )
 
+    return title
 
-async def check_if_role_exists(db: PG, data: RoleData) -> None:
+
+async def get_emails_of_duplicated_roles(db: PG, data: RolesData) -> List[str]:
     '''
-    Checks if user already has a role in given project
-    if yes raises 400 error
+    Checks if users with given emails already have a role in given project.
+    Returns email list of such users.
     '''
+    email_list = data.email_list
+
     query = roles_table.\
+        join(
+            users_table,
+            roles_table.c.user_id == users_table.c.id
+        ).\
         select().\
-        with_only_columns([literal_column('1')]).\
+        with_only_columns([
+            users_table.c.email,
+        ]).\
         where(and_(
-            roles_table.c.user_id == data['user_id'],
-            roles_table.c.project_id == data['project_id'],
+            roles_table.c.project_id == data.project_id,
+            users_table.c.email.in_(email_list),
             roles_table.c.is_deleted.is_(False),
+            users_table.c.is_deleted.is_(False)
         ))
-    query = select([exists(query)])
 
-    result = await db.fetchval(query)
-    if result:
-        raise APIException(
-            'User already has a role in given project.',
-            status=StatusEnum.BAD_REQUEST.name
-        )
+    result = await db.fetch(query)
+    result = list(map(lambda record: record['email'], result))
+    return result
 
 
-async def create_role(db: PG, data: RoleData) -> RoleResponseData:
-    '''Creates and returns new role'''
+def get_rid_of_duplications(
+    data: RolesData,
+    duplicated_email_list: List[str]
+) -> RolesData:
+    '''
+    Get rid of duplicated emails in data['email_list']
+    '''
+    email_list = data.email_list
 
-    query = roles_table.insert().\
-        returning(roles_table.c.id, *ROLES_REQUIRED_FIELDS).\
-        values(data)
+    for email in duplicated_email_list:
+        for i in range(len(email_list)):
+            if email_list[i] == email:
+                del email_list[i]
 
-    try:
-        role = dict(await db.fetchrow(query))
-    except ForeignKeyViolationError:
-        raise APIException(
-            'Invalid project id or user id.',
-            status=StatusEnum.BAD_REQUEST.name
-        )
+    return data
 
-    return role
+
+@dataclass
+class RolesDataWithAccountsInfo:
+    role: UserRoleEnum
+    accounts: Dict[str, Union[None, str]]
+    project_id: int
+    assign_by: int
+
+
+async def check_if_accounts_exist(
+    db: PG, data: RolesData
+) -> RolesDataWithAccountsInfo:
+    '''
+    Check if accounts with given emails exist.
+    '''
+    email_list = data.email_list
+
+    query = users_table.\
+        select().\
+        with_only_columns(
+            [users_table.c.email, users_table.c.username]
+        ).\
+        where(and_(
+            users_table.c.email.in_(email_list),
+            users_table.c.is_deleted.is_(False),
+            users_table.c.is_confirmed.is_(True)
+        ))
+
+    result = await db.fetch(query)
+
+    accounts = {email: None for email in email_list}
+    for record in result:
+        accounts[record['email']] = record['username']
+
+    return RolesDataWithAccountsInfo(
+        accounts=accounts,
+        role=data.role,
+        project_id=data.project_id,
+        assign_by=data.assign_by,
+    )

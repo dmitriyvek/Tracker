@@ -1,10 +1,9 @@
-import os
 from datetime import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-import aiosmtplib
 import jwt
+from aiosmtplib import SMTP
 from aiohttp.web import Application
 from asyncpgsa import PG
 
@@ -56,7 +55,7 @@ async def decode_email_confirmation_token(
                 'verify_signature': True,
             }
         )
-        if not payload.get('email'):
+        if not payload.get('email') or len(payload.keys()) > 2:
             raise jwt.InvalidTokenError('Invalid email confirmation token.')
 
         await check_if_token_is_blacklisted(db, token)
@@ -70,9 +69,11 @@ async def decode_email_confirmation_token(
         )
 
 
-async def send_confirmation_email(
+async def send_auth_confirmation_email(
     app: Application,
-    data: dict
+    data: dict,
+    smtp_client: SMTP,
+    domain: str,
 ) -> None:
     config = app['config']
 
@@ -84,11 +85,6 @@ async def send_confirmation_email(
     token = generate_email_confirmation_token(
         config=config, email=data['email']
     )
-
-    host = os.getenv('domain_name')
-    domain = 'http://localhost:3000' \
-        if host == 'localhost' or host == '127.0.0.1' else \
-        f'https://{host}'
     confirmation_url = f'{domain}/auth/confirmation/{token}'
 
     template = app['jinja_env'].get_template(
@@ -100,41 +96,8 @@ async def send_confirmation_email(
     )
     message.attach(MIMEText(content, 'html', 'utf-8'))
 
-    try:
-        await aiosmtplib.send(
-            message,
-            hostname=config['mail_server'],
-            port=config['mail_port'],
-            username=config['mail_username'],
-            password=config['mail_password'],
-            use_tls=config['mail_use_ssl'],
-            timeout=config['mail_timeout'],
-        )
-
-    except aiosmtplib.SMTPDataError as err:
-        if err.code == 550:
-            raise APIException(
-                'Can not send a confirmation email. A letter on given '
-                'email was rejected by smpt server - server consider it spam.'
-                ' If you are using a temporary email address, '
-                'please try registering with a new one.',
-                status=StatusEnum.BAD_GATEWAY.name
-            )
-
-    except aiosmtplib.SMTPRecipientsRefused:
-        raise APIException(
-            'Can not send a confirmation email. '
-            ' Smtp server can not send email on give domain.',
-            status=StatusEnum.BAD_GATEWAY.name
-        )
-
-    except aiosmtplib.SMTPException as err:
-        app['logger'].error(err)
-        raise APIException(
-            'Can not send a confirmation email. Registration not completed.'
-            ' Please, try again.',
-            status=StatusEnum.BAD_GATEWAY.name
-        )
+    async with smtp_client:
+        await smtp_client.send_message(message)
 
 
 async def confirm_email(db: PG, email: str) -> dict:

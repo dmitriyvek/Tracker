@@ -1,21 +1,24 @@
 from .base import ROLES_REQUIRED_FIELDS
 from .create import (
-    RoleData, RoleResponseData,
-    check_if_role_exists,
-    create_role,
+    RolesData,
+    check_if_accounts_exist,
+    get_emails_of_duplicated_roles,
+    get_rid_of_duplications,
     check_if_user_is_project_manager
 )
 from .duplication_checks import check_user_role_duplication
+from .email_confirmation import send_role_confirmation_email
 from .list import get_total_count_of_roles_in_project, get_projects_role_list
 
 __all__ = [
     'ROLES_REQUIRED_FIELDS',
-    'RoleData',
-    'RoleResponseData',
-    'check_if_role_exists',
+    'RolesData',
+    'check_if_accounts_exist',
+    'get_emails_of_duplicated_roles',
+    'get_rid_of_duplications',
     'check_if_user_is_project_manager',
     'check_user_role_duplication',
-    'create_role',
     'get_total_count_of_roles_in_project',
     'get_projects_role_list',
+    'send_role_confirmation_email',
 ]

@@ -25,6 +25,7 @@ DEFAULT_CONFIG = {
     'pg_pool_min_size': 10,
     'api_host': '0.0.0.0',
     'domain_name': 'localhost',
+    'url_schema': 'http',
     'api_port': 8000,
     'log_level': LogLevelEnum.debug.value.name.lower(),
     'error_log_file_path': BASE_DIR.parent / Path('log/app/error.log'),
@@ -41,6 +42,8 @@ DEFAULT_CONFIG = {
     'mail_password': None,
     'mail_use_ssl': True,
     'mail_timeout': 10,  # in seconds
+    # how many letters you can send in one api request (hardcoded in EmailList scalar)
+    'mail_max_letters_number': 5,
 }
 
 

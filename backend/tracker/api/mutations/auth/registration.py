@@ -1,10 +1,10 @@
 import graphene
 
 from ..base import BaseMutationPayload
-from tracker.api.services import validate_input
+from tracker.api.services import send_email_factory, validate_input
 from tracker.api.services.auth import (
     check_if_user_exists, create_user,
-    generate_auth_token, send_confirmation_email
+    generate_auth_token, send_auth_confirmation_email
 )
 from tracker.api.scalars.auth import Email, Password, Username
 from tracker.api.schemas.auth import RegistrationSchema
@@ -51,7 +51,9 @@ class Registration(BaseMutationPayload, graphene.Mutation):
         data = validate_input(input, RegistrationSchema)
         await check_if_user_exists(app['db'], data)
 
-        await send_confirmation_email(app=app, data=data)
+        send_conf_email = \
+            send_email_factory(app=app)(send_auth_confirmation_email)
+        await send_conf_email(app=app, data=data)
 
         await create_user(app['db'], data)
 

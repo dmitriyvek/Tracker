@@ -29,16 +29,20 @@ def init_routes(app, cors):
         # add cors for apollo sudio
         cors_options['https://studio.apollographql.com'] = cors_resourse_options
 
-        resource = cors.add(app.router.add_resource("/graphql"), cors_options)
+        resource = cors.add(app.router.add_resource('/graphql'), cors_options)
+        cors.add(resource.add_route('POST', gql_view))
+        cors.add(resource.add_route('GET', gql_view))
+        resource = cors.add(app.router.add_resource('/graphql/'), cors_options)
         cors.add(resource.add_route('POST', gql_view))
         cors.add(resource.add_route('GET', gql_view))
 
-    resource = app.router.add_resource('/graphql/')
-    resource.add_route('POST', gql_view)
-    resource.add_route('GET', gql_view)
-    resource = app.router.add_resource('/graphql')
-    resource.add_route('POST', gql_view)
-    resource.add_route('GET', gql_view)
+    else:
+        resource = app.router.add_resource('/graphql/')
+        resource.add_route('POST', gql_view)
+        resource.add_route('GET', gql_view)
+        resource = app.router.add_resource('/graphql')
+        resource.add_route('POST', gql_view)
+        resource.add_route('GET', gql_view)
 
 
 def create_app() -> web.Application:

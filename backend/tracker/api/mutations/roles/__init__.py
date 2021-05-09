@@ -1,7 +1,7 @@
 import graphene
 
-from .create import RoleCreation
+from .create import RoleListCreation
 
 
 class RoleRootMutation(graphene.ObjectType):
-    role_creation = RoleCreation.Field()
+    role_creation = RoleListCreation.Field()
