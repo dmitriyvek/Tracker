@@ -34,7 +34,7 @@ class Logout(BaseMutationPayload, graphene.Mutation):
         auth_token = info.context['request'].\
             headers.get('Authorization').split(' ')[1]
 
-        await create_blacklist_token(db, auth_token)
+        await create_blacklist_token(db, token=auth_token)
 
         return Logout(
             logout_payload=LogoutPayload(status=LogoutStatus.SUCCESS)

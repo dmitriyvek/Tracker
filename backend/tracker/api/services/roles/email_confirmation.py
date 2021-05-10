@@ -8,18 +8,22 @@ import jwt
 import aiosmtplib
 from aiohttp.web import Application
 from asyncpgsa import PG
+from sqlalchemy.sql import and_
 
 from tracker.api.errors import APIException
 from tracker.api.services.auth import check_if_token_is_blacklisted
 from tracker.api.services.roles import RolesData
+from tracker.api.services.users import USERS_REQUIRED_FIELDS
 from tracker.api.status_codes import StatusEnum
+from tracker.db.schema import roles_table, users_table
 
 
 def generate_role_confirmation_token(
     config: dict,
     email: str,
     project_id: int,
-    role: str
+    role: str,
+    assign_by: int
 ) -> bytes:
     '''
     Generates the Role Confirmation Token with the given data.
@@ -29,6 +33,7 @@ def generate_role_confirmation_token(
         'email': email,
         'project_id': project_id,
         'role': role,
+        'assign_by': assign_by,
     }
 
     return jwt.encode(
@@ -43,9 +48,10 @@ class RoleConfTokenPayload:
     email: str
     role: str
     project_id: int
+    assign_by: int
 
 
-async def decode_email_confirmation_token(
+async def decode_role_confirmation_token(
     db: PG,
     config: dict,
     token: str,
@@ -67,12 +73,14 @@ async def decode_email_confirmation_token(
                 'verify_signature': True,
             }
         )
-        email, role, project_id = (
+        email, role, project_id, assign_by = (
             payload.get('email'),
             payload.get('role'),
-            payload.get('project_id')
+            payload.get('project_id'),
+            payload.get('assign_by')
         )
-        if not all(email, role, project_id) or len(payload.keys()) > 4:
+        if not all([email, role, project_id, assign_by]) or \
+                len(payload.keys()) > 5:
             raise jwt.InvalidTokenError('Invalid role confirmation token.')
 
         await check_if_token_is_blacklisted(db, token)
@@ -80,7 +88,8 @@ async def decode_email_confirmation_token(
         return RoleConfTokenPayload(
             email=email,
             role=role,
-            project_id=project_id
+            project_id=project_id,
+            assign_by=assign_by
         )
 
     except jwt.InvalidTokenError:
@@ -114,6 +123,7 @@ async def send_role_confirmation_email(
                 email=email,
                 role=data.role,
                 project_id=data.project_id,
+                assign_by=data.assign_by
             )
             confirmation_url = f'{domain}/role/confirmation/{token}'
 
@@ -151,3 +161,44 @@ async def send_role_confirmation_email(
                 )
 
     return error_list
+
+
+async def check_if_user_exists_by_email(
+    db: PG, email: str,
+) -> dict:
+    '''
+    Check if account with given email exist.
+    If yes returns it. If no returns None.
+    '''
+    query = users_table.\
+        select().\
+        with_only_columns([
+            *USERS_REQUIRED_FIELDS,
+            users_table.c.is_confirmed,
+        ]).\
+        where(and_(
+            users_table.c.email == email,
+            users_table.c.is_deleted.is_(False),
+        ))
+
+    result = await db.fetchrow(query)
+    if result:
+        return dict(result)
+
+
+async def create_role(
+    db: PG, data: RoleConfTokenPayload, user_id: int
+) -> None:
+    '''
+    Creates new role with given data and user_id.
+    '''
+    query = roles_table.\
+        insert().\
+        values({
+            'role': data.role,
+            'user_id': user_id,
+            'project_id': data.project_id,
+            'assign_by': data.assign_by,
+        })
+
+    await db.fetchrow(query)

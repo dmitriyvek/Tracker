@@ -3,6 +3,7 @@ from enum import Enum
 
 class StatusEnum(Enum):
     SUCCESS = 200
+    MOVED_TEMPORARILY = 302
     BAD_REQUEST = 400
     UNAUTHORIZED = 401
     FORBIDDEN = 403

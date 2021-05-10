@@ -9,44 +9,44 @@ from tracker.api.status_codes import StatusEnum
 from tracker.api.types import UserType
 
 
-class EmailConfirmationStatus(graphene.Enum):
+class RegisterEmailConfirmationStatus(graphene.Enum):
     SUCCESS = StatusEnum.SUCCESS.value
     BAD_REQUEST = StatusEnum.BAD_REQUEST.value
     ENPROCESSABLE_ENTITY = StatusEnum.ENPROCESSABLE_ENTITY.value
 
     @property
     def description(self):
-        if self == EmailConfirmationStatus.SUCCESS:
+        if self == RegisterEmailConfirmationStatus.SUCCESS:
             return 'Successfully confirmed your email'
-        elif self == EmailConfirmationStatus.BAD_REQUEST:
+        elif self == RegisterEmailConfirmationStatus.BAD_REQUEST:
             return 'Confirmation failed: bad request'
-        elif self == EmailConfirmationStatus.ENPROCESSABLE_ENTITY:
+        elif self == RegisterEmailConfirmationStatus.ENPROCESSABLE_ENTITY:
             return 'Confirmation failed: invalid input'
 
 
-class EmailConfirmationInput(graphene.InputObjectType):
+class RegisterEmailConfirmationInput(graphene.InputObjectType):
     token = graphene.String(required=True)
 
 
-class EmailConfirmationPayload(graphene.ObjectType):
+class RegisterEmailConfirmationPayload(graphene.ObjectType):
     auth_token = graphene.String(required=True)
     record = graphene.Field(UserType, required=True)
     record_id = graphene.Int(required=True)
-    status = graphene.Field(EmailConfirmationStatus, required=True)
+    status = graphene.Field(RegisterEmailConfirmationStatus, required=True)
 
 
-class EmailConfirmation(BaseMutationPayload, graphene.Mutation):
-    '''Confirm user\'s emain by given token'''
+class RegisterEmailConfirmation(BaseMutationPayload, graphene.Mutation):
+    '''Confirm user\'s email by given token'''
 
     class Arguments:
-        input = EmailConfirmationInput(required=True)
+        input = RegisterEmailConfirmationInput(required=True)
 
-    email_confirmation_payload = graphene.Field(
-        EmailConfirmationPayload, required=True
+    register_email_confirmation_payload = graphene.Field(
+        RegisterEmailConfirmationPayload, required=True
     )
 
     @staticmethod
-    async def mutate(parent, info, input: EmailConfirmationInput):
+    async def mutate(parent, info, input: RegisterEmailConfirmationInput):
         app = info.context['request'].app
 
         email = await decode_email_confirmation_token(
@@ -61,13 +61,13 @@ class EmailConfirmation(BaseMutationPayload, graphene.Mutation):
             user_id=user['id'],
         )
 
-        await create_blacklist_token(db=app['db'], auth_token=input['token'])
+        await create_blacklist_token(db=app['db'], token=input['token'])
 
-        return EmailConfirmation(
-            email_confirmation_payload=EmailConfirmationPayload(
+        return RegisterEmailConfirmation(
+            register_email_confirmation_payload=RegisterEmailConfirmationPayload(
                 auth_token=auth_token,
                 record=user,
                 record_id=user['id'],
-                status=EmailConfirmationStatus.SUCCESS,
-            )
+                    status=RegisterEmailConfirmationStatus.SUCCESS,
+                )
         )

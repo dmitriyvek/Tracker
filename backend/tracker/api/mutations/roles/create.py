@@ -8,7 +8,7 @@ from tracker.api.schemas.roles import RoleCreationSchema
 from tracker.api.services import send_email_factory, validate_input
 from tracker.api.services.roles import (
     RolesData,
-    check_if_accounts_exist, check_if_user_is_project_manager,
+    check_if_user_is_project_manager,
     get_emails_of_duplicated_roles, get_rid_of_duplications,
     send_role_confirmation_email,
 )
@@ -90,7 +90,6 @@ class RoleListCreation(BaseMutationPayload, graphene.Mutation):
             app['db'], data
         )
         data = get_rid_of_duplications(data, duplicated_email_list)
-        # data = await check_if_accounts_exist(app['db'], data)
         send_conf_email = send_email_factory(app=app)(
             send_role_confirmation_email
         )

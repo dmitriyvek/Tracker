@@ -1,6 +1,7 @@
 from datetime import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from typing import Union
 
 import jwt
 from aiosmtplib import SMTP
@@ -100,16 +101,21 @@ async def send_auth_confirmation_email(
         await smtp_client.send_message(message)
 
 
-async def confirm_email(db: PG, email: str) -> dict:
+async def confirm_email(
+    db: PG, email: str, returning: bool = True
+) -> Union[dict, None]:
     '''
     Takes an email and verifies an associated account.
-    Returns user data.
+    Returns user data if returning param is True (default).
     '''
     query = users_table.\
         update().\
         where(users_table.c.email == email).\
-        values(is_confirmed=True).\
-        returning(*USERS_REQUIRED_FIELDS)
+        values(is_confirmed=True)
 
-    user = dict(await db.fetchrow(query))
-    return user
+    if returning:
+        query = query.returning(*USERS_REQUIRED_FIELDS)
+        user = dict(await db.fetchrow(query))
+        return user
+
+    await db.fetchrow(query)

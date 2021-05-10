@@ -3,20 +3,27 @@ import json
 import jwt
 
 from tests.utils import generate_user_data
-from tracker.db.schema import users_table
+from tracker.db.schema import projects_table, users_table, roles_table
 from tracker.api.services.auth import (
     generate_password_hash
 )
-from tracker.api.services.auth.email_confirmation import (
-    generate_email_confirmation_token
+from tracker.api.services.roles.email_confirmation import (
+    generate_role_confirmation_token
 )
 from tracker.api.status_codes import StatusEnum
 
 
-async def test_email_confirmation_mutation(migrated_db_connection, client):
+async def test_role_confirmation_mutation(migrated_db_connection, client):
     app = client.server.app
     email = 'test@mail.com'
 
+    # create admin user
+    admin = generate_user_data()
+    admin['password'] = generate_password_hash(admin['password'])
+    db_query = users_table.insert().values(admin).returning(users_table.c.id)
+    admin_id = migrated_db_connection.execute(db_query).fetchone()[0]
+
+    # create tested user
     user = generate_user_data(email=email)
     user['password'] = generate_password_hash(user['password'])
     db_query = users_table.insert().values(user).returning(users_table.c.id)
@@ -28,24 +35,31 @@ async def test_email_confirmation_mutation(migrated_db_connection, client):
     is_confirmed = migrated_db_connection.execute(db_query).fetchone()[0]
     assert not is_confirmed
 
-    confirmation_token = generate_email_confirmation_token(
+    db_query = projects_table.insert().\
+        values({'title': 'title1', 'created_by': admin_id}).\
+        returning(projects_table.c.id)
+    project_id = migrated_db_connection.execute(db_query).fetchone()[0]
+
+    confirmation_token = generate_role_confirmation_token(
         config=app['config'],
-        email=email
+        email=email,
+        project_id=project_id,
+        role='team_member',
+        assign_by=admin_id
     )
 
     query = '''
-        mutation ($input: RegisterEmailConfirmationInput!) {
-            auth {
-                emailConfirmation(input: $input) {
-                    registerEmailConfirmationPayload {
-                        recordId
+        mutation RoleConfirmationMutation($input: RoleConfirmationInput!) {
+            role {
+                roleConfirmation(input: $input) {
+                    roleConfirmationPayload {
+                        status
                         authToken
+                        nextUrl
                         record {
-                            id
-                            username
                             email
                         }
-                        status
+                        recordId
                     }
                 }
             }
@@ -73,12 +87,14 @@ async def test_email_confirmation_mutation(migrated_db_connection, client):
     assert response.status == 200
 
     data = await response.json()
-    data = data['data']['auth']['emailConfirmation'][
-        'registerEmailConfirmationPayload']
+    data = data['data']['role']['roleConfirmation'][
+        'roleConfirmationPayload']
 
     assert data['status'] == 'SUCCESS'
     assert data['recordId'] == user_id
     assert data['record']['email'] == email
+
+    assert data['nextUrl'] is None
 
     payload = jwt.decode(
         data['authToken'],
@@ -100,7 +116,26 @@ async def test_email_confirmation_mutation(migrated_db_connection, client):
     is_confirmed = migrated_db_connection.execute(db_query).fetchone()[0]
     assert is_confirmed
 
-    # againg with same token
+    db_query = roles_table.select().\
+        with_only_columns([roles_table.c.project_id]).\
+        where(roles_table.c.user_id == user_id)
+    project_id_2 = migrated_db_connection.execute(db_query).fetchone()[0]
+    assert project_id == project_id_2
+
+    # user with new email
+    confirmation_token = generate_role_confirmation_token(
+        config=app['config'],
+        email='unexistent@gmail.com',
+        project_id=project_id,
+        role='team_member',
+        assign_by=admin_id
+    )
+    variables = {
+        'input': {
+            'token': confirmation_token,
+        },
+    }
+
     response = await client.post(
         '/graphql',
         data=json.dumps({
@@ -118,28 +153,13 @@ async def test_email_confirmation_mutation(migrated_db_connection, client):
     assert response.status == 200
 
     data = await response.json()
-    assert data['errors'][0]['status'] == StatusEnum.BAD_REQUEST._name_
+    data = data['data']['role']['roleConfirmation'][
+        'roleConfirmationPayload']
 
-    # with invalid token
-    response = await client.post(
-        '/graphql',
-        data=json.dumps({
-            'query': query,
-            'variables': json.dumps({
-                'input': {
-                    'token': 'invalid_token'
-                }
-            }),
-        }),
-        headers={
-            'content-type': 'application/json',
-        },
-    )
+    assert data['status'] == 'MOVED_TEMPORARILY'
+    assert data['recordId'] is None
+    assert data['record'] is None
+    assert data['authToken'] is None
 
-    # if something will go wrong there will be response body output
-    print(await response.text())
-
-    assert response.status == 200
-
-    data = await response.json()
-    assert data['errors'][0]['status'] == StatusEnum.BAD_REQUEST._name_
+    assert data['nextUrl'] == \
+        f'http://localhost:3000/role/confirmation/register/{confirmation_token}'
