@@ -100,11 +100,7 @@ class RoleConfirmation(BaseMutationPayload, graphene.Mutation):
                 )
             )
 
-        host = app['config']['domain_name']
-        schema = app['config']['url_schema']
-        domain = 'http://localhost:3000' \
-            if host == 'localhost' or host == '127.0.0.1' else \
-            f'{schema}://{host}'
+        domain = app['config']['to_smtp_domain']
         next_url = f'{domain}/role/confirmation/register/{token}'
 
         return RoleConfirmation(

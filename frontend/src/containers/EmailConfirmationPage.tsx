@@ -6,7 +6,7 @@ import { useHistory, useParams } from "react-router";
 import { EMAIL_CONFIRMATION_MUTATION } from "../gqlQueries";
 import { useAuthToken } from "../hooks";
 
-import type { EmailConfirmationResponseType } from "../types";
+import type { RegisterEmailConfirmationResponseType } from "../types";
 
 const EmailConfirmationPage: React.FC = () => {
   const history = useHistory();
@@ -20,13 +20,13 @@ const EmailConfirmationPage: React.FC = () => {
   const [
     confirmMutation,
     { data, error, loading },
-  ] = useMutation<EmailConfirmationResponseType>(EMAIL_CONFIRMATION_MUTATION, {
-    onCompleted: (response: EmailConfirmationResponseType) => {
+  ] = useMutation<RegisterEmailConfirmationResponseType>(EMAIL_CONFIRMATION_MUTATION, {
+    onCompleted: (response: RegisterEmailConfirmationResponseType) => {
       setFinishEventId(
         window.setTimeout(() => {
           if (authToken) removeAuthToken();
           setAuthToken(
-            response.auth.emailConfirmation.emailConfirmationPayload.authToken,
+            response.auth.emailConfirmation.registerEmailConfirmationPayload.authToken,
           );
           history.push("/projects");
         }, 10000),
@@ -52,7 +52,7 @@ const EmailConfirmationPage: React.FC = () => {
     if (finishEventId) clearTimeout(finishEventId);
     if (authToken) removeAuthToken();
 
-    setAuthToken(data!.auth.emailConfirmation.emailConfirmationPayload.authToken);
+    setAuthToken(data!.auth.emailConfirmation.registerEmailConfirmationPayload.authToken);
     history.push("/projects");
   };
 

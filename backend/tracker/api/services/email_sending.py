@@ -19,22 +19,8 @@ def send_email_factory(
 
         @wraps(func)
         async def send_email_wrapper(*args, **kwargs):
-            config = app['config']
-
-            smtp_client = aiosmtplib.SMTP(
-                hostname=config['mail_server'],
-                port=config['mail_port'],
-                username=config['mail_username'],
-                password=config['mail_password'],
-                use_tls=config['mail_use_ssl'],
-                timeout=config['mail_timeout'],
-            )
-
-            host = config['domain_name']
-            schema = config['url_schema']
-            domain = 'http://localhost:3000' \
-                if host == 'localhost' or host == '127.0.0.1' else \
-                f'{schema}://{host}'
+            smtp_client = app['smtp_client']
+            domain = app['config']['to_smtp_domain']
 
             try:
                 return await func(

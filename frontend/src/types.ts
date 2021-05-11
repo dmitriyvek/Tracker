@@ -191,10 +191,10 @@ type UserDetailResponseType = {
   node: UserRecord;
 };
 
-type EmailConfirmationResponseType = {
+type RegisterEmailConfirmationResponseType = {
   auth: {
     emailConfirmation: {
-      emailConfirmationPayload: {
+      registerEmailConfirmationPayload: {
         recordId: number;
         authToken: string;
         status: MutatianStatusEnum;
@@ -205,7 +205,7 @@ type EmailConfirmationResponseType = {
 
 export type {
   AuthTokenPayloadType,
-  EmailConfirmationResponseType,
+  RegisterEmailConfirmationResponseType,
   ProjectNodeType,
   ProjectListResponseType,
   EmailDuplicationCheckResponse,

@@ -22,6 +22,7 @@ class RoleCreationStatus(graphene.Enum):
     SUCCESS = StatusEnum.SUCCESS.value
     BAD_REQUEST = StatusEnum.BAD_REQUEST.value
     ENPROCESSABLE_ENTITY = StatusEnum.ENPROCESSABLE_ENTITY.value
+    FORBIDDEN = StatusEnum.FORBIDDEN.value
 
     @property
     def description(self):
@@ -31,6 +32,9 @@ class RoleCreationStatus(graphene.Enum):
             return 'Role creation failed: bad request'
         elif self == RoleCreationStatus.ENPROCESSABLE_ENTITY:
             return 'Role creation failed: invalid input'
+        elif self == RoleCreationStatus.FORBIDDEN:
+            return 'Role creation failed: '\
+                'you must be a manager of a given project'
 
 
 class RoleCreationInput(graphene.InputObjectType):

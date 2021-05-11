@@ -5,7 +5,7 @@ from sqlalchemy import and_
 from tracker.api.services.auth import (
     check_password_hash, generate_auth_token, generate_password_hash
 )
-from tests.utils import generate_user_data
+from tests.services import generate_user_data
 from tracker.db.schema import (
     UserRoleEnum, projects_table, roles_table, users_table
 )

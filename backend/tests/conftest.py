@@ -1,10 +1,13 @@
-import pytest
+import os
 import sys
-from pytest_aiohttp import aiohttp_unused_port, aiohttp_client
+from pathlib import Path
+
+import pytest
 from alembic.command import upgrade
+from dotenv import dotenv_values
+from pytest_aiohttp import aiohttp_unused_port, aiohttp_client
 from sqlalchemy import create_engine
 from yarl import URL
-
 
 from tracker.api.app import create_app
 from tracker.utils.db import (
@@ -15,7 +18,7 @@ from tracker.api.services.auth import (
     generate_auth_token, generate_password_hash
 )
 from tracker.db.schema import users_table
-from tests.utils import create_projects_in_db, generate_user_data
+from tests.services import create_projects_in_db, generate_user_data
 
 
 @pytest.fixture(scope='session')
@@ -73,8 +76,11 @@ def app_args(aiohttp_unused_port, migrated_db):
         '--api-port', str(port),
         '--log-level', 'debug',
         '--db-url', migrated_db,
-        '--api-host', '127.0.0.1'
+        '--api-host', '127.0.0.1',
     ]
+    # mail smtp config
+    env_file_path = Path(__file__).parent.parent / '.env'
+    dot_env_config = dotenv_values(dotenv_path=env_file_path)
 
 
 @pytest.fixture()

@@ -4,7 +4,7 @@ from tracker.api.services.auth import (
     generate_auth_token, generate_password_hash
 )
 from tracker.db.schema import users_table
-from tests.utils import (
+from tests.services import (
     create_projects_in_db, generate_user_data, make_request_coroutines
 )
 

@@ -124,10 +124,10 @@ const PROJECT_DETAIL_QUERY = gql`
 `;
 
 const EMAIL_CONFIRMATION_MUTATION = gql`
-  mutation($input: EmailConfirmationInput!) {
+  mutation($input: RegisterEmailConfirmationInput!) {
     auth {
       emailConfirmation(input: $input) {
-        emailConfirmationPayload {
+        registerEmailConfirmationPayload {
           recordId
           authToken
           status

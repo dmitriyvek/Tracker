@@ -22,15 +22,9 @@ async def test_create_role_mutation(
             role {
                 roleCreation(input: $input) {
                     roleCreationPayload {
-                        recordId
-                        record {
-                            assignBy
-                            assignAt
-                            role
-                            userId
-                            projectId
-                        }
+                        duplicatedEmailList
                         status
+                        errorList
                     }
                 }
             }
@@ -38,9 +32,9 @@ async def test_create_role_mutation(
     '''
     variables = {
         'input': {
-            "projectId": to_global_id('ProjectType', 1),
-            "role": "team_member",
-            "userId": to_global_id('UserType', 3)
+            'projectId': to_global_id('ProjectType', 1),
+            'role': 'team_member',
+            'emailList': ['joke@thejoker5.com', 'joke2@thejoker5.com'],
         }
     }
 
@@ -65,57 +59,12 @@ async def test_create_role_mutation(
     data = await response.json()
     assert data['errors'][0]['status'] == StatusEnum.FORBIDDEN._name_
 
-    # with pm token
-    response = await client.post(
-        '/graphql',
-        data=json.dumps({
-            'query': query,
-            'variables': json.dumps(variables),
-        }),
-        headers={
-            'content-type': 'application/json',
-            'Authorization': f'Bearer {pm_auth_token}'
-        },
-    )
-
-    # if something will go wrong there will be response body output
-    print(await response.text())
-
-    assert response.status == 200
-
-    data = await response.json()
-    assert data['data']['role']['roleCreation'][
-        'roleCreationPayload']['status'] == 'SUCCESS'
-    assert data['data']['role']['roleCreation'][
-        'roleCreationPayload']['recordId']
-
-    # with pm token add already existed user
-    response = await client.post(
-        '/graphql',
-        data=json.dumps({
-            'query': query,
-            'variables': json.dumps(variables),
-        }),
-        headers={
-            'content-type': 'application/json',
-            'Authorization': f'Bearer {pm_auth_token}'
-        },
-    )
-
-    # if something will go wrong there will be response body output
-    print(await response.text())
-
-    assert response.status == 200
-
-    data = await response.json()
-    assert data['errors'][0]['status'] == StatusEnum.BAD_REQUEST._name_
-
-    # with invalid user id
+    # with invalid project id
     variables = {
         'input': {
-            "projectId": to_global_id('ProjectType', 1),
-            "role": "team_member",
-            "userId": to_global_id('UserType', 30000000)
+            'projectId': to_global_id('ProjectType', 99999),
+            'role': 'team_member',
+            'emailList': ['joke@thejoker5.com', 'joke2@thejoker5.com'],
         }
     }
 
@@ -137,4 +86,4 @@ async def test_create_role_mutation(
     assert response.status == 200
 
     data = await response.json()
-    assert data['errors'][0]['status'] == StatusEnum.BAD_REQUEST._name_
+    assert data['errors'][0]['status'] == StatusEnum.FORBIDDEN._name_

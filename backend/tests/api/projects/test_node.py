@@ -1,6 +1,6 @@
 from base64 import b64decode, b64encode
 
-from tests.utils import make_request_coroutines
+from tests.services import make_request_coroutines
 
 
 async def test_user_detail_query(

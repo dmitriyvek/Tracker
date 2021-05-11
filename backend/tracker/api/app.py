@@ -2,6 +2,7 @@ import os
 from functools import partial
 
 import aiohttp_cors
+import aiosmtplib
 from aiohttp import web
 from jinja2 import Environment, PackageLoader, select_autoescape
 
@@ -72,6 +73,26 @@ def create_app() -> web.Application:
     app.on_shutdown.append(close_logger)
 
     init_routes(app, cors)
+
+    # inti smpt client
+    config = app['config']
+    smtp_client = aiosmtplib.SMTP(
+        hostname=config['mail_server'],
+        port=config['mail_port'],
+        username=config['mail_username'],
+        password=config['mail_password'],
+        use_tls=config['mail_use_ssl'],
+        timeout=config['mail_timeout'],
+    )
+
+    host = config['domain_name']
+    schema = config['url_schema']
+    domain = 'http://localhost:3000' \
+        if host == 'localhost' or host == '127.0.0.1' else \
+        f'{schema}://{host}'
+
+    app['smtp_client'] = smtp_client
+    app['config']['to_smtp_domain'] = domain
 
     return app
 
