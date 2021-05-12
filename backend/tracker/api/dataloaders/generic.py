@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional
 
 from aiodataloader import DataLoader
 from asyncpgsa import PG

@@ -1,6 +1,5 @@
 import graphene
 from graphene.types import ResolveInfo
-from sqlalchemy import and_
 
 from tracker.api.scalars.auth import Email, Username
 from tracker.api.connections import (
@@ -11,7 +10,6 @@ from tracker.api.services.users import get_user_by_id
 from tracker.api.services.projects import get_user_project_list
 from tracker.api.types.project import ProjectType, ProjectConnection
 from tracker.api.wrappers import login_required
-from tracker.db.schema import users_table
 
 
 class UserType(graphene.ObjectType):

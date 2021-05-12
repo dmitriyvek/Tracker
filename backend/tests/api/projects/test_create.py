@@ -3,7 +3,7 @@ import json
 from sqlalchemy import and_
 
 from tracker.api.services.auth import (
-    check_password_hash, generate_auth_token, generate_password_hash
+    generate_auth_token, generate_password_hash
 )
 from tests.services import generate_user_data
 from tracker.db.schema import (

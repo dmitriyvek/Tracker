@@ -20,7 +20,7 @@ def check_password_hash(encoded: str, password: str) -> bool:
 
 async def check_user_credentials(db: PG, data: dict) -> dict:
     '''
-    Check if user with given credentials exist; 
+    Check if user with given credentials exist;
     if it does then returns this user else raise 401 error
     '''
 

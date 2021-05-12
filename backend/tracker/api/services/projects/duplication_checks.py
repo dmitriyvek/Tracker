@@ -7,7 +7,7 @@ from tracker.db.schema import projects_table
 async def check_title_duplication(db: PG, user_id: int, title: str) -> bool:
     '''
     Checks if project with given title is already created by given user
-    return True if it does 
+    return True if it does
     '''
     query = projects_table.\
         select().\

@@ -1,5 +1,3 @@
-import sys
-
 from aiohttp import web
 
 from tracker.api.app import create_app

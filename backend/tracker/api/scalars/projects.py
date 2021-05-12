@@ -7,4 +7,3 @@ class Title(graphene.String):
 
 class Description(graphene.String):
     '''GraphQL string type with min length = 0 and max = 128'''
-

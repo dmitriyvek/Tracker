@@ -11,8 +11,8 @@ def send_email_factory(
     app: Application,
 ) -> None:
     '''
-    Decorator for sending mail functions. 
-    Wrapped function must accept smtp_client and domain as key word args. 
+    Decorator for sending mail functions.
+    Wrapped function must accept smtp_client and domain as key word args.
     '''
 
     def send_email_decorator(func):
@@ -34,8 +34,9 @@ def send_email_factory(
                 if err.code == 550:
                     raise APIException(
                         'Can not send a confirmation email. A letter on given '
-                        'email was rejected by smpt server - server consider it spam.'
-                        ' If you are using a temporary email address, '
+                        'email was rejected by smpt server - '
+                        'server consider it spam. '
+                        'If you are using a temporary email address, '
                         'please try registering with a new one.',
                         status=StatusEnum.BAD_GATEWAY.name
                     )

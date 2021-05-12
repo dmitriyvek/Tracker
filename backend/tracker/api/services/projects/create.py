@@ -10,7 +10,7 @@ from tracker.db.schema import UserRoleEnum, projects_table, roles_table
 
 async def check_if_project_exists(db: PG, data: dict) -> None:
     '''
-    Checks if project with given title is already created by given user 
+    Checks if project with given title is already created by given user
     if yes raises 400 error
     '''
     query = projects_table.\

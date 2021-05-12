@@ -13,7 +13,6 @@ from tracker.api.services.roles import (
     send_role_confirmation_email,
 )
 from tracker.api.status_codes import StatusEnum
-from tracker.api.types import RoleType
 from tracker.api.wrappers import login_required
 from tracker.db.schema import UserRoleEnum
 
@@ -65,7 +64,7 @@ class RoleCreationPayload(graphene.ObjectType):
 
 class RoleListCreation(BaseMutationPayload, graphene.Mutation):
     '''
-    Entity for creation new roles for users 
+    Entity for creation new roles for users
     with given emails on a project.
     '''
 

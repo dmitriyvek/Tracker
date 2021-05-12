@@ -5,7 +5,7 @@ import jwt
 from tests.services import generate_user_data
 from tracker.db.schema import users_table
 from tracker.api.services.auth import (
-    generate_auth_token, generate_password_hash
+    generate_password_hash
 )
 
 
@@ -18,8 +18,6 @@ async def test_login_mutation(migrated_db_connection, client):
     user['is_confirmed'] = True
     db_query = users_table.insert().values(user).returning(users_table.c.id)
     user_id = migrated_db_connection.execute(db_query).fetchone()[0]
-
-    auth_token = generate_auth_token(app['config'], user_id=user_id)
 
     query = '''
         mutation ($input: LoginInput!) {

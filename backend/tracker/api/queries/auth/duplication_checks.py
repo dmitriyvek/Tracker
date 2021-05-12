@@ -1,5 +1,4 @@
 import graphene
-from graphql import ResolveInfo
 
 from tracker.api.types import UserDuplicationChecksType
 

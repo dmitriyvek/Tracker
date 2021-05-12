@@ -57,7 +57,7 @@ async def decode_role_confirmation_token(
     token: str,
 ) -> RoleConfTokenPayload:
     '''
-    Decodes given email confirmation token and 
+    Decodes given email confirmation token and
     returns email or raise 400 if token is invalid.
     '''
     try:

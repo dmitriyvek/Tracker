@@ -1,6 +1,6 @@
-from base64 import b64decode, b64encode
+from base64 import b64decode
 
-from tests.conftest import NUMBER_OF_PROJECTS, NUMBER_OF_ROLES
+from tests.conftest import NUMBER_OF_ROLES
 from tests.services import make_request_coroutines
 
 
@@ -62,8 +62,6 @@ async def test_project_list_with_nested_connections_first_only(
 ):
     auth_token = setup_project_list_test_retrun_auth_token
 
-    max_fetch_number = client.server.app['config']['max_fetch_number']
-
     query = base_query.format(proj_num=PROJ_NUM, params='(first: 3)')
     request_coroutine_list = make_request_coroutines(
         client=client, query=query, auth_token=auth_token)
@@ -101,8 +99,6 @@ async def test_project_list_with_nested_connections_last_only(
     setup_project_list_test_retrun_auth_token
 ):
     auth_token = setup_project_list_test_retrun_auth_token
-
-    max_fetch_number = client.server.app['config']['max_fetch_number']
 
     query = base_query.format(proj_num=PROJ_NUM, params='(last: 5)')
     request_coroutine_list = make_request_coroutines(
@@ -143,8 +139,6 @@ async def test_project_list_with_nested_connections_first_and_last(
 ):
     auth_token = setup_project_list_test_retrun_auth_token
 
-    max_fetch_number = client.server.app['config']['max_fetch_number']
-
     query = base_query.format(
         proj_num=PROJ_NUM, params='(first: 7, last: 4)'
     )
@@ -184,8 +178,6 @@ async def test_project_list_with_nested_connections_after_only(
     setup_project_list_test_retrun_auth_token
 ):
     auth_token = setup_project_list_test_retrun_auth_token
-
-    max_fetch_number = client.server.app['config']['max_fetch_number']
 
     query = base_query.format(
         proj_num=PROJ_NUM, params='(after: "test_fail")'

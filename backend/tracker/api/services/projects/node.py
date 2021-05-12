@@ -15,7 +15,7 @@ from tracker.db.schema import roles_table, projects_table
 
 def check_role_requested_in_node(info: ResolveInfo) -> bool:
     '''
-    Parses projectType node\'s field_asts and 
+    Parses projectType node\'s field_asts and
     check if current user role is requested
     '''
 
@@ -62,7 +62,7 @@ async def get_project_node(
     user_id: int
 ) -> Union[Dict, None]:
     '''
-    Get a project with given id. 
+    Get a project with given id.
     Raise 403 if user is not member of this project
     '''
 

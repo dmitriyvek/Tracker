@@ -64,10 +64,10 @@ class RegisterEmailConfirmation(BaseMutationPayload, graphene.Mutation):
         await create_blacklist_token(db=app['db'], token=input['token'])
 
         return RegisterEmailConfirmation(
-            register_email_confirmation_payload=RegisterEmailConfirmationPayload(
+            register_email_confirmation_payload=RegisterEmailConfirmationPayload(  # noqa: E501
                 auth_token=auth_token,
                 record=user,
                 record_id=user['id'],
-                    status=RegisterEmailConfirmationStatus.SUCCESS,
-                )
+                status=RegisterEmailConfirmationStatus.SUCCESS,
+            )
         )

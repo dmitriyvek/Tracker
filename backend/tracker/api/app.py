@@ -1,6 +1,3 @@
-import os
-from functools import partial
-
 import aiohttp_cors
 import aiosmtplib
 from aiohttp import web
@@ -28,7 +25,8 @@ def init_routes(app, cors):
         app.router.add_route('GET', '/graphiql', gqil_view, name='graphiql')
         app.router.add_route('POST', '/graphiql', gqil_view, name='graphiql')
         # add cors for apollo sudio
-        cors_options['https://studio.apollographql.com'] = cors_resourse_options
+        cors_options['https://studio.apollographql.com'] = \
+            cors_resourse_options
 
         resource = cors.add(app.router.add_resource('/graphql'), cors_options)
         cors.add(resource.add_route('POST', gql_view))

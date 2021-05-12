@@ -1,6 +1,6 @@
 from marshmallow import Schema, validates
-from marshmallow.fields import Dict, Int, List, Nested, Str
-from marshmallow.validate import Length, OneOf, Range, Email
+from marshmallow.fields import Str
+from marshmallow.validate import Length, Email
 
 from tracker.api.errors import APIException
 from tracker.api.status_codes import StatusEnum
@@ -16,7 +16,7 @@ class RegistrationSchema(Schema):
 class EmailDuplicationCheckSchema(Schema):
     email = Str(required=True, validate=Email(
         error='Not a valid email address'))
-        
+
 
 class UsernameDuplicationCheckSchema(Schema):
     username = Str(required=True, validate=Length(min=4, max=32))

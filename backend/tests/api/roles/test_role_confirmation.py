@@ -10,7 +10,6 @@ from tracker.api.services.auth import (
 from tracker.api.services.roles.email_confirmation import (
     generate_role_confirmation_token
 )
-from tracker.api.status_codes import StatusEnum
 
 
 async def test_role_confirmation_mutation(migrated_db_connection, client):
@@ -40,7 +39,7 @@ async def test_role_confirmation_mutation(migrated_db_connection, client):
         returning(projects_table.c.id)
     project_id = migrated_db_connection.execute(db_query).fetchone()[0]
 
-    confirmation_token = generate_role_confirmation_token(
+    confirm_token = generate_role_confirmation_token(
         config=app['config'],
         email=email,
         project_id=project_id,
@@ -67,7 +66,7 @@ async def test_role_confirmation_mutation(migrated_db_connection, client):
     '''
     variables = {
         'input': {
-            'token': confirmation_token,
+            'token': confirm_token,
         },
     }
     response = await client.post(
@@ -123,7 +122,7 @@ async def test_role_confirmation_mutation(migrated_db_connection, client):
     assert project_id == project_id_2
 
     # user with new email
-    confirmation_token = generate_role_confirmation_token(
+    confirm_token = generate_role_confirmation_token(
         config=app['config'],
         email='unexistent@gmail.com',
         project_id=project_id,
@@ -132,7 +131,7 @@ async def test_role_confirmation_mutation(migrated_db_connection, client):
     )
     variables = {
         'input': {
-            'token': confirmation_token,
+            'token': confirm_token,
         },
     }
 
@@ -162,4 +161,4 @@ async def test_role_confirmation_mutation(migrated_db_connection, client):
     assert data['authToken'] is None
 
     assert data['nextUrl'] == \
-        f'http://localhost:3000/role/confirmation/register/{confirmation_token}'
+        f'http://localhost:3000/role/confirmation/register/{confirm_token}'

@@ -4,7 +4,7 @@ from typing import Dict, Union, List, Any
 import graphene
 from asyncpg import Record
 from graphene.relay import Connection, PageInfo
-from graphql_relay import from_global_id, to_global_id
+from graphql_relay import from_global_id
 from sqlalchemy import and_, func
 from sqlalchemy.sql.schema import Column, Table
 
@@ -67,7 +67,7 @@ def validate_connection_params(
 
                     # cursor is now id
                     params[key] = int(param[1])
-                except:
+                except Exception:
                     raise APIException(
                         f'value of "{key}" is not a valid cursor',
                         status=StatusEnum.BAD_REQUEST.name
@@ -145,7 +145,7 @@ def modify_query_by_nested_connection_params(
     partition_by: Union[str, Column],
 ):
     '''
-    Modify the database query according to the nested connection 
+    Modify the database query according to the nested connection
     parameters ("first" and "last" only)
     '''
 

@@ -1,6 +1,6 @@
 from graphql_relay import from_global_id
 from marshmallow import Schema, validates
-from marshmallow.fields import Str, Int, List
+from marshmallow.fields import Str, List
 from marshmallow.validate import OneOf, Email, Length
 
 from tracker.api.errors import APIException
@@ -17,8 +17,8 @@ class RoleBaseSchema(Schema):
         try:
             values = from_global_id(value)
             if values[0] != 'ProjectType' or int(values[1]) <= 0:
-                raise
-        except:
+                raise ValueError
+        except ValueError:
             raise APIException('Invalid project id provided',
                                status=StatusEnum.ENPROCESSABLE_ENTITY.name)
 
@@ -45,7 +45,7 @@ class RoleDuplicationCheckSchema(RoleBaseSchema):
         try:
             values = from_global_id(value)
             if values[0] != 'UserType' or int(values[1]) <= 0:
-                raise
-        except:
+                raise ValueError
+        except ValueError:
             raise APIException('Invalid user id provided',
                                status=StatusEnum.ENPROCESSABLE_ENTITY.name)

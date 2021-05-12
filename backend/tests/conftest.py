@@ -1,11 +1,7 @@
-import os
 import sys
-from pathlib import Path
 
 import pytest
 from alembic.command import upgrade
-from dotenv import dotenv_values
-from pytest_aiohttp import aiohttp_unused_port, aiohttp_client
 from sqlalchemy import create_engine
 from yarl import URL
 
@@ -78,9 +74,6 @@ def app_args(aiohttp_unused_port, migrated_db):
         '--db-url', migrated_db,
         '--api-host', '127.0.0.1',
     ]
-    # mail smtp config
-    env_file_path = Path(__file__).parent.parent / '.env'
-    dot_env_config = dotenv_values(dotenv_path=env_file_path)
 
 
 @pytest.fixture()

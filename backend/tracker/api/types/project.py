@@ -1,5 +1,4 @@
 import graphene
-from sqlalchemy import and_
 
 from graphene.types import ResolveInfo
 
@@ -17,7 +16,7 @@ from tracker.api.services.projects import (
     get_total_count_of_user_projects,
 )
 from tracker.api.services.roles import (
-    ROLES_REQUIRED_FIELDS, get_projects_role_list
+    ROLES_REQUIRED_FIELDS
 )
 from tracker.api.services.users import USERS_REQUIRED_FIELDS
 from tracker.api.types.role import RoleType, RoleConnection

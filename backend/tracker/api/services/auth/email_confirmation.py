@@ -40,7 +40,7 @@ async def decode_email_confirmation_token(
     token: str,
 ) -> str:
     '''
-    Decodes given email confirmation token and 
+    Decodes given email confirmation token and
     returns email or raise 400 if token is invalid.
     '''
     try:

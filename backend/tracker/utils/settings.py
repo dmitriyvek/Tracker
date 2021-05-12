@@ -30,7 +30,8 @@ DEFAULT_CONFIG = {
     'log_level': LogLevelEnum.debug.value.name.lower(),
     'error_log_file_path': BASE_DIR.parent / Path('log/app/error.log'),
     'info_log_file_path': BASE_DIR.parent / Path('log/app/info.log'),
-    'request_info_log_file_path': BASE_DIR.parent / Path('log/app/request.log'),
+    'request_info_log_file_path':
+        BASE_DIR.parent / Path('log/app/request.log'),
     'censored_sign': '***',
     'auth_token_expiration_time': timedelta(days=1),
     'max_fetch_number': 10,
@@ -42,7 +43,8 @@ DEFAULT_CONFIG = {
     'mail_password': None,
     'mail_use_ssl': True,
     'mail_timeout': 10,  # in seconds
-    # how many letters you can send in one api request (hardcoded in EmailList scalar)
+    # how many letters you can send in one api request
+    # (hardcoded in EmailList scalar)
     'mail_max_letters_number': 5,
 }
 

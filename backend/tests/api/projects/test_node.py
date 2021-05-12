@@ -1,4 +1,4 @@
-from base64 import b64decode, b64encode
+from base64 import b64encode
 
 from tests.services import make_request_coroutines
 
@@ -8,8 +8,6 @@ async def test_user_detail_query(
     setup_project_list_test_retrun_auth_token
 ):
     auth_token = setup_project_list_test_retrun_auth_token
-
-    max_fetch_number = client.server.app['config']['max_fetch_number']
 
     s = 'ProjectType:1'
     project_id = b64encode(s.encode('utf-8')).decode('utf-8')

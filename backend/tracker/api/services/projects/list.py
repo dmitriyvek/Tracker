@@ -1,14 +1,12 @@
-from typing import List, Dict, Union
+from typing import List, Dict
 
 from asyncpgsa import PG
 from graphene.types import ResolveInfo
 from sqlalchemy import and_, func
 
 from .base import PROJECTS_REQUIRED_FIELDS, format_project_type
-from tracker.api.errors import APIException
 from tracker.api.connections import modify_query_by_connection_params
 from tracker.api.services.roles import ROLES_REQUIRED_FIELDS
-from tracker.api.status_codes import StatusEnum
 from tracker.db.schema import roles_table, projects_table
 
 

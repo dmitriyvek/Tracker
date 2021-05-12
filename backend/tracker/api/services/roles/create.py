@@ -1,8 +1,6 @@
 from dataclasses import dataclass
-from datetime import datetime
-from typing import List, Dict, Union
+from typing import List
 
-from asyncpg.exceptions import ForeignKeyViolationError
 from asyncpgsa import PG
 from sqlalchemy import and_
 
@@ -11,7 +9,6 @@ from tracker.api.status_codes import StatusEnum
 from tracker.db.schema import (
     UserRoleEnum, projects_table, roles_table, users_table
 )
-from .base import ROLES_REQUIRED_FIELDS
 
 
 @dataclass

@@ -2,7 +2,9 @@ from .base import (
     generate_auth_token, decode_auth_token, check_if_token_is_blacklisted
 )
 from .email_confirmation import (
-    confirm_email, decode_email_confirmation_token, send_auth_confirmation_email
+    confirm_email,
+    decode_email_confirmation_token,
+    send_auth_confirmation_email
 )
 from .login import check_password_hash, check_user_credentials
 from .logout import create_blacklist_token

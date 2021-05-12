@@ -68,5 +68,5 @@ async def decode_auth_token(
 
         return payload
 
-    except (jwt.ExpiredSignatureError, jwt.InvalidTokenError) as error:
+    except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
         return None
