@@ -1,9 +1,14 @@
 name: Build
 
 on:
+  pull_request:
+    branches: "*"
+
   push:
     branches:
       - "master"
+
+  workflow_dispatch:
 
 jobs:
   build-backend:
