@@ -1,4 +1,4 @@
 [flake8]
 max-line-length = 79
-exclude = env,.git,__pycache__,build,dist,*/alembic/versions
+exclude = env,venv,.git,__pycache__,build,dist,*/alembic/versions
 ignore = E711
