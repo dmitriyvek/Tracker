@@ -42,7 +42,7 @@ DEFAULT_CONFIG = {
     'mail_username': None,
     'mail_password': None,
     'mail_use_ssl': True,
-    'mail_timeout': 10,  # in seconds
+    'mail_timeout': 10,  # number of seconds
     # how many letters you can send in one api request
     # (hardcoded in EmailList scalar)
     'mail_max_letters_number': 5,

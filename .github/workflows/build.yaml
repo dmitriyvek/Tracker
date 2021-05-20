@@ -53,12 +53,9 @@ jobs:
         run: |
           flake8 --count --show-source --statistics .
 
-      - name: Create empty .env file
-        run: touch .env
-
-      - name: Test with pytest
-        run: |
-          pytest --disable-warnings ./tests
+      # - name: Test with pytest
+      #   run: |
+      #     pytest --disable-warnings ./tests
 
   build-frontend:
     name: Building Tracker frontend
