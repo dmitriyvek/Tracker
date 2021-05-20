@@ -53,6 +53,9 @@ jobs:
         run: |
           flake8 --count --show-source --statistics .
 
+      - name: Create empty .env file
+        run: touch .env
+
       - name: Test with pytest
         run: |
           pytest --disable-warnings ./tests
@@ -67,7 +70,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [10.x, 12.x, 14.x, 15.x, 16.x]
+        node-version: [10.19.0, 10.x, 12.x, 14.x, 15.x, 16.x]
 
     steps:
     - name: Checkout code
