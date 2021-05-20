@@ -41,7 +41,7 @@ jobs:
             
       - uses: actions/cache@v2
         with:
-          path: ${{ steps.pip-cache-location.outputs.dir }}
+          path: ${{ steps.pip-cache-location.outputs.dir }} # ~/.cache/pip for ubuntu
           key: ${{ runner.os }}-${{ hashFiles('setup.py') }}-${{ hashFiles('requirements.txt') }}-${{ hashFiles('requirements-dev.txt') }}
 
       - name: Install dependencies

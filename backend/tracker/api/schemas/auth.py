@@ -37,3 +37,9 @@ class LoginSchema(Schema):
         if not 8 <= len(value) <= 32:
             raise APIException('No user with given credentials.',
                                status=StatusEnum.UNAUTHORIZED.name)
+
+
+class RegisterByRoleTokenSchema(Schema):
+    token = Str(required=True)
+    username = Str(required=True, validate=Length(min=4, max=32))
+    password = Str(required=True, validate=Length(min=8, max=32))

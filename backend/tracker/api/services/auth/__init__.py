@@ -14,9 +14,14 @@ from .register import (
     create_user,
     generate_password_hash,
 )
+from .register_by_role_token import (
+    RegisterByRoleTokenData,
+    create_user_and_role_by_role_token
+)
 
 
 __all__ = [
+    'RegisterByRoleTokenData',
     'check_credentials_duplication',
     'check_user_credentials',
     'check_if_token_is_blacklisted',
@@ -25,6 +30,7 @@ __all__ = [
     'confirm_email',
     'create_blacklist_token',
     'create_user',
+    'create_user_and_role_by_role_token',
     'decode_auth_token',
     'decode_email_confirmation_token',
     'generate_auth_token',

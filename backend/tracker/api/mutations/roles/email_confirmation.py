@@ -43,7 +43,11 @@ class RoleConfirmationPayload(graphene.ObjectType):
     status = graphene.Field(RoleConfirmationStatus, required=True)
     next_url = graphene.String(
         required=False,
-        description='Go to this url to create your account',
+        description='Go to this url to create your account.',
+    )
+    token = graphene.String(
+        required=False,
+        description='Role creation token that will be used for registration.',
     )
 
 
@@ -101,11 +105,12 @@ class RoleConfirmation(BaseMutationPayload, graphene.Mutation):
             )
 
         domain = app['config']['to_smtp_domain']
-        next_url = f'{domain}/role/confirmation/register/{token}'
+        next_url = f'{domain}/role/confirmation/register/'
 
         return RoleConfirmation(
             role_confirmation_payload=RoleConfirmationPayload(
                 status=RoleConfirmationStatus.MOVED_TEMPORARILY,
-                next_url=next_url
+                next_url=next_url,
+                token=token
             )
         )
