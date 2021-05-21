@@ -13,6 +13,7 @@ from .email_confirmation import (
     send_role_confirmation_email
 )
 from .list import get_total_count_of_roles_in_project, get_projects_role_list
+from .node import get_role_node
 
 __all__ = [
     'ROLES_REQUIRED_FIELDS',
@@ -22,6 +23,7 @@ __all__ = [
     'decode_role_confirmation_token',
     'get_emails_of_duplicated_roles',
     'get_rid_of_duplications',
+    'get_role_node',
     'check_if_user_is_project_manager',
     'check_user_role_duplication',
     'get_total_count_of_roles_in_project',

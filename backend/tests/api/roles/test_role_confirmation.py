@@ -159,6 +159,3 @@ async def test_role_confirmation_mutation(migrated_db_connection, client):
     assert data['recordId'] is None
     assert data['record'] is None
     assert data['authToken'] is None
-
-    assert data['nextUrl'] == \
-        f'http://localhost:3000/role/confirmation/register/{confirm_token}'

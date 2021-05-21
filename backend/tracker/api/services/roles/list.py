@@ -35,10 +35,7 @@ async def get_projects_role_list(
 
     query = roles_table.\
         select().\
-        with_only_columns([
-            roles_table.c.id,
-            *ROLES_REQUIRED_FIELDS
-        ]).\
+        with_only_columns(ROLES_REQUIRED_FIELDS).\
         where(and_(
             roles_table.c.project_id == project_id,
             roles_table.c.is_deleted.is_(False),

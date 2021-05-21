@@ -119,7 +119,7 @@ class ProjectType(graphene.ObjectType):
                 attr='project_id',
                 connection_params=connection_params,
                 nested_connection=is_list,
-                required_fields=[roles_table.c.id, *ROLES_REQUIRED_FIELDS],
+                required_fields=ROLES_REQUIRED_FIELDS,
                 many=True
             )()
 

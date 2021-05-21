@@ -65,7 +65,9 @@ async def get_user_project_list(
     my_role = requested_fields['myRole']
 
     if my_role:
-        required_columns.extend(ROLES_REQUIRED_FIELDS)
+        roles_fields = ROLES_REQUIRED_FIELDS.copy()
+        roles_fields[0] = roles_fields[0].label('role_id')
+        required_columns.extend(roles_fields)
 
     query = projects_table.\
         join(
@@ -84,7 +86,7 @@ async def get_user_project_list(
 
     result = await db.query(query)
 
-    if requested_fields['myRole']:
+    if my_role:
         result = list(map(format_project_type, result))
     else:
         result = list(map(lambda record: dict(record), result))

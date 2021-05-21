@@ -9,6 +9,7 @@ from tracker.api.services.roles import (
     check_if_user_is_project_manager,
     check_user_role_duplication,
     get_total_count_of_roles_in_project,
+    get_role_node,
 )
 from tracker.api.schemas.roles import RoleDuplicationCheckSchema
 from tracker.api.wrappers import login_required
@@ -43,6 +44,24 @@ class RoleType(graphene.ObjectType):
         description='User linked with this role'
     )
 
+    class Meta:
+        interfaces = (graphene.relay.Node, )
+
+    @classmethod
+    @login_required
+    async def get_node(cls, info: ResolveInfo, role_id):
+        role_id = int(role_id)
+        user_id = info.context['request']['user_id']
+        db = info.context['request'].app['db']
+
+        # may be used by different resolvers
+        info.context['request']['role_id'] = role_id
+
+        record = await get_role_node(db, info, role_id, user_id)
+        record = cls(**record)
+
+        return record
+
     @staticmethod
     async def resolve_user(parent, info: ResolveInfo):
         if not info.context.get('user_loader'):
@@ -58,7 +77,11 @@ class RoleType(graphene.ObjectType):
                 many=False,
             )()
 
-        record = await info.context['user_loader'].load(parent['user_id'])
+        # parent is RoleType in node; parent is dict in connection (list)
+        user_id = parent.user_id if isinstance(
+            parent, RoleType) else parent['user_id']
+
+        record = await info.context['user_loader'].load(user_id)
         return record
 
 

@@ -34,11 +34,12 @@ async def get_user_project_role(
     db: PG, project_id: int, user_id: int
 ) -> Record:
     '''Get role with given user id and project id. If not raise 403'''
+    roles_fields = ROLES_REQUIRED_FIELDS.copy()
+    roles_fields[0] = roles_fields[0].label('role_id')
+
     query = roles_table.\
         select().\
-        with_only_columns([
-            *ROLES_REQUIRED_FIELDS,
-        ]).\
+        with_only_columns(roles_fields).\
         where(and_(
             roles_table.c.user_id == user_id,
             roles_table.c.project_id == project_id,

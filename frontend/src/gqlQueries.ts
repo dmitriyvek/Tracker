@@ -105,6 +105,7 @@ const PROJECT_DETAIL_QUERY = gql`
         roleList(first: $roleNumber, after: $after) {
           edges {
             node {
+              id
               role
               user {
                 id

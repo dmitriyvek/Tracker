@@ -61,6 +61,7 @@ type UsernameDuplicationCheckResponse = {
 
 type RoleNodeType = {
   node: {
+    id: string;
     role: RoleEnum;
     user: {
       id: string;

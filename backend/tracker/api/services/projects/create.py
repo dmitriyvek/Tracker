@@ -32,7 +32,7 @@ async def check_if_project_exists(db: PG, data: dict) -> None:
 
 
 async def create_project(db: PG, data: dict) -> dict:
-    '''Creates and returns new project and role'''
+    '''Creates and returns new project and creator\'s role'''
 
     async with db.transaction() as conn:
         project_query = projects_table.insert().\
