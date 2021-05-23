@@ -26,6 +26,7 @@ async def check_if_user_is_project_manager(
     '''
     Checks if user has project manager role in given project
     if not raise 403, if yes returns project title.
+    (title is for email)
     '''
     query = roles_table.\
         join(

@@ -5,6 +5,10 @@ from .create import (
     get_rid_of_duplications,
     check_if_user_is_project_manager
 )
+from .delete import (
+    check_user_priviliges_for_role_deletion,
+    delete_role_by_id
+)
 from .duplication_checks import check_user_role_duplication
 from .email_confirmation import (
     check_if_user_exists_by_email,
@@ -19,8 +23,10 @@ __all__ = [
     'ROLES_REQUIRED_FIELDS',
     'RolesData',
     'check_if_user_exists_by_email',
+    'check_user_priviliges_for_role_deletion',
     'create_role',
     'decode_role_confirmation_token',
+    'delete_role_by_id',
     'get_emails_of_duplicated_roles',
     'get_rid_of_duplications',
     'get_role_node',

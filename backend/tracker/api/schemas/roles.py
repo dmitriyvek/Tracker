@@ -49,3 +49,17 @@ class RoleDuplicationCheckSchema(RoleBaseSchema):
         except ValueError:
             raise APIException('Invalid user id provided',
                                status=StatusEnum.ENPROCESSABLE_ENTITY.name)
+
+
+class RoleDeletionSchema(Schema):
+    role_id = Str(required=True)
+
+    @validates('role_id')
+    def validate_role_id(self, value: str):
+        try:
+            values = from_global_id(value)
+            if values[0] != 'RoleType' or int(values[1]) <= 0:
+                raise ValueError
+        except ValueError:
+            raise APIException('Invalid role id provided',
+                               status=StatusEnum.ENPROCESSABLE_ENTITY.name)

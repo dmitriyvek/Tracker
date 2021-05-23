@@ -1,4 +1,5 @@
 import graphene
+from graphene.types import ResolveInfo
 
 from ..base import BaseMutationPayload
 from tracker.api.status_codes import StatusEnum
@@ -29,7 +30,7 @@ class Logout(BaseMutationPayload, graphene.Mutation):
 
     @staticmethod
     @login_required
-    async def mutate(parent, info):
+    async def mutate(parent, info: ResolveInfo):
         db = info.context['request'].app['db']
         auth_token = info.context['request'].\
             headers.get('Authorization').split(' ')[1]

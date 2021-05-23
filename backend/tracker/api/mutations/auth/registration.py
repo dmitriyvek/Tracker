@@ -1,4 +1,5 @@
 import graphene
+from graphene.types import ResolveInfo
 
 from ..base import BaseMutationPayload
 from tracker.api.services import send_email_factory, validate_input
@@ -45,7 +46,7 @@ class Registration(BaseMutationPayload, graphene.Mutation):
     register_payload = graphene.Field(RegisterPayload, required=True)
 
     @staticmethod
-    async def mutate(parent, info, input):
+    async def mutate(parent, info: ResolveInfo, input):
         app = info.context['request'].app
         data = validate_input(input, RegistrationSchema)
         await check_if_user_exists(app['db'], data)

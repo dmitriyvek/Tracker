@@ -1,4 +1,5 @@
 import graphene
+from graphene.types import ResolveInfo
 
 from ..base import BaseMutationPayload
 from tracker.api.services.auth import (
@@ -65,7 +66,7 @@ class RoleConfirmation(BaseMutationPayload, graphene.Mutation):
     )
 
     @staticmethod
-    async def mutate(parent, info, input: RoleConfirmationInput):
+    async def mutate(parent, info: ResolveInfo, input: RoleConfirmationInput):
         app = info.context['request'].app
         token = input['token']
 

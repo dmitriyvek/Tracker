@@ -1,4 +1,5 @@
 import graphene
+from graphene.types import ResolveInfo
 
 from ..base import BaseMutationPayload
 from tracker.api.services import validate_input
@@ -56,7 +57,9 @@ class RegisterByRoleToken(BaseMutationPayload, graphene.Mutation):
     )
 
     @staticmethod
-    async def mutate(parent, info, input):
+    async def mutate(
+        parent, info: ResolveInfo, input: RegisterByRoleTokenInput
+    ):
         app = info.context['request'].app
         data = validate_input(input, RegisterByRoleTokenSchema)
         token_payload = await decode_role_confirmation_token(

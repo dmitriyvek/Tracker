@@ -1,4 +1,5 @@
 import graphene
+from graphene.types import ResolveInfo
 from graphql_relay import from_global_id
 
 from ..base import BaseMutationPayload
@@ -76,7 +77,7 @@ class RoleListCreation(BaseMutationPayload, graphene.Mutation):
 
     @staticmethod
     @login_required
-    async def mutate(parent, info, input):
+    async def mutate(parent, info: ResolveInfo, input):
         app = info.context['request'].app
         data = validate_input(input, RoleCreationSchema)
 

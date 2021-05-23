@@ -1,4 +1,5 @@
 import graphene
+from graphene.types import ResolveInfo
 
 from ..base import BaseMutationPayload
 from tracker.api.scalars.projects import Description, Title
@@ -49,7 +50,7 @@ class ProjectCreation(BaseMutationPayload, graphene.Mutation):
 
     @staticmethod
     @login_required
-    async def mutate(parent, info, input):
+    async def mutate(parent, info: ResolveInfo, input: ProjectCreationInput):
         app = info.context['request'].app
         data = validate_input(input, ProjectCreationSchema)
         data['created_by'] = info.context['request']['user_id']

@@ -1,4 +1,5 @@
 import graphene
+from graphene.types import ResolveInfo
 
 from ..base import BaseMutationPayload
 from tracker.api.services import validate_input
@@ -50,7 +51,7 @@ class Login(BaseMutationPayload, graphene.Mutation):
     login_payload = graphene.Field(LoginPayload, required=True)
 
     @staticmethod
-    async def mutate(parent, info, input):
+    async def mutate(parent, info: ResolveInfo, input: LoginInput):
         app = info.context['request'].app
         data = validate_input(input, LoginSchema)
 

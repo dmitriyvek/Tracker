@@ -1,4 +1,5 @@
 import graphene
+from graphene.types import ResolveInfo
 
 from ..base import BaseMutationPayload
 from tracker.api.services.auth import (
@@ -46,7 +47,9 @@ class RegisterEmailConfirmation(BaseMutationPayload, graphene.Mutation):
     )
 
     @staticmethod
-    async def mutate(parent, info, input: RegisterEmailConfirmationInput):
+    async def mutate(
+        parent, info: ResolveInfo, input: RegisterEmailConfirmationInput
+    ):
         app = info.context['request'].app
 
         email = await decode_email_confirmation_token(
