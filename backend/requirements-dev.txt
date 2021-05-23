@@ -5,3 +5,4 @@ flake8==3.9.0
 ipython==7.20.0
 pytest==6.2.2
 pytest-aiohttp==0.3.0
+pytest-cov==2.12.0
