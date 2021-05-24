@@ -1,12 +1,14 @@
+import warnings
+
 import aiohttp_cors
 import aiosmtplib
 from aiohttp import web
 from jinja2 import Environment, PackageLoader, select_autoescape
 
-
-from tracker.utils import get_config, setup_db, setup_logger, close_logger
-from tracker.api.views import gqil_view, gql_view
 from tracker.api.middleware import auth_middleware, request_logging_middleware
+from tracker.api.views import gqil_view, gql_view
+from tracker.utils import setup_db, setup_logger, close_logger
+from tracker.utils.settings import MAIN_CONFIG
 
 
 def init_routes(app, cors):
@@ -44,10 +46,16 @@ def init_routes(app, cors):
         resource.add_route('GET', gql_view)
 
 
-def create_app() -> web.Application:
+def create_app(config: dict = MAIN_CONFIG) -> web.Application:
     app = web.Application(
         middlewares=[auth_middleware, request_logging_middleware, ])
-    app['config'] = get_config()
+
+    app['config'] = config
+
+    if app['config']['debug']:
+        warnings.warn(
+            'App is running in debug mode.', category=RuntimeWarning
+        )
 
     app['logger'] = setup_logger(
         app['config']['log_level'],

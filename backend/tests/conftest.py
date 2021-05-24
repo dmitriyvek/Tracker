@@ -1,20 +1,19 @@
-import sys
-
 import pytest
 from alembic.command import upgrade
 from sqlalchemy import create_engine
 from yarl import URL
 
+from tests.services import create_projects_in_db, generate_user_data
 from tracker.api.app import create_app
-from tracker.utils.db import (
-    get_alembic_config_from_url, get_db_url, tmp_database
-)
-from tracker.utils.loggers import setup_logger
 from tracker.api.services.auth import (
     generate_auth_token, generate_password_hash
 )
 from tracker.db.schema import users_table
-from tests.services import create_projects_in_db, generate_user_data
+from tracker.utils.db import (
+    get_alembic_config_from_url, get_db_url, tmp_database
+)
+from tracker.utils.loggers import setup_logger
+from tracker.utils.settings import MAIN_CONFIG
 
 
 @pytest.fixture(scope='session')
@@ -65,6 +64,7 @@ def migrated_db_connection(migrated_db):
         engine.dispose()
 
 
+# deprecated
 @pytest.fixture
 def app_args(aiohttp_unused_port, migrated_db):
     port = aiohttp_unused_port()
@@ -76,13 +76,34 @@ def app_args(aiohttp_unused_port, migrated_db):
     ]
 
 
+@pytest.fixture
+def app_config(aiohttp_unused_port, migrated_db):
+    config = MAIN_CONFIG.copy()
+
+    if not all([
+        config.get('db_url'), config.get('api_host'),
+        config.get('api_port'), config.get('log_level')
+    ]):
+        raise TypeError('Failed to validate settings.')
+
+    config['db_url'] = migrated_db
+
+    config['api_host'] = '127.0.0.1'
+    config['api_port'] = aiohttp_unused_port()
+
+    config['log_level'] = 'debug'
+
+    return config
+
+
 @pytest.fixture()
-async def client(aiohttp_client, app_args):
+async def client(aiohttp_client, app_config):
     # get rid of pytest params
-    sys.argv = [sys.argv[0]]
+    # sys.argv = [sys.argv[0]]
     # set params needed for creating an app
-    sys.argv.extend(app_args)
-    app = create_app()
+    # sys.argv.extend(app_args)
+
+    app = create_app(config=app_config)
 
     # redirect log stream into tests root folder
     error_log_file_path = str(app['config']['error_log_file_path']).\

@@ -14,7 +14,7 @@ from sqlalchemy_utils import create_database, drop_database
 from yarl import URL
 
 from tracker import __name__ as project_name
-from tracker.utils.settings import BASE_DIR, DEFAULT_CONFIG, ENV_PATH
+from tracker.utils.settings import BASE_DIR, MAIN_CONFIG, ENV_PATH
 from tracker.utils.utils import parse_env_file
 
 
@@ -25,7 +25,8 @@ async def setup_db(app: Application) -> PG:
     config = app['config']
     log = app['logger']
 
-    log_db_url = config['db_url'].with_password(config['censored_sign'])
+    log_db_url = URL(config['db_url']).with_password(
+        config['log_censored_sign'])
     log.info(f'Connecting to database: {log_db_url}')
 
     app['db'] = pg
@@ -45,28 +46,28 @@ async def setup_db(app: Application) -> PG:
         log.info(f'Disconnected from database {log_db_url}')
 
 
-def construct_db_url(env_values: dict, default_url: str) -> str:
+def construct_db_url(env_values: dict, default_url: str) -> URL:
     '''
     Reads all pg parameters from .env file and construct pg url
     if all of them are specified else returns default
     '''
     pg_keys = ['pg_name', 'pg_user', 'pg_password', 'pg_host', 'pg_port']
     if all([env_values.get(key) for key in pg_keys]):
-        return 'postgresql://{user}:{password}@{host}:{port}/{database}'.\
-            format(
-                user=env_values[pg_keys[1]],
-                password=env_values[pg_keys[2]],
-                host=env_values[pg_keys[3]],
-                port=env_values[pg_keys[4]],
-                database=env_values[pg_keys[0]]
-            )
+        return URL('postgresql://{user}:{password}@{host}:{port}/{database}'.
+                   format(
+                       user=env_values[pg_keys[1]],
+                       password=env_values[pg_keys[2]],
+                       host=env_values[pg_keys[3]],
+                       port=env_values[pg_keys[4]],
+                       database=env_values[pg_keys[0]]
+                   ))
     return default_url
 
 
 def get_db_url() -> str:
     '''Helper for getting current db url'''
     env_options = parse_env_file(ENV_PATH)
-    return construct_db_url(env_options, DEFAULT_CONFIG['db_url'])
+    return construct_db_url(env_options, MAIN_CONFIG['db_url'])
 
 
 def make_alembic_config(cmd_opts: SimpleNamespace,

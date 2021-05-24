@@ -38,7 +38,7 @@ setup(
     platforms='all',
     classifiers=[
         'Intended Audience :: Developers',
-        'Natural Language :: Russian',
+        'Natural Language :: English',
         'Operating System :: Unix',
         'Operating System :: POSIX',
         'Programming Language :: Python',
