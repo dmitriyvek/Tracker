@@ -7,7 +7,7 @@ const cache = new InMemoryCache({
       fields: {
         auth: {
           keyArgs: false,
-          merge(existing, incoming) {
+          merge(_, incoming) {
             return incoming;
           },
         },
@@ -46,7 +46,7 @@ const cache = new InMemoryCache({
           },
         },
         pageInfo: {
-          merge(existing, incoming) {
+          merge(_, incoming) {
             return incoming;
           },
         },
@@ -94,13 +94,13 @@ const cache = new InMemoryCache({
       fields: {
         email: {
           keyArgs: false,
-          merge(existing, incoming) {
+          merge(_, incoming) {
             return incoming;
           },
         },
         username: {
           keyArgs: false,
-          merge(existing, incoming) {
+          merge(_, incoming) {
             return incoming;
           },
         },
@@ -111,7 +111,7 @@ const cache = new InMemoryCache({
       fields: {
         title: {
           keyArgs: false,
-          merge(existing, incoming) {
+          merge(_, incoming) {
             return incoming;
           },
         },

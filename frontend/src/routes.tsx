@@ -1,5 +1,5 @@
-import React from "react";
-import { Route, Switch } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Route, Switch, useHistory } from "react-router-dom";
 
 import { AuthPage } from "./containers/AuthPage";
 import { EmailConfirmationPage } from "./containers/EmailConfirmationPage";
@@ -12,6 +12,12 @@ type BaseRouterPropsType = {
 const BaseRouter: React.FC<BaseRouterPropsType> = ({
   isAuthenticated,
 }: BaseRouterPropsType) => {
+  const history = useHistory();
+
+  useEffect(() => {
+    if (!isAuthenticated) history.push("/auth");
+  }, [isAuthenticated]);
+
   return (
     <Switch>
       <Route exact path="/auth/confirmation/:token" component={EmailConfirmationPage} />

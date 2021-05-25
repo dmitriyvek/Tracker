@@ -1,6 +1,6 @@
 import { Menu, Layout, Button, Modal, Row, Col, Dropdown } from "antd";
 import { useState } from "react";
-import { Link, useHistory, useLocation } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 
 const { Header } = Layout;
 
@@ -25,7 +25,6 @@ const MainHeader: React.FC<MainHeaderPropsType> = ({ logout }) => {
   );
 
   const history = useHistory();
-  const location = useLocation();
 
   const showLogoutModal = () => {
     setLogoutModalVisible(true);
@@ -45,10 +44,10 @@ const MainHeader: React.FC<MainHeaderPropsType> = ({ logout }) => {
     setLogoutModalVisible(false);
   };
 
-  const getSelectedKeys = () => {
-    if (location.pathname.startsWith("/projects")) return ["projects-link"];
-    if (location.pathname.startsWith("/users")) return ["users-link"];
-  };
+  // const getSelectedKeys = () => {
+  //   if (location.pathname.startsWith("/projects")) return ["projects-link"];
+  //   if (location.pathname.startsWith("/users")) return ["users-link"];
+  // };
 
   const projectListMenu = (
     <Menu>

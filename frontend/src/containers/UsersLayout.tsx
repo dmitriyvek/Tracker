@@ -4,7 +4,7 @@ import { Route, Switch } from "react-router";
 import { UserDetailPage } from "./UserDetailPage";
 import { UserHomePage } from "./UserHomePage";
 
-const UsersLayout = () => {
+const UsersLayout: React.FC = () => {
   return (
     <Layout style={{ textAlign: "center" }}>
       <Switch>

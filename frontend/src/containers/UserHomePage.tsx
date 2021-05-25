@@ -6,7 +6,7 @@ import { UserDetail } from "../components/UserDetail";
 
 import type { UserDetailHomeResponseType } from "../types";
 
-const UserHomePage = () => {
+const UserHomePage: React.FC = () => {
   const { error, data, loading } = useQuery<UserDetailHomeResponseType>(
     USER_DETAIL_HOME_QUERY,
   );

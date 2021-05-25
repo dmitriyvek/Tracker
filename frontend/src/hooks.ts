@@ -1,5 +1,6 @@
 import {
   DocumentNode,
+  FetchResult,
   OperationVariables,
   QueryHookOptions,
   QueryResult,
@@ -18,7 +19,11 @@ import type { LogoutMutationResponseType, AuthTokenPayloadType } from "./types";
 type setAuthTokenFuncType = (authToken: string) => void;
 type removeAuthTokenFunctionType = () => void;
 
-const useAuthToken = () => {
+const useAuthToken = (): [
+  string,
+  (authToken: string) => void,
+  removeAuthTokenFunctionType,
+] => {
   const TOKEN_NAME = "authToken";
   const [cookies, setCookie, removeCookie] = useCookies([TOKEN_NAME]);
 
@@ -33,7 +38,9 @@ const useAuthToken = () => {
   return [cookies[TOKEN_NAME], setAuthToken, removeAuthToken];
 };
 
-const useLogout = () => {
+const useLogout = (): (() => Promise<
+  FetchResult<LogoutMutationResponseType, Record<string, any>, Record<string, any>>
+>) => {
   const [, , removeAuthToken] = useAuthToken();
   const apolloClient = useApolloClient();
 

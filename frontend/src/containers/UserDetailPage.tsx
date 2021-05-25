@@ -7,7 +7,7 @@ import { UserDetail } from "../components/UserDetail";
 
 import type { UserDetailResponseType } from "../types";
 
-const UserDetailPage = () => {
+const UserDetailPage: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();
 
   const { error, data, loading } = useQuery<UserDetailResponseType>(USER_DETAIL_QUERY, {

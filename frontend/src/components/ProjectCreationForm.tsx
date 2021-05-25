@@ -1,4 +1,3 @@
-import { ApolloQueryResult } from "@apollo/client";
 import { Form, Input, Button, Spin } from "antd";
 import { useState } from "react";
 

@@ -1,4 +1,4 @@
-import { ApolloError, FetchResult, useMutation } from "@apollo/client";
+import { ApolloError, useMutation } from "@apollo/client";
 import { useHistory } from "react-router";
 
 import { PROJECT_CREATION_MUTATION } from "../gqlQueries";
@@ -7,7 +7,7 @@ import { ProjectCreationForm } from "../components/ProjectCreationForm";
 import type { ProjectCreationFormValuesType } from "../components/ProjectCreationForm";
 import type { ProjectCreationMutationResponseType } from "../types";
 
-const ProjectCreationPage = () => {
+const ProjectCreationPage: React.FC = () => {
   const history = useHistory();
 
   const [

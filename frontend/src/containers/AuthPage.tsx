@@ -1,4 +1,4 @@
-import { ApolloError, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import React, { useState } from "react";
 import { useHistory } from "react-router";
 
@@ -9,7 +9,6 @@ import { RegisterForm } from "../components/RegisterForm";
 
 import type {
   LoginMutationResponseType,
-  RegisterMutationResponseType,
   LoginMutationRequiredVarsType,
   RegistrationMutationRequiredVarsType,
 } from "../types";
@@ -33,17 +32,15 @@ const AuthPage: React.FC = () => {
       onCompleted: (response: LoginMutationResponseType) => {
         setAuthToken(response.auth.login.loginPayload.authToken);
       },
-      onError: (error: ApolloError) => {},
     },
   );
   const [
     registerMutation,
     { error: registerError, loading: registerIsLoading },
   ] = useMutation(REGISTER_MUTATION, {
-    onCompleted: (response: RegisterMutationResponseType) => {
+    onCompleted: () => {
       setIsRegisterComplition(true);
     },
-    onError: (error: ApolloError) => {},
   });
 
   const login: LoginFuncType = (input) => {

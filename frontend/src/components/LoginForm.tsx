@@ -1,6 +1,6 @@
 import { ApolloError } from "@apollo/client";
 import React, { useEffect } from "react";
-import { message, Form, Input, Button, Checkbox, Spin } from "antd";
+import { message, Form, Input, Button, Spin } from "antd";
 
 const layout = {
   labelCol: {

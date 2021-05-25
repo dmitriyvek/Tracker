@@ -1,14 +1,13 @@
 import { useQuery } from "@apollo/client";
-import { Layout, List, Button, Spin, Col, Empty, Table, Avatar, Space } from "antd";
+import { Layout, Button, Spin, Col, Empty, Table, Avatar, Space } from "antd";
 import { ColumnsType } from "antd/es/table";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 import { recordNumber } from "../App";
 import { PROJECT_LIST_QUERY } from "../gqlQueries";
-import { ProjectListItem } from "../components/ProjectListItem";
 
-import type { ProjectNodeType, ProjectListResponseType } from "../types";
+import type { ProjectNodeType } from "../types";
 
 const { Content } = Layout;
 
@@ -23,7 +22,7 @@ const ProjectList: React.FC = () => {
 
   const { error, data, fetchMore } = useQuery(PROJECT_LIST_QUERY, {
     variables: { first: recordNumber },
-    onCompleted: (response: ProjectListResponseType) => {
+    onCompleted: () => {
       setInitLoad(true);
     },
   });

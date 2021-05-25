@@ -1,5 +1,5 @@
 import { Layout } from "antd";
-import React, { ReactElement } from "react";
+import React from "react";
 import { Route, Switch } from "react-router";
 
 import { useLogout } from "../hooks";

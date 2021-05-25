@@ -6,7 +6,6 @@ import { Link } from "react-router-dom";
 import { recordNumber } from "../App";
 import { PROJECT_DETAIL_QUERY } from "../gqlQueries";
 import { ProjectsBreadCrumb } from "../components/ProjectsBreadCrumb";
-import { ProjectsSideBar } from "../components/ProjectsSideBar";
 import { ProjectRoleList } from "../components/ProjectRoleList";
 
 import type { ProjectDetailResponseType } from "../types";
@@ -15,7 +14,7 @@ type TParam = {
   projectId: string;
 };
 
-type ProjectDetailPropsType = {} & RouteComponentProps<TParam>;
+type ProjectDetailPropsType = RouteComponentProps<TParam>;
 
 const { Content } = Layout;
 
