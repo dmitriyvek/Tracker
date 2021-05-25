@@ -3,6 +3,7 @@ from typing import Dict, List, Optional
 
 from aiodataloader import DataLoader
 from asyncpgsa import PG
+from sqlalchemy.sql import and_
 from sqlalchemy.sql.schema import Table, Column
 
 from tracker.api.connections import (
@@ -30,7 +31,10 @@ def get_generic_loader(
 
         async def batch_load_fn(self, key_list: list) -> List[List[Dict]]:
 
-            lookup = getattr(table.c, attr).in_(key_list)
+            lookup = and_(
+                getattr(table.c, attr).in_(key_list),
+                table.c.is_deleted.is_(False)
+            )
             query = table.select().where(lookup)
 
             if required_fields:
