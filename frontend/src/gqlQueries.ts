@@ -96,6 +96,7 @@ const PROJECT_DETAIL_QUERY = gql`
         description
         createdAt
         myRole {
+          id
           role
         }
         createdBy {
@@ -118,6 +119,18 @@ const PROJECT_DETAIL_QUERY = gql`
             hasNextPage
             endCursor
           }
+        }
+      }
+    }
+  }
+`;
+
+const ROLE_DELETION_MUTATION = gql`
+  mutation RoleDeletionMutation($input: RoleDeletionInput!) {
+    role {
+      roleDeletion(input: $input) {
+        roleDeletionPayload {
+          status
         }
       }
     }
@@ -196,6 +209,7 @@ const USER_DETAIL_QUERY = gql`
 export {
   EMAIL_CONFIRMATION_MUTATION,
   REGISTER_MUTATION,
+  ROLE_DELETION_MUTATION,
   LOGIN_MUTATION,
   LOGOUT_MUTATION,
   PROJECT_LIST_QUERY,

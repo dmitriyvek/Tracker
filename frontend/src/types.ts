@@ -1,7 +1,12 @@
 enum RoleEnum {
-  project_manager,
-  team_member,
-  viewer,
+  project_manager = "project_manager",
+  team_member = "team_member",
+  viewer = "viewer",
+}
+
+enum MutatianStatusEnum {
+  success = "SUCCESS",
+  fail = "FAIL",
 }
 
 type AuthTokenPayloadType = {
@@ -90,15 +95,19 @@ type ProjectDetailResponseType = {
       username: string;
     };
     myRole: {
+      id: string;
       role: RoleEnum;
     };
   };
 };
 
-enum MutatianStatusEnum {
-  success = "SUCCESS",
-  fail = "FAIL",
-}
+type RoleDeletionResponseType = {
+  role: {
+    roleDeletion: {
+      status: MutatianStatusEnum;
+    };
+  };
+};
 
 type UserType = {
   username: string;
@@ -214,6 +223,7 @@ export type {
   LoginMutationResponseType,
   LogoutMutationResponseType,
   RegisterMutationResponseType,
+  RoleDeletionResponseType,
   LoginMutationRequiredVarsType,
   RegistrationMutationRequiredVarsType,
   ProjectDetailResponseType,
@@ -223,4 +233,4 @@ export type {
   UserDetailResponseType,
 };
 
-export { MutatianStatusEnum };
+export { MutatianStatusEnum, RoleEnum };

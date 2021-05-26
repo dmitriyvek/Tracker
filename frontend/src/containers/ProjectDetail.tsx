@@ -1,20 +1,25 @@
-import { useQuery } from "@apollo/client";
-import { Layout, Spin } from "antd";
+import { ApolloError, FetchResult, useMutation, useQuery } from "@apollo/client";
+import { message, Layout, Spin } from "antd";
 import { RouteComponentProps } from "react-router";
 import { Link } from "react-router-dom";
 
 import { recordNumber } from "../App";
-import { PROJECT_DETAIL_QUERY } from "../gqlQueries";
+import { PROJECT_DETAIL_QUERY, ROLE_DELETION_MUTATION } from "../gqlQueries";
 import { ProjectsBreadCrumb } from "../components/ProjectsBreadCrumb";
 import { ProjectRoleList } from "../components/ProjectRoleList";
 
-import type { ProjectDetailResponseType } from "../types";
+import type { ProjectDetailResponseType, RoleDeletionResponseType } from "../types";
 
 type TParam = {
   projectId: string;
 };
 
 type ProjectDetailPropsType = RouteComponentProps<TParam>;
+type OnRoleClickFunctionType = (
+  roleId: string,
+) => Promise<
+  FetchResult<RoleDeletionResponseType, Record<string, any>, Record<string, any>>
+>;
 
 const { Content } = Layout;
 
@@ -23,15 +28,41 @@ const ProjectDetail: React.FC<ProjectDetailPropsType> = ({
 }: ProjectDetailPropsType) => {
   const projectId: string = match.params.projectId;
 
-  const { error, data, fetchMore } = useQuery<ProjectDetailResponseType>(
-    PROJECT_DETAIL_QUERY,
-    {
-      variables: { projectId, roleNumber: recordNumber },
-    },
-  );
+  message.config({
+    top: 60,
+    duration: 2,
+  });
 
-  if (error) {
-    console.log("Error in project detail: ", error);
+  const {
+    data,
+    fetchMore,
+    error: projectDetailError,
+  } = useQuery<ProjectDetailResponseType>(PROJECT_DETAIL_QUERY, {
+    variables: { projectId, roleNumber: recordNumber },
+  });
+
+  const [roleDeletionMutation] = useMutation(ROLE_DELETION_MUTATION, {
+    onCompleted: () => {
+      message.success("The user was successfully deleted from the project.");
+    },
+    onError: (error: ApolloError) => {
+      console.log(error);
+      message.error("The was an error in role deletion. (see the console)");
+    },
+  });
+
+  const onRoleDelete = async (roleId: string) => {
+    return roleDeletionMutation({
+      variables: {
+        input: {
+          roleId: roleId,
+        },
+      },
+    });
+  };
+
+  if (projectDetailError) {
+    console.log("Error in project detail: ", projectDetailError);
     return <span>Something went wrong. Sorry...</span>;
   }
 
@@ -60,7 +91,11 @@ const ProjectDetail: React.FC<ProjectDetailPropsType> = ({
                 {data.node.createdBy.username}
               </Link>
             </p>
-            <ProjectRoleList fetchMore={fetchMore} data={data} />
+            <ProjectRoleList
+              onRoleDelete={onRoleDelete}
+              fetchMore={fetchMore}
+              data={data}
+            />
           </Content>
         </Layout>
       )) || <Spin style={{ margin: "auto" }} />}
@@ -69,3 +104,4 @@ const ProjectDetail: React.FC<ProjectDetailPropsType> = ({
 };
 
 export { ProjectDetail };
+export type { OnRoleClickFunctionType };
