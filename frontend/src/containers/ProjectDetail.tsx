@@ -1,3 +1,4 @@
+import produce from "immer";
 import { ApolloError, FetchResult, useMutation, useQuery } from "@apollo/client";
 import { message, Layout, Spin } from "antd";
 import { RouteComponentProps } from "react-router";
@@ -58,6 +59,62 @@ const ProjectDetail: React.FC<ProjectDetailPropsType> = ({
           roleId: roleId,
         },
       },
+      // TODO: fix troubles with deleting the last role -> update pageInfo
+      update(cache) {
+        cache.modify({
+          fields: {
+            node: (projectNode) => {
+              const newRoleList = projectNode.roleList.edges.filter(
+                (role: any) => roleId !== role.node.__ref.split(":")[1],
+              );
+
+              return produce(projectNode, (updatedProjectNode: any) => {
+                updatedProjectNode.roleList.edges = newRoleList;
+              });
+              // return {
+              //   ...projectNode,
+              //   roleList: {
+              //     ...projectNode.roleList,
+              //     edges: newRoleList,
+              //   },
+              // };
+            },
+          },
+        });
+      },
+
+      // cache.writeQuery({overwrite: true}) from apollo 3.4 should prevent cahce merging
+      // https://github.com/apollographql/apollo-client/issues/7491#issuecomment-772115227
+
+      // update: (cache) => {
+      //   // retruns null if no all fields data
+      //   const projectNode = cache.readQuery<any>({
+      //     query: PROJECT_DETAIL_ROLE_LIST_LOCAL_QUERY,
+      //     variables: {
+      //       projectId,
+      //     },
+      //   });
+      //   if (!projectNode) return;
+
+      //   cache.writeQuery({
+      //     // overwrite: true,
+      //     query: PROJECT_DETAIL_ROLE_LIST_LOCAL_QUERY,
+      //     data: {
+      //       node: {
+      //         ...projectNode.node,
+      //         roleList: {
+      //           edges: projectNode.node.roleList.edges.filter(
+      //             (roleRef: any) => roleId !== roleRef.node.id,
+      //           ),
+      //           __typename: "RoleConnection",
+      //         },
+      //       },
+      //     },
+      //     variables: {
+      //       projectId,
+      //     },
+      //   });
+      // },
     });
   };
 

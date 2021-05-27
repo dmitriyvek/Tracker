@@ -206,6 +206,42 @@ const USER_DETAIL_QUERY = gql`
   }
 `;
 
+// for apollo 3.4 overwrite writeQuery in ProjectDeatail onRoleDelete mutation
+const PROJECT_DETAIL_ROLE_LIST_LOCAL_QUERY = gql`
+  query projectDetailRoleListLocalQuery($projectId: ID!) {
+    node(id: $projectId) {
+      title
+      description
+      createdAt
+      myRole {
+        id
+        role
+      }
+      createdBy {
+        id
+        username
+      }
+      roleList {
+        edges {
+          node {
+            id
+            role
+            user {
+              id
+              username
+              email
+            }
+          }
+        }
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
+      }
+    }
+  }
+`;
+
 export {
   EMAIL_CONFIRMATION_MUTATION,
   REGISTER_MUTATION,
@@ -216,6 +252,7 @@ export {
   USERNAME_DUPLICATION_CHECK_QUERY,
   EMAIL_DUPLICATION_CHECK_QUERY,
   PROJECT_DETAIL_QUERY,
+  PROJECT_DETAIL_ROLE_LIST_LOCAL_QUERY,
   PROJECT_CREATION_MUTATION,
   PROJECT_TITLE_DUPLICATION_CHECK_QUERY,
   USER_DETAIL_HOME_QUERY,

@@ -41,7 +41,7 @@ const cache = new InMemoryCache({
     RoleConnection: {
       fields: {
         edges: {
-          merge(existing = [], incoming) {
+          merge(existing = [], incoming: Array<any>) {
             return [...existing, ...incoming];
           },
         },
