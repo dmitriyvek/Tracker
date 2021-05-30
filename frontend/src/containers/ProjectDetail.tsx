@@ -8,6 +8,7 @@ import { recordNumber } from "../App";
 import { PROJECT_DETAIL_QUERY, ROLE_DELETION_MUTATION } from "../gqlQueries";
 import { ProjectsBreadCrumb } from "../components/ProjectsBreadCrumb";
 import { ProjectRoleList } from "../components/ProjectRoleList";
+import { RolesCreationForm } from "../components/RolesCreationForm";
 
 import type { ProjectDetailResponseType, RoleDeletionResponseType } from "../types";
 
@@ -125,6 +126,7 @@ const ProjectDetail: React.FC<ProjectDetailPropsType> = ({
 
   return (
     <>
+      <RolesCreationForm />
       {/* <ProjectsSideBar /> */}
       {(data && (
         <Layout style={{ padding: "0 24px 24px" }}>
