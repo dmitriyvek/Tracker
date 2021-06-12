@@ -6,6 +6,7 @@ from marshmallow.validate import OneOf, Email, Length
 from tracker.api.errors import APIException
 from tracker.api.status_codes import StatusEnum
 from tracker.db.schema import UserRoleEnum
+from tracker.utils.settings import MAIN_CONFIG
 
 
 class RoleBaseSchema(Schema):
@@ -33,7 +34,8 @@ class RoleCreationSchema(RoleBaseSchema):
                 error='not a valid email'
             )
         ),
-        required=True
+        required=True,
+        validate=Length(max=MAIN_CONFIG['mail_max_letters_number'])
     )
 
 

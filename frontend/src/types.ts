@@ -213,6 +213,24 @@ type RegisterEmailConfirmationResponseType = {
   };
 };
 
+type RoleCreationMutaionResponseType = {
+  role: {
+    roleCreation: {
+      roleCreationPayload: {
+        duplicatedEmailList: Array<string>;
+        status: MutatianStatusEnum;
+        errorList: Array<string>;
+      };
+    };
+  };
+};
+
+type RolesCreateionInputType = {
+  projectId: string;
+  emailList: Array<string>;
+  roles: RoleEnum;
+};
+
 export type {
   AuthTokenPayloadType,
   RegisterEmailConfirmationResponseType,
@@ -223,6 +241,8 @@ export type {
   LoginMutationResponseType,
   LogoutMutationResponseType,
   RegisterMutationResponseType,
+  RoleCreationMutaionResponseType,
+  RolesCreateionInputType,
   RoleDeletionResponseType,
   LoginMutationRequiredVarsType,
   RegistrationMutationRequiredVarsType,

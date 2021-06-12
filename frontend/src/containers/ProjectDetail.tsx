@@ -1,15 +1,21 @@
-import produce from "immer";
 import { ApolloError, FetchResult, useMutation, useQuery } from "@apollo/client";
-import { message, Layout, Spin } from "antd";
+import { message, Layout, Spin, Button } from "antd";
+import produce from "immer";
+import { useState } from "react";
 import { RouteComponentProps } from "react-router";
 import { Link } from "react-router-dom";
 
 import { recordNumber } from "../App";
-import { PROJECT_DETAIL_QUERY, ROLE_DELETION_MUTATION } from "../gqlQueries";
+import {
+  PROJECT_DETAIL_QUERY,
+  ROLE_CREATION_MUTATION,
+  ROLE_DELETION_MUTATION,
+} from "../gqlQueries";
 import { ProjectsBreadCrumb } from "../components/ProjectsBreadCrumb";
 import { ProjectRoleList } from "../components/ProjectRoleList";
-import { RolesCreationForm } from "../components/RolesCreationForm";
+import { RolesCreationModal } from "../components/RolesCreationModal";
 
+import { RoleEnum, RolesCreateionInputType } from "../types";
 import type { ProjectDetailResponseType, RoleDeletionResponseType } from "../types";
 
 type TParam = {
@@ -30,6 +36,8 @@ const ProjectDetail: React.FC<ProjectDetailPropsType> = ({
 }: ProjectDetailPropsType) => {
   const projectId: string = match.params.projectId;
 
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+
   message.config({
     top: 60,
     duration: 2,
@@ -42,6 +50,24 @@ const ProjectDetail: React.FC<ProjectDetailPropsType> = ({
   } = useQuery<ProjectDetailResponseType>(PROJECT_DETAIL_QUERY, {
     variables: { projectId, roleNumber: recordNumber },
   });
+
+  const [rolesCreationMutation] = useMutation(ROLE_CREATION_MUTATION, {
+    onCompleted: () => {
+      message.success("Letters on given emails are sent successfully.");
+    },
+    onError: (error: ApolloError) => {
+      console.log(error);
+      message.error("The was an error in roles creation. (see the console)");
+    },
+  });
+
+  const onRolesCreation = async (values: RolesCreateionInputType) => {
+    return rolesCreationMutation({
+      variables: {
+        input: values,
+      },
+    });
+  };
 
   const [roleDeletionMutation] = useMutation(ROLE_DELETION_MUTATION, {
     onCompleted: () => {
@@ -126,7 +152,6 @@ const ProjectDetail: React.FC<ProjectDetailPropsType> = ({
 
   return (
     <>
-      <RolesCreationForm />
       {/* <ProjectsSideBar /> */}
       {(data && (
         <Layout style={{ padding: "0 24px 24px" }}>
@@ -158,6 +183,20 @@ const ProjectDetail: React.FC<ProjectDetailPropsType> = ({
           </Content>
         </Layout>
       )) || <Spin style={{ margin: "auto" }} />}
+
+      {data && data.node.myRole.role === RoleEnum.project_manager && (
+        <>
+          <RolesCreationModal
+            projectId={projectId}
+            onFormSubmit={onRolesCreation}
+            isVisible={isModalVisible}
+            setIsVisible={setIsModalVisible}
+          />
+          <Button onClick={() => setIsModalVisible(true)} type="primary">
+            Add new participants
+          </Button>
+        </>
+      )}
     </>
   );
 };

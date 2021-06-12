@@ -80,6 +80,8 @@ class RoleListCreation(BaseMutationPayload, graphene.Mutation):
     async def mutate(parent, info: ResolveInfo, input):
         app = info.context['request'].app
         data = validate_input(input, RoleCreationSchema)
+        data['email_list'] = list(set(data['email_list']))
+        print(data['email_list'])
 
         data['assign_by'] = info.context['request']['user_id']
         data['project_id'] = int(from_global_id(data['project_id'])[1])

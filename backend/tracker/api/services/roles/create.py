@@ -86,7 +86,7 @@ def get_rid_of_duplications(
     duplicated_email_list: List[str]
 ) -> RolesData:
     '''
-    Get rid of duplicated emails in data['email_list']
+    Get rid of duplicated emails in data.email_list
     '''
     email_list = data.email_list
 
@@ -94,5 +94,6 @@ def get_rid_of_duplications(
         for i in range(len(email_list)):
             if email_list[i] == email:
                 del email_list[i]
+                break
 
     return data
