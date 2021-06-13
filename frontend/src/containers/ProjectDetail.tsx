@@ -15,8 +15,13 @@ import { ProjectsBreadCrumb } from "../components/ProjectsBreadCrumb";
 import { ProjectRoleList } from "../components/ProjectRoleList";
 import { RolesCreationModal } from "../components/RolesCreationModal";
 
-import { RoleEnum, RolesCreateionInputType } from "../types";
-import type { ProjectDetailResponseType, RoleDeletionResponseType } from "../types";
+import { RoleEnum } from "../types";
+import type {
+  ProjectDetailResponseType,
+  RoleDeletionResponseType,
+  RoleCreationMutaionResponseType,
+  RolesCreateionInputType,
+} from "../types";
 
 type TParam = {
   projectId: string;
@@ -52,12 +57,27 @@ const ProjectDetail: React.FC<ProjectDetailPropsType> = ({
   });
 
   const [rolesCreationMutation] = useMutation(ROLE_CREATION_MUTATION, {
-    onCompleted: () => {
-      message.success("Letters on given emails are sent successfully.");
+    onCompleted: (response: RoleCreationMutaionResponseType) => {
+      response.role.roleCreation.roleCreationPayload.duplicatedEmailList.forEach(
+        (duplicatedEmail: string) =>
+          message.warning(
+            `${duplicatedEmail}: a user with the given email address is already participating in this project .`,
+            10,
+          ),
+      );
+
+      if (!response.role.roleCreation.roleCreationPayload.errorList.length)
+        message.success("Letters on given emails are sent successfully.");
+
+      response.role.roleCreation.roleCreationPayload.errorList.forEach((msg: string) =>
+        message.error(msg),
+      );
     },
     onError: (error: ApolloError) => {
       console.log(error);
-      message.error("The was an error in roles creation. (see the console)");
+      message.error(
+        "The was an error in roles creation. (see the console for detail information)",
+      );
     },
   });
 

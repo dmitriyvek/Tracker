@@ -53,6 +53,17 @@ const cache = new InMemoryCache({
       },
     },
 
+    RoleRootMutation: {
+      fields: {
+        roleCreation: {
+          keyArgs: false,
+          merge(_, incoming) {
+            return incoming;
+          },
+        },
+      },
+    },
+
     ProjectType: {
       fields: {
         roleList: {
