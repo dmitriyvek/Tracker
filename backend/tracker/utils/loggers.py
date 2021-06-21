@@ -1,3 +1,4 @@
+import os
 import sys
 from enum import Enum, unique
 from functools import partial
@@ -44,6 +45,9 @@ def setup_logger(
 ) -> logger:
     '''Setting up Loguru logger'''
     global_log_level = LogLevelEnum[global_log_level].value.no
+
+    if os.getenv('log_to_console'):
+        return logger
 
     # remove default console logging
     logger.remove()

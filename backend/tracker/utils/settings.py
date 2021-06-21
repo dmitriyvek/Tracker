@@ -35,7 +35,7 @@ MAIN_CONFIG = {
     'api_host': os.getenv('api_host') or '0.0.0.0',
     'domain_name': os.getenv('domain_name') or 'localhost',
     'url_schema': os.getenv('url_schema') or 'http',
-    'api_port': int(os.getenv('api_port')) or 8000,
+    'api_port': int(os.getenv('api_port')) or None,
     'max_fetch_number': 10,
 
     'log_level': LogLevelEnum.debug.value.name.lower(),
